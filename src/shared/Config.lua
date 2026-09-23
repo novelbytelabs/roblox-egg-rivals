@@ -1,18 +1,24 @@
--- Stage 3 tuning. Session-only progress; no purchases or public item wagering.
+-- Canonical 0.4.0 tuning. No persistence, Robux commerce, or public item staking.
 local C = {
-	Build = "MOONWOOD-0.3.2-r2",
+	Build = "EGG-RIVALS-0.4.0-rc1",
+	SchemaVersion = 4,
 	MaxPlayers = 4,
 	MaxItems = 80,
+	MaxCoins = 1000000000,
+	MaxVisiblePets = 8,
 	BaseWalkSpeed = 16,
-	SpeedFactor = 0.4,
+	SpeedFactor = 0.42,
+	SpeedCap = 10000,
+	WalkSpeedCap = 58,
 	DuelWalkSpeed = 20,
 	TrainInterval = 1,
-	UpgradeCost = 100,
-	PetIncomeInterval = 2,
+	PetIncomeInterval = 1,
 	BatRange = 7,
 	BatCooldown = 0.8,
 	PickupRange = 10,
 	TrapCost = 15,
+	TrapExchangeValue = 5,
+	MaxTrapCharges = 5,
 	TrapLifetime = 35,
 	TrapSlowTime = 2.5,
 	TrapArmTime = 1.25,
@@ -23,6 +29,7 @@ local C = {
 	BossAlertDelay = 0.8,
 	NightDuration = 45,
 	NightMultiplier = 30,
+	EggRespawnTime = 8,
 	DuelTarget = 5,
 	DuelDamage = 34,
 	ShotCooldown = 0.3,
@@ -32,74 +39,100 @@ local C = {
 	RequestTime = 20,
 	Countdown = 3,
 	BetweenRounds = 1.5,
-	MaxVisiblePets = 8,
 	InventoryKey = Enum.KeyCode.I,
+	OverdriveKey = Enum.KeyCode.Q,
+	MomentumRamp = 30,
+	MomentumDecay = 10,
+	MomentumBonus = 0.75,
+	OverdriveChargeRate = 2,
+	OverdriveDuration = 5,
+	OverdriveFactor = 1.2,
+	OverdriveCap = 68,
+	EnergyThreshold = 0.75,
+	EnergyRate = 1.5,
+	EnergyDrain = 0.5,
+	IncubatorHold = 0.75,
+	IncubatorHalfExtent = 4,
+	IncubatorHeight = 10,
+	PreviewLifetime = 20,
+	HoldLifetime = 15,
+	TradeHold = 3,
+	GodlyHold = 5,
+	ExchangeHold = 1,
+	TradeCooldown = 5,
+	TradeLifetime = 90,
+	TradeRange = 16,
+	ShopRange = 18,
+	MaxTradeItems = 4,
+	WelcomeBatch = 3,
+	WelcomeGap = 8,
+	WelcomeDuration = 6,
+	ReverenceMin = 240,
+	ReverenceMax = 420,
+	ReverenceCooldown = 120,
+	ReverenceDuration = 7,
+	GodlyDistance = 3.5,
+	RanchTick = 0.5,
+	HomeAwayTime = 15,
+	TrialSpeed = 45,
+	TrialTimeout = 120,
+	TrialSampleInterval = 0.1,
+	TrialGateRadius = 4.5,
 }
-C.RarityOrder = { "Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic" }
+C.RarityOrder = { "Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic", "Godly" }
 C.ElementOrder = { "Fire", "Water", "Wind", "Earth" }
-C.Elements = {
-	Fire = { color = Color3.fromRGB(255, 104, 65), accent = Color3.fromRGB(255, 193, 86) },
-	Water = { color = Color3.fromRGB(73, 168, 255), accent = Color3.fromRGB(129, 235, 255) },
-	Wind = { color = Color3.fromRGB(205, 243, 244), accent = Color3.fromRGB(137, 211, 220) },
-	Earth = { color = Color3.fromRGB(99, 168, 91), accent = Color3.fromRGB(178, 135, 84) },
-}
 C.Creatures = { "Skunk", "Lizard", "Gorilla", "Dragon" }
-C.Rarities = {
-	Common = {
-		color = Color3.fromRGB(238, 224, 181),
-		hatch = 20,
-		income = 1,
-		boss = 19,
-		species = "Skunk",
-		creature = "Skunk",
-		hint = 57,
+C.Elements = {
+	Fire = {
+		color = Color3.fromRGB(255, 104, 65),
+		accent = Color3.fromRGB(255, 193, 86),
+		night = Color3.fromRGB(255, 60, 166),
 	},
-	Uncommon = {
-		color = Color3.fromRGB(124, 220, 155),
-		hatch = 120,
-		income = 2,
-		boss = 20,
-		species = "Lizard",
-		creature = "Lizard",
-		hint = 100,
+	Water = {
+		color = Color3.fromRGB(73, 168, 255),
+		accent = Color3.fromRGB(129, 235, 255),
+		night = Color3.fromRGB(0, 244, 225),
 	},
-	Rare = {
-		color = Color3.fromRGB(116, 192, 249),
-		hatch = 300,
-		income = 5,
-		boss = 22,
-		species = "Gorilla",
-		creature = "Gorilla",
-		hint = 225,
+	Wind = {
+		color = Color3.fromRGB(205, 243, 244),
+		accent = Color3.fromRGB(137, 211, 220),
+		night = Color3.fromRGB(174, 113, 255),
 	},
-	Epic = {
-		color = Color3.fromRGB(195, 147, 251),
-		hatch = 600,
-		income = 12,
-		boss = 24,
-		species = "Dragon",
-		creature = "Dragon",
-		hint = 400,
-	},
-	Legendary = {
-		color = Color3.fromRGB(255, 196, 76),
-		hatch = 9000,
-		income = 35,
-		boss = 24,
-		species = "Dragon",
-		creature = "Dragon",
-		hint = 400,
-	},
-	Mythic = {
-		color = Color3.fromRGB(255, 119, 191),
-		hatch = 9000,
-		income = 80,
-		boss = 26,
-		species = "Dragon",
-		creature = "Dragon",
-		hint = 625,
+	Earth = {
+		color = Color3.fromRGB(99, 168, 91),
+		accent = Color3.fromRGB(178, 135, 84),
+		night = Color3.fromRGB(163, 255, 65),
 	},
 }
+-- Integer weights avoid accumulated floating-point probability gaps. Total = 10000.
+C.DayWeights = { Common = 4800, Uncommon = 2800, Rare = 1400, Epic = 700, Legendary = 240, Mythic = 55, Godly = 5 }
+C.NightWeights = { Legendary = 8000, Mythic = 1900, Godly = 100 }
+C.Rarities = {
+	Common = { color = Color3.fromRGB(238, 224, 181), hatch = 20, income = 6, boss = 19 },
+	Uncommon = { color = Color3.fromRGB(124, 220, 155), hatch = 45, income = 15, boss = 20 },
+	Rare = { color = Color3.fromRGB(116, 192, 249), hatch = 120, income = 40, boss = 22 },
+	Epic = { color = Color3.fromRGB(195, 147, 251), hatch = 300, income = 100, boss = 24 },
+	Legendary = { color = Color3.fromRGB(255, 196, 76), hatch = 900, income = 275, boss = 24 },
+	Mythic = { color = Color3.fromRGB(255, 119, 191), hatch = 2700, income = 750, boss = 26 },
+	Godly = { color = Color3.fromRGB(255, 244, 164), hatch = 7200, income = 2500, boss = 28 },
+}
+C.Grades = {
+	{ name = "Starter", rate = 1, cap = 250, cost = 0 },
+	{ name = "Boost", rate = 1.5, cap = 600, cost = 150 },
+	{ name = "Turbo", rate = 2.25, cap = 1200, cost = 650 },
+	{ name = "Hyper", rate = 3.25, cap = 2200, cost = 2000 },
+	{ name = "Flux", rate = 4.5, cap = 3800, cost = 6000 },
+	{ name = "Quantum", rate = 6, cap = 6000, cost = 18000 },
+	{ name = "Apex", rate = 8, cap = 10000, cost = 55000 },
+}
+C.Expansions = {
+	{ name = "Starter Ranch", capacity = 8, cost = 0, width = 28, depth = 14, columns = 4, rows = 2 },
+	{ name = "Side Paddocks", capacity = 12, cost = 800, width = 30, depth = 20, columns = 4, rows = 3 },
+	{ name = "Garden Paddock", capacity = 16, cost = 3000, width = 34, depth = 24, columns = 4, rows = 4 },
+	{ name = "Grand Ranch", capacity = 24, cost = 12000, width = 38, depth = 28, columns = 6, rows = 4 },
+}
+C.ItemTypes = { SnarePod = { name = "Snare Pod", cost = 15, exchange = 5, rarity = "Common" } }
+C.SpeedMilestones = { 100, 250, 600, 1200, 2200, 3800, 6000, 10000 }
 C.Colors = {
 	Ink = Color3.fromRGB(14, 31, 35),
 	Panel = Color3.fromRGB(23, 47, 51),
@@ -109,5 +142,18 @@ C.Colors = {
 	Muted = Color3.fromRGB(164, 194, 186),
 	Red = Color3.fromRGB(247, 135, 122),
 	Blue = Color3.fromRGB(132, 208, 244),
+}
+C.Visual = {
+	LowBudget = 120,
+	HighBudget = 320,
+	TrailThreshold = 18,
+	PetTrailThreshold = 4,
+	StopSpeed = 0.9,
+	ResumeSpeed = 1.4,
+	ImpactWindow = 0.35,
+	ImpactDuration = 0.7,
+	TrailLifetime = 0.6,
+	FragmentLifetime = 0.8,
+	MaxTrailPerObject = 24,
 }
 return C

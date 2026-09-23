@@ -9,21 +9,38 @@ local Art = require(Shared.Art)
 local Inventory = require(script.Parent.Inventory)
 local Duel = require(script.Parent.Duel)
 local World = require(script.Parent.World)
+local Holds = require(script.Parent.Holds)
+local SpeedLab = require(script.Parent.SpeedLab)
+local Trials = require(script.Parent.Trials)
+local Ranch = require(script.Parent.Ranch)
+local Trade = require(script.Parent.Trade)
+local Incubation = require(script.Parent.Incubation)
+local HttpService = game:GetService("HttpService")
 local Game = {}
 Game.__index = Game
 function Game:now()
 	return workspace:GetServerTimeNow()
 end
 function Game:root(p)
-	return p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+	return p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")
 end
 function Game:humanoid(p)
-	return p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+	return p and p.Character and p.Character:FindFirstChildOfClass("Humanoid")
 end
 function Game:alive(p)
 	local h = self:humanoid(p)
 	return self.profiles[p] ~= nil and p.Parent == Players and h ~= nil and h.Health > 0 and self:root(p) ~= nil
 end
+function Game:busy(p, ignorePreview)
+	local pro = self.profiles[p]
+	return pro == nil
+		or pro.duel ~= nil
+		or pro.trade ~= nil
+		or pro.exchange ~= nil
+		or pro.trial ~= nil
+		or (not ignorePreview and pro.incubatorPreview ~= nil)
+end
+
 function Game:equipped(p, name)
 	local t = p.Character and p.Character:FindFirstChild(name)
 	return t and t:IsA("Tool") and t:GetAttribute("Stage3Tool") == true
@@ -63,10 +80,13 @@ function Game:applySpeed(p)
 	end
 	if pro.duel and p:GetAttribute("InDuel") then
 		h.WalkSpeed = pro.duel.phase == "Active" and C.DuelWalkSpeed or 0
+	elseif p:GetAttribute("InTrial") then
+		h.WalkSpeed = C.TrialSpeed
 	elseif pro.slowUntil > self:now() then
 		h.WalkSpeed = 6
 	else
-		h.WalkSpeed = R.speed(pro.speed.Value)
+		local overdrive = pro.lab and pro.lab.untilTime > self:now()
+		h.WalkSpeed = R.speed(pro.speed.Value, overdrive)
 	end
 end
 function Game:teleport(p, cf)
@@ -77,6 +97,10 @@ function Game:teleport(p, cf)
 	root.AssemblyLinearVelocity = Vector3.zero
 	root.AssemblyAngularVelocity = Vector3.zero
 	p.Character:PivotTo(cf)
+	local pro = self.profiles[p]
+	if pro then
+		pro.teleportSerial = (pro.teleportSerial or 0) + 1
+	end
 end
 function Game:clearGear(p)
 	for _, container in ipairs({ p:FindFirstChildOfClass("Backpack"), p.Character }) do
@@ -133,7 +157,7 @@ function Game:setup(p)
 	speed.Name = "Speed"
 	speed.Parent = stats
 	local money = Instance.new("IntValue")
-	money.Name = "Money"
+	money.Name = "Coins"
 	money.Parent = stats
 	local inv = Instance.new("Folder")
 	inv.Name = "Inventory"
@@ -148,17 +172,31 @@ function Game:setup(p)
 		activePetId = nil,
 		penPage = 1,
 		inventoryFolder = inv,
-		charges = 1,
+		charges = 0,
+		onboardingComplete = false,
 		slowUntil = 0,
 		duel = nil,
+		trade = nil,
+		exchange = nil,
 		rates = {},
 		training = false,
 		tutorial = 1,
-		trainCarry = 0,
-		incomeCarry = 0,
+		coinRemainder = 0,
+		ranchLevel = 0,
+		hatched = 0,
+		teleportSerial = 0,
+		trial = nil,
+		bestTrial = nil,
 	}
 	self.profiles[p] = pro
+	assert(self.inventory:createConsumable(p.UserId, "SnarePod"))
+	pro.charges = #self.inventory:consumables(p.UserId, true)
+	self.speedLab:setup(pro)
+	self.ranch:setup(p)
+	base.applyGrade(pro.tier)
+	base.applyExpansion(pro.ranchLevel)
 	p:SetAttribute("InDuel", false)
+	p:SetAttribute("InTrial", false)
 	p:SetAttribute("Busy", false)
 	p:SetAttribute("BaseIndex", table.find(self.world.bases, base))
 	speed.Changed:Connect(function()
@@ -173,6 +211,7 @@ function Game:setup(p)
 		if not p:GetAttribute("InDuel") then
 			self:teleport(p, base.spawn)
 			self:giveGear(p, false)
+			self.ranch:homecoming(p, "respawn")
 		end
 		self:applySpeed(p)
 		local prompt = Instance.new("ProximityPrompt")
@@ -194,6 +233,15 @@ function Game:setup(p)
 			end
 		end)
 		h.Died:Connect(function()
+			self.incubation:cancel(p)
+			self.trades:leaving(p)
+			if pro.exchange then
+				self:exchangeCancel(p, "Exchange canceled on respawn.")
+			end
+			if pro.trial then
+				self.trials:finish(p, false, "Trial ended on respawn.")
+			end
+			self.holds:cancel(p)
 			if self.carry[p] then
 				self:drop(p, "death")
 			end
@@ -219,14 +267,16 @@ function Game:prompt(part, action, text, callback)
 	prompt.Triggered:Connect(callback)
 	return prompt
 end
-function Game:spawnEgg(nest, rarity)
+function Game:spawnEgg(nest, rarity, creature)
 	if nest.egg then
 		return
 	end
-	local creature = C.Rarities[rarity].creature
+	creature = creature or nest.creature or C.Creatures[self.rng:NextInteger(1, #C.Creatures)]
+	assert(C.Rarities[rarity] and table.find(C.Creatures, creature), "Invalid egg spawn")
 	local model = Art.egg(rarity, self.world.dynamic, creature)
 	model:PivotTo(CFrame.new(nest.position))
-	local id = "nest-" .. nest.id
+	self.eggSequence = (self.eggSequence or 0) + 1
+	local id = "nest-" .. tostring(nest.id) .. "-" .. self.eggSequence
 	local egg = {
 		id = id,
 		nest = nest,
@@ -237,6 +287,9 @@ function Game:spawnEgg(nest, rarity)
 		carrier = nil,
 		changed = self:now(),
 		immune = nil,
+		revision = 0,
+		nightEvent = nest.event == true,
+		claimed = false,
 	}
 	model:SetAttribute("EggId", id)
 	model:SetAttribute("State", "Home")
@@ -246,14 +299,25 @@ function Game:spawnEgg(nest, rarity)
 			self:notify(p, err)
 		end
 	end)
+	if nest.label then
+		nest.label.Text = creature:upper() .. " EGG • " .. rarity:upper() .. "\nEscape the Grove Warden"
+		nest.label.TextColor3 = C.Rarities[rarity].color
+	end
+	if egg.nightEvent then
+		egg.prompt.MaxActivationDistance = 6
+		local label = model:FindFirstChildWhichIsA("BillboardGui", true)
+		if label then
+			label.MaxDistance = 14
+		end
+	end
 	nest.egg = egg
 	self.eggs[id] = egg
 end
 function Game:take(p, id)
 	local egg = self.eggs[id]
 	local pro = self.profiles[p]
-	if not self:alive(p) or not pro or pro.duel then
-		return false, "Finish your current duel first."
+	if not self:alive(p) or self:busy(p) then
+		return false, "Finish your current activity first."
 	end
 	if self.carry[p] then
 		return false, "You are already carrying an egg."
@@ -264,6 +328,9 @@ function Game:take(p, id)
 	if not egg or (egg.state ~= "Home" and egg.state ~= "Dropped") then
 		return false, "That egg is unavailable."
 	end
+	if workspace:GetAttribute("Night") and egg.state == "Home" and not egg.nightEvent then
+		return false, "Daytime nests are dormant during Moonrise."
+	end
 	if egg.immune == p and self:now() - egg.changed < 1 then
 		return false, "Wait a moment before taking it back."
 	end
@@ -272,6 +339,8 @@ function Game:take(p, id)
 		return false, "Move closer to the egg."
 	end
 	egg.state = "Carried"
+	egg.revision += 1
+	egg.claimed = true
 	egg.carrier = p
 	egg.changed = self:now()
 	egg.immune = nil
@@ -310,23 +379,55 @@ function Game:unweld(egg)
 	end
 end
 function Game:resetEgg(egg)
+	if not egg or self.eggs[egg.id] ~= egg then
+		return false
+	end
 	if egg.carrier then
+		self.incubation:cancel(egg.carrier)
 		self.carry[egg.carrier] = nil
 	end
 	self:unweld(egg)
-	egg.carrier = nil
-	egg.immune = nil
-	egg.state = "Home"
-	egg.changed = self:now()
+	egg.carrier, egg.immune = nil, nil
+	egg.revision += 1
+	if egg.nightEvent and (workspace:GetAttribute("Night") ~= true or egg ~= self.nightEgg) then
+		self:retireEgg(egg)
+		return true
+	end
+	egg.state, egg.changed, egg.claimed = "Home", self:now(), false
 	egg.model:PivotTo(CFrame.new(egg.nest.position))
 	egg.model:SetAttribute("State", "Home")
-	egg.prompt.Enabled = true
+	egg.prompt.Enabled = workspace:GetAttribute("Night") ~= true or egg.nightEvent
+	return true
 end
+function Game:retireEgg(egg)
+	if not egg or self.eggs[egg.id] ~= egg then
+		return false
+	end
+	if egg.carrier then
+		self.incubation:cancel(egg.carrier)
+		self.carry[egg.carrier] = nil
+		self:unweld(egg)
+	end
+	self.eggs[egg.id] = nil
+	if egg.nest.egg == egg then
+		egg.nest.egg = nil
+	end
+	egg.nest.respawn = self:now() + C.EggRespawnTime
+	if egg == self.nightEgg then
+		self.nightEgg, self.nightNest = nil, nil
+	end
+	egg.carrier, egg.state = nil, "Resolved"
+	egg.model:Destroy()
+	return true
+end
+
 function Game:drop(p, reason)
 	local egg = self.carry[p]
 	if not egg then
 		return false
 	end
+	self.incubation:cancel(p)
+	egg.revision += 1
 	local position = egg.model:GetPivot().Position
 	self:unweld(egg)
 	self.carry[p] = nil
@@ -358,7 +459,16 @@ function Game:nearIncubator(p)
 	end
 	for _, element in ipairs(C.ElementOrder) do
 		local slot = pro.base.incubators[element]
-		if slot and R.within(root.Position, slot.pad.Position, 3.25, 3.25, 9) then
+		if
+			slot
+			and R.within(
+				root.Position,
+				slot.pad.Position,
+				C.IncubatorHalfExtent,
+				C.IncubatorHalfExtent,
+				C.IncubatorHeight
+			)
+		then
 			return element
 		end
 	end
@@ -368,8 +478,8 @@ end
 function Game:beginIncubation(p, item, element)
 	local pro = self.profiles[p]
 	local slot = pro and pro.base.incubators[element]
-	if not pro or pro.duel then
-		return false, "Finish the duel before incubating."
+	if not pro or self:busy(p) or not self:alive(p) then
+		return false, "Finish your current activity before incubating."
 	end
 	if not C.Elements[element] or not slot then
 		return false, "Choose Fire, Water, Wind, or Earth."
@@ -380,11 +490,12 @@ function Game:beginIncubation(p, item, element)
 	if not R.eligible(item, p.UserId) or item.kind ~= "Egg" then
 		return false, "Select an unlocked egg you own."
 	end
+	local model = Art.egg(item.rarity, self.world.dynamic, item.creature)
+	model:PivotTo(CFrame.new(slot.pad.Position + Vector3.new(0, 2.5, 0)))
 	item.state = "Incubating"
 	item.element = element
 	item.species = item.creature
-	local model = Art.egg(item.rarity, self.world.dynamic, item.creature)
-	model:PivotTo(CFrame.new(slot.pad.Position + Vector3.new(0, 2.5, 0)))
+	item.revision += 1
 	pro.incubations[element] = {
 		itemId = item.id,
 		remaining = C.Rarities[item.rarity].hatch,
@@ -398,14 +509,22 @@ end
 function Game:secure(p, element)
 	local pro = self.profiles[p]
 	local egg = self.carry[p]
-	if not pro or not egg or not self:alive(p) or pro.duel then
+	if not pro or not egg or not self:alive(p) or self:busy(p) then
 		return false, "No egg to secure."
 	end
 	local slot = pro.base.incubators[element]
 	if not slot or not C.Elements[element] then
 		return false, "Choose an elemental incubator at your camp."
 	end
-	if not R.within(self:root(p).Position, slot.pad.Position, 3.25, 3.25, 9) then
+	if
+		not R.within(
+			self:root(p).Position,
+			slot.pad.Position,
+			C.IncubatorHalfExtent,
+			C.IncubatorHalfExtent,
+			C.IncubatorHeight
+		)
+	then
 		return false, "Carry the egg onto your chosen elemental incubator."
 	end
 	if pro.incubations[element] then
@@ -420,12 +539,7 @@ function Game:secure(p, element)
 		self.inventory.items[item.id] = nil
 		return false, incErr
 	end
-	self:unweld(egg)
-	self.carry[p] = nil
-	self.eggs[egg.id] = nil
-	egg.nest.egg = nil
-	egg.nest.respawn = self:now() + 8
-	egg.model:Destroy()
+	self:retireEgg(egg)
 	pro.tutorial = math.max(pro.tutorial, 4)
 	self:notify(p, egg.creature .. " egg secured in the " .. element .. " incubator.", "pickup")
 	self:push(p)
@@ -435,15 +549,26 @@ end
 function Game:incubate(p, id, element)
 	local pro = self.profiles[p]
 	local item = self.inventory.items[id]
-	if not pro or pro.duel then
-		return false, "Finish the duel before incubating."
+	if not pro or self:busy(p) then
+		return false, "Finish your other activity before incubating."
 	end
 	if type(id) ~= "string" or type(element) ~= "string" or not C.Elements[element] then
 		return false, "Choose an egg and an elemental incubator."
 	end
+	local slot = pro.base.incubators[element]
 	local root = self:root(p)
-	if not root or not R.within(root.Position, pro.base.center, 19, 22, 12) then
-		return false, "Return to your camp to incubate an egg."
+	if
+		not root
+		or not slot
+		or not R.within(
+			root.Position,
+			slot.pad.Position,
+			C.IncubatorHalfExtent,
+			C.IncubatorHalfExtent,
+			C.IncubatorHeight
+		)
+	then
+		return false, "Stand at your chosen " .. element .. " incubator to place the egg."
 	end
 	return self:beginIncubation(p, item, element)
 end
@@ -451,8 +576,8 @@ end
 function Game:setPetMode(p, id, mode)
 	local pro = self.profiles[p]
 	local item = self.inventory.items[id]
-	if not pro or pro.duel then
-		return false, "Finish the duel first."
+	if not pro or self:busy(p) then
+		return false, "Finish your current activity first."
 	end
 	if not item or item.ownerId ~= p.UserId or item.kind ~= "Pet" or item.state ~= "Inventory" then
 		return false, "Select an available pet you own."
@@ -474,6 +599,7 @@ function Game:setPetMode(p, id, mode)
 	else
 		return false, "Invalid pet mode."
 	end
+	item.revision += 1
 	self:reconcilePets()
 	self:push(p)
 	return true
@@ -505,9 +631,21 @@ function Game:reconcilePets()
 				penCount += 1
 			end
 		end
-		pro.penPages = math.max(1, math.ceil(penCount / C.MaxVisiblePets))
+		local capacity = C.Expansions[(pro.ranchLevel or 0) + 1].capacity
+		pro.penPages = math.max(1, math.ceil(penCount / capacity))
 		pro.penCount = penCount
 		pro.penPage = math.clamp(pro.penPage or 1, 1, pro.penPages)
+		local totalPets = 0
+		for _, owned in ipairs(items) do
+			if owned.kind == "Pet" then
+				totalPets += 1
+			end
+		end
+		pro.base.earningsLabel.Text = "YOUR RANCH\n"
+			.. totalPets
+			.. " pets • +"
+			.. self.inventory:income(owner.UserId)
+			.. " Coins/min"
 		local index = 0
 		for _, item in ipairs(items) do
 			if item.kind == "Pet" then
@@ -519,6 +657,12 @@ function Game:reconcilePets()
 				local record = records:FindFirstChild(item.id) or Instance.new("Folder")
 				record.Name = item.id
 				record:SetAttribute("OwnerUserId", item.ownerId)
+				record:SetAttribute("BehaviorSeed", item.order)
+				record:SetAttribute("PenCenter", pro.base.penCenter)
+				record:SetAttribute("PenBounds", pro.base.penBounds)
+				record:SetAttribute("Income", C.Rarities[item.rarity].income)
+				record:SetAttribute("Favorite", item.favorite)
+				record:SetAttribute("Training", pro.training == true)
 				record:SetAttribute("Creature", item.creature)
 				record:SetAttribute("Species", item.species)
 				record:SetAttribute("Rarity", item.rarity)
@@ -529,12 +673,13 @@ function Game:reconcilePets()
 				local position = nil
 				if unlocked and not activePet then
 					index += 1
-					local page = math.floor((index - 1) / C.MaxVisiblePets) + 1
-					local slot = (index - 1) % C.MaxVisiblePets
+					local capacity = C.Expansions[(pro.ranchLevel or 0) + 1].capacity
+					local page = math.floor((index - 1) / capacity) + 1
+					local slot = (index - 1) % capacity + 1
 					displayed = page == pro.penPage
-					position = pro.base.penCenter
-						+ Vector3.new((slot % 4 - 1.5) * 6, 1.6, (math.floor(slot / 4) - 0.5) * 5)
+					position = pro.base.penSlots[slot]
 				end
+				record:SetAttribute("DisplayIndex", index)
 				record:SetAttribute("Displayed", displayed == true)
 				record:SetAttribute("PenPosition", position)
 				record.Parent = records
@@ -547,7 +692,7 @@ function Game:setPenPage(p, page)
 	local pro = self.profiles[p]
 	if
 		not pro
-		or pro.duel
+		or self:busy(p)
 		or type(page) ~= "number"
 		or page ~= page
 		or page % 1 ~= 0
@@ -564,7 +709,7 @@ end
 
 function Game:storeEgg(p)
 	local pro, egg = self.profiles[p], self.carry[p]
-	if not pro or not egg or pro.duel or not self:alive(p) then
+	if not pro or not egg or self:busy(p) or not self:alive(p) then
 		return false, "Carry an egg home first."
 	end
 	if not R.within(self:root(p).Position, pro.base.center, 19, 22, 12) then
@@ -574,19 +719,14 @@ function Game:storeEgg(p)
 	if not item then
 		return false, err
 	end
-	self:unweld(egg)
-	self.carry[p] = nil
-	self.eggs[egg.id] = nil
-	egg.nest.egg = nil
-	egg.nest.respawn = self:now() + 8
-	egg.model:Destroy()
+	self:retireEgg(egg)
 	self:notify(p, "Egg stored. Open Collection to choose its element later.", "pickup")
 	self:push(p)
 	return true
 end
 
 function Game:bat(p)
-	if not self:alive(p) or self.profiles[p].duel or not self:equipped(p, "Bat") then
+	if not self:alive(p) or self:busy(p) or not self:equipped(p, "Bat") then
 		return false, "Equip your bat outside a duel."
 	end
 	if not self:rate(p, "bat", C.BatCooldown) then
@@ -618,61 +758,148 @@ function Game:bat(p)
 	end
 	return false, "Miss: get within 7 studs of an egg carrier."
 end
-function Game:buyUpgrade(p)
+function Game:buyUpgrade(p, nextTier)
 	local pro = self.profiles[p]
-	local root = self:root(p)
-	if not pro or pro.duel or not root then
-		return false, "You cannot upgrade right now."
+	if not pro then
+		return false, "No player profile."
 	end
-	if (root.Position - pro.base.treadmill.Position).Magnitude > 20 then
-		return false, "Return to your own training deck."
+	return self.speedLab:buy(p, nextTier)
+end
+function Game:exchangeBegin(p, id, nonce)
+	local pro = self.profiles[p]
+	local item = self.inventory.items[id]
+	if not pro or not self:alive(p) or self:busy(p) then
+		return false, "You cannot use the Exchange right now."
 	end
-	if pro.tier >= 2 then
-		return false, "Bronze treadmill is already unlocked."
+	if not R.id(id) or not R.id(nonce) or not R.transferable(item, p.UserId) then
+		return false, "Choose an unlocked, unreserved item. Send active pets to the pen first."
 	end
-	if pro.money.Value < C.UpgradeCost then
-		return false, "You need 100 coins."
+	if (self:root(p).Position - self.world.exchangeShop.Position).Magnitude > C.ShopRange then
+		return false, "Visit the Exchange."
 	end
-	pro.money.Value -= C.UpgradeCost
-	pro.tier = 2
-	pro.tutorial = 6
-	pro.base.treadmill:SetAttribute("Tier", 2)
-	local label = pro.base.model:FindFirstChild("Console")
-	if label and label:FindFirstChild("Label") then
-		label.Label.Text.Text = "BRONZE TRAINER\n+2 Speed / second"
+	local key = "exchange:" .. HttpService:GenerateGUID(false)
+	local ok, err = self.inventory:reserveOffer(p.UserId, { id }, key, "Exchange")
+	if not ok then
+		return false, err
 	end
-	self:notify(p, "Bronze unlocked! Training now gives +2 Speed each second.", "win")
+	local duration = item.rarity == "Godly" and C.GodlyHold or C.ExchangeHold
+	local fingerprint = key .. "|" .. id .. "|" .. tostring(item.revision)
+	local hold, holdErr = self.holds:begin(p, "exchange", fingerprint, duration, nonce)
+	if not hold then
+		self.inventory:release(key)
+		return false, holdErr
+	end
+	pro.exchange = {
+		key = key,
+		id = id,
+		fingerprint = fingerprint,
+		expires = hold.expires,
+		token = hold.token,
+		revision = item.revision,
+		value = R.exchangeValue(item),
+	}
+	p:SetAttribute("Busy", true)
+	self:feed(p, "exchangeHold", {
+		nonce = hold.nonce,
+		started = hold.started,
+		token = hold.token,
+		duration = duration,
+		item = self.inventory:snapshotItem(item),
+		value = R.exchangeValue(item),
+	})
 	self:push(p)
 	return true
 end
-function Game:buyTrap(p)
+
+function Game:exchangeComplete(p, token)
 	local pro = self.profiles[p]
-	local root = self:root(p)
-	if not pro or pro.duel or not root or (root.Position - self.world.shop.Position).Magnitude > 16 then
-		return false, "Visit Trail Supplies in the Meadow."
+	local x = pro and pro.exchange
+	if not x then
+		return false, "No Exchange confirmation is active."
 	end
-	if pro.charges >= 5 then
+	local item = self.inventory.items[x.id]
+	if
+		not self:alive(p)
+		or self:now() >= x.expires
+		or (self:root(p).Position - self.world.exchangeShop.Position).Magnitude > C.ShopRange
+		or not item
+		or item.revision ~= x.revision
+		or R.exchangeValue(item) ~= x.value
+		or pro.duel
+		or pro.trade
+		or pro.trial
+	then
+		self:exchangeCancel(p, "Exchange canceled: item, activity, or position changed.")
+		return false, "Exchange conditions changed. Review the item again."
+	end
+	local ok, err = self.holds:consume(p, "exchange", x.fingerprint, token)
+	if not ok then
+		return false, err
+	end
+	local done, value = self.inventory:exchange(p.UserId, x.id, x.key, pro.money)
+	if not done then
+		self.inventory:release(x.key)
+		pro.exchange = nil
+		p:SetAttribute("Busy", pro.duel ~= nil or pro.trade ~= nil or p:GetAttribute("InTrial") == true)
+		return false, value
+	end
+	pro.exchange = nil
+	p:SetAttribute("Busy", pro.duel ~= nil or pro.trade ~= nil or p:GetAttribute("InTrial") == true)
+	self:reconcilePets()
+	self:notify(p, "Exchange complete: +" .. tostring(value) .. " Coins.", "win")
+	self:push(p)
+	return true
+end
+
+function Game:exchangeCancel(p, reason)
+	local pro = self.profiles[p]
+	local x = pro and pro.exchange
+	if not x then
+		return false, "No Exchange confirmation is active."
+	end
+	self.holds:cancel(p)
+	self.inventory:release(x.key)
+	pro.exchange = nil
+	p:SetAttribute("Busy", pro.duel ~= nil or pro.trade ~= nil or p:GetAttribute("InTrial") == true)
+	if reason then
+		self:notify(p, reason)
+	end
+	self:push(p)
+	return true
+end
+
+function Game:buyTrap(p)
+	local pro, root = self.profiles[p], self:root(p)
+	if not self:alive(p) or self:busy(p) or (root.Position - self.world.shop.Position).Magnitude > C.ShopRange then
+		return false, "Visit Trail Supplies while available."
+	end
+	if #self.inventory:consumables(p.UserId, false) >= C.MaxTrapCharges then
 		return false, "You can carry five snare pods."
 	end
 	if pro.money.Value < C.TrapCost then
-		return false, "You need 15 coins for a snare pod."
+		return false, "Need " .. C.TrapCost .. " Coins for a snare pod."
+	end
+	local item, err = self.inventory:createConsumable(p.UserId, "SnarePod")
+	if not item then
+		return false, err
 	end
 	pro.money.Value -= C.TrapCost
-	pro.charges += 1
 	self:push(p)
-	self:notify(p, "Snare pod purchased.", "pickup")
+	self:notify(p, "Snare pod purchased. It is also tradable and exchangeable.", "pickup")
 	return true
 end
+
 function Game:placeTrap(p)
 	local pro = self.profiles[p]
 	local root = self:root(p)
-	if not self:alive(p) or pro.duel or not self:equipped(p, "SnarePod") then
+	if not self:alive(p) or self:busy(p) or not self:equipped(p, "SnarePod") then
 		return false, "Equip a snare pod outside a duel."
 	end
 	if not self:rate(p, "trap", 1) then
 		return false, "Cooldown"
 	end
-	if pro.charges <= 0 then
+	local pod = self.inventory:consumables(p.UserId, true)[1]
+	if not pod then
 		return false, "Buy more pods at Trail Supplies."
 	end
 	local pos = root.Position + root.CFrame.LookVector * 5
@@ -688,7 +915,6 @@ function Game:placeTrap(p)
 	if count >= C.MaxTraps then
 		return false, "You already have two active snares."
 	end
-	pro.charges -= 1
 	pos = Vector3.new(pos.X, 0.36, pos.Z)
 	local trap = Art.part(
 		self.world.dynamic,
@@ -700,6 +926,11 @@ function Game:placeTrap(p)
 		Enum.Material.Neon
 	)
 	local label = Art.billboard(trap, "ARMING…", C.Colors.Mint, 150, 30, Vector3.new(0, 1.5, 0))
+	local consumed, err = self.inventory:consume(p.UserId, pod.id, "SnarePod")
+	if not consumed then
+		trap:Destroy()
+		return false, err
+	end
 	table.insert(self.traps, {
 		owner = p,
 		part = trap,
@@ -729,7 +960,10 @@ function Game:push(p)
 			}
 		end
 	end
+	pro.charges = #self.inventory:consumables(p.UserId, true)
 	local snapshot = {
+		onboardingComplete = pro.onboardingComplete == true,
+		hatched = pro.hatched,
 		build = C.Build,
 		speed = pro.speed.Value,
 		money = pro.money.Value,
@@ -748,6 +982,12 @@ function Game:push(p)
 		carryingCreature = egg and egg.creature or nil,
 		tutorial = pro.tutorial,
 		incubators = incubators,
+		lab = self.speedLab:snapshot(p),
+		trial = self.trials:snapshot(p),
+		ranchLevel = pro.ranchLevel,
+		ranchCapacity = C.Expansions[pro.ranchLevel + 1].capacity,
+		ranch = self.ranch:snapshot(p),
+		trade = self.trades:snapshot(p),
 		duel = self.duels:snapshot(p),
 		result = pro.result and pro.result.untilTime > self:now() and pro.result or nil,
 		serverTime = self:now(),
@@ -782,6 +1022,33 @@ function Game:pushAll()
 		self:push(p)
 	end
 end
+function Game:tradeTargets(p)
+	local out = {}
+	local root = self:root(p)
+	if not root or (root.Position - self.world.tradingPost.Position).Magnitude > C.ShopRange + 8 then
+		return out
+	end
+	for _, other in ipairs(Players:GetPlayers()) do
+		if other ~= p and self:alive(other) then
+			local otherRoot = self:root(other)
+			local pro = self.profiles[other]
+			if
+				otherRoot
+				and pro
+				and (otherRoot.Position - root.Position).Magnitude <= C.TradeRange
+				and (otherRoot.Position - self.world.tradingPost.Position).Magnitude <= C.ShopRange + 8
+			then
+				table.insert(out, {
+					userId = other.UserId,
+					name = other.DisplayName,
+					unlocked = pro.hatched >= 3 and pro.onboardingComplete == true,
+				})
+			end
+		end
+	end
+	return out
+end
+
 function Game:action(p, name, data)
 	if type(name) ~= "string" or #name > 32 or not self.profiles[p] then
 		return false, "Invalid request."
@@ -789,7 +1056,7 @@ function Game:action(p, name, data)
 	if type(data) ~= "table" then
 		data = {}
 	end
-	if not self:rate(p, "network", 0.035) then
+	if not self:rate(p, "network:" .. name, name == "sync" and 0.15 or 0.02) then
 		return false, "Cooldown"
 	end
 	if name == "sync" then
@@ -802,11 +1069,72 @@ function Game:action(p, name, data)
 	elseif name == "trap" then
 		return self:placeTrap(p)
 	elseif name == "upgrade" then
-		return self:buyUpgrade(p)
+		return self:buyUpgrade(p, data.tier)
+	elseif name == "overdrive" then
+		return self.speedLab:activate(p)
+	elseif name == "trialStart" then
+		return self.trials:start(p)
+	elseif name == "trialCancel" then
+		return self.trials:finish(p, false, "Trial canceled. No record changed.")
+	elseif name == "ranchExpand" then
+		return self.ranch:buyExpansion(p, data.level)
+	elseif name == "ranchRevere" then
+		local owner = R.integer(data.userId, -100000000000, 100000000000) and Players:GetPlayerByUserId(data.userId)
+			or nil
+		return self.ranch:requestReverence(p, owner)
+	elseif name == "tradeRequest" then
+		local target = R.integer(data.userId, -100000000000, 100000000000) and Players:GetPlayerByUserId(data.userId)
+			or nil
+		return self.trades:request(p, target)
+	elseif name == "tradeReply" then
+		return self.trades:reply(p, data.accept)
+	elseif name == "tradeOffer" then
+		return self.trades:offer(p, data.ids, data.revision)
+	elseif name == "tradeHoldBegin" then
+		return self.trades:beginHold(p, data.nonce)
+	elseif name == "tradeHoldComplete" then
+		return self.trades:completeHold(p, data.token, data.stage)
+	elseif name == "tradeCancel" then
+		return self.trades:cancel(p)
+	elseif name == "exchangeBegin" then
+		return self:exchangeBegin(p, data.id, data.nonce)
+	elseif name == "exchangeComplete" then
+		return self:exchangeComplete(p, data.token)
+	elseif name == "exchangeCancel" then
+		return self:exchangeCancel(p, "Exchange canceled. Item returned.")
 	elseif name == "buyTrap" then
 		return self:buyTrap(p)
 	elseif name == "incubate" then
-		return self:incubate(p, data.id, data.element)
+		return self.incubation:preview(p, data.element, data.id)
+	elseif name == "incubationHold" then
+		return self.incubation:hold(p, data.id, data.nonce)
+	elseif name == "incubationConfirm" then
+		return self.incubation:confirm(p, data.id, data.token)
+	elseif name == "incubationCancel" then
+		self.incubation:cancel(p)
+		return true
+	elseif name == "holdCancel" then
+		if not R.id(data.nonce) then
+			return false, "Invalid hold identity."
+		end
+		local h = self.holds.active[p]
+		if h and h.nonce == data.nonce then
+			if h.kind == "exchange" then
+				return self:exchangeCancel(p)
+			end
+			self.holds:cancel(p, data.nonce)
+		end
+		return true
+	elseif name == "itemLock" then
+		if self:busy(p) then
+			return false, "Finish your current activity first."
+		end
+		local ok, err = self.inventory:setLocked(p.UserId, data.id, data.locked)
+		if ok then
+			self:reconcilePets()
+			self:push(p)
+		end
+		return ok, err
 	elseif name == "autoHatch" then
 		return false, "Choose an elemental incubator for each egg."
 	elseif name == "store" then
@@ -834,15 +1162,18 @@ function Game:action(p, name, data)
 		self:setNight(not workspace:GetAttribute("Night"))
 		return true
 	elseif name == "debugItems" and RunService:IsStudio() then
-		if self.profiles[p].duel then
-			return false, "Finish the duel first."
+		if self:busy(p) then
+			return false, "Finish your current activity first."
 		end
 		if not self:rate(p, "debugItems", 2) then
 			return false, "Cooldown"
 		end
 		self.inventory:create(p.UserId, "Egg", "Common", "Skunk")
 		self.inventory:create(p.UserId, "Egg", "Epic", "Dragon")
-		self.inventory:create(p.UserId, "Pet", "Rare", "Gorilla", "Water")
+		local pet = self.inventory:create(p.UserId, "Pet", "Rare", "Gorilla", "Water")
+		if pet then
+			self.ranch:acquired(p, pet)
+		end
 		self:reconcilePets()
 		self:push(p)
 		return true
@@ -850,20 +1181,63 @@ function Game:action(p, name, data)
 	return false, "Unknown action."
 end
 function Game:setNight(enabled)
+	if type(enabled) ~= "boolean" then
+		return false
+	end
+	local wasNight = workspace:GetAttribute("Night") == true
+	if wasNight == enabled then
+		return true
+	end
 	workspace:SetAttribute("Night", enabled)
 	self.phaseEnds = self:now() + (enabled and C.NightDuration or R.nextNight(self.rng))
 	workspace:SetAttribute("PhaseEnds", self.phaseEnds)
-	if enabled then
-		local n = self.world.nests[5]
-		if not n.egg then
-			self:spawnEgg(n, self.rng:NextNumber() < 0.8 and "Legendary" or "Mythic")
+	for _, nest in ipairs(self.world.nests) do
+		if nest.egg and nest.egg.state == "Home" then
+			nest.egg.prompt.Enabled = not enabled
 		end
-		self:effect("night", {})
-		for p in pairs(self.profiles) do
-			self:notify(p, "Moonrise! All incubators run at 30x. The Moon Shrine has awakened.", "night")
-		end
+		nest.part:SetAttribute("Dormant", enabled)
 	end
+	if enabled then
+		self.nightEpoch = (self.nightEpoch or 0) + 1
+		local spot = self.world.hiddenNightSpots[self.rng:NextInteger(1, #self.world.hiddenNightSpots)]
+		local nest = {
+			id = "night-" .. self.nightEpoch,
+			position = spot,
+			event = true,
+			creature = C.Creatures[self.rng:NextInteger(1, #C.Creatures)],
+		}
+		self.nightNest = nest
+		self:spawnEgg(nest, R.roll(self.rng, C.NightWeights), nest.creature)
+		self.nightEgg = nest.egg
+		-- Broad local clue region, deliberately offset from the actual hiding place.
+		local region = Vector3.new(math.floor(spot.X / 35) * 35 + 17.5, 1, math.floor(spot.Z / 35) * 35 + 17.5)
+		self.world.shrine:SetAttribute("Awake", true)
+		self.world.shrine:SetAttribute("ClueRegion", region)
+		self:effect("night", { shrine = self.world.shrine.Position })
+		for p in pairs(self.profiles) do
+			self:notify(
+				p,
+				"MOONRISE • Nests are dormant. Search the Forest for one hidden egg. Hatching runs at 30x.",
+				"night"
+			)
+		end
+	else
+		local retired = {}
+		for _, egg in pairs(self.eggs) do
+			if egg.nightEvent and egg.state == "Home" then
+				table.insert(retired, egg)
+			end
+		end
+		for _, egg in ipairs(retired) do
+			self:retireEgg(egg)
+		end
+		self.world.shrine:SetAttribute("Awake", false)
+		self.world.shrine:SetAttribute("ClueRegion", nil)
+	end
+	self:pushAll()
+	return true
 end
+
 function Game:bossStep(dt, now)
 	local w = self.world
 	local boss = w.guardian
@@ -876,7 +1250,10 @@ function Game:bossStep(dt, now)
 	local bpos = boss:GetPivot().Position
 	for _, egg in pairs(self.eggs) do
 		local root = egg.carrier and self:root(egg.carrier)
-		if (egg.state == "Carried" and root and not self:safe(root.Position)) or egg.state == "Dropped" then
+		if
+			not egg.nightEvent
+			and ((egg.state == "Carried" and root and not self:safe(root.Position)) or egg.state == "Dropped")
+		then
 			local pos = root and root.Position or egg.model:GetPivot().Position
 			local d = (pos - bpos).Magnitude
 			if d < closest and now - egg.changed > C.BossAlertDelay then
@@ -919,32 +1296,36 @@ function Game:bossStep(dt, now)
 end
 function Game:step(dt)
 	local now = self:now()
+	self.holds:step(now)
+	self.incubation:step()
 	self.duels:step(now)
+	self.ranch:step(now)
+	self.trades:step(now)
+	for p, pro in pairs(self.profiles) do
+		if
+			pro.exchange
+			and (
+				now >= pro.exchange.expires
+				or not self:alive(p)
+				or (self:root(p).Position - self.world.exchangeShop.Position).Magnitude > C.ShopRange
+			)
+		then
+			self:exchangeCancel(p, "Exchange interrupted. Item returned.")
+		end
+	end
 	if now >= self.phaseEnds then
 		self:setNight(not workspace:GetAttribute("Night"))
 	end
 	for p, pro in pairs(self.profiles) do
 		local root = self:root(p)
 		local alive = self:alive(p)
-		pro.training = alive and not pro.duel and R.within(root.Position, pro.base.treadmill.Position, 5, 2.9, 5)
-		if pro.training then
-			pro.trainCarry += dt
-			if pro.trainCarry >= C.TrainInterval then
-				local n = math.floor(pro.trainCarry / C.TrainInterval)
-				pro.trainCarry -= n * C.TrainInterval
-				pro.speed.Value += n * pro.tier
-				if pro.speed.Value >= 60 then
-					pro.tutorial = math.max(pro.tutorial, 2)
-				end
-			end
-		else
-			pro.trainCarry = 0
-		end
-		pro.incomeCarry += dt
-		if pro.incomeCarry >= C.PetIncomeInterval then
-			local n = math.floor(pro.incomeCarry / C.PetIncomeInterval)
-			pro.incomeCarry -= n * C.PetIncomeInterval
-			pro.money.Value += self.inventory:income(p.UserId) * n
+		pro.training = alive and not self:busy(p) and R.within(root.Position, pro.base.treadmill.Position, 5, 2.9, 5)
+		self.speedLab:step(p, dt, now)
+		local newMoney, remainder = R.credit(pro.money.Value, pro.coinRemainder, self.inventory:income(p.UserId), dt)
+		pro.money.Value = newMoney
+		pro.coinRemainder = remainder
+		if pro.trial then
+			self.trials:step(p, dt, now)
 		end
 		for _, element in ipairs(C.ElementOrder) do
 			local inc = pro.incubations[element]
@@ -973,6 +1354,12 @@ function Game:step(dt)
 					inc.model:Destroy()
 					pro.incubations[element] = nil
 					pro.tutorial = math.max(pro.tutorial, 5)
+					pro.hatched += 1
+					if pro.tier > 1 then
+						pro.tutorial = 6
+						pro.onboardingComplete = true
+					end
+					self.ranch:acquired(p, item)
 					self:effect("hatch", {
 						position = slot.pad.Position + Vector3.new(0, 3, 0),
 						rarity = item.rarity,
@@ -980,7 +1367,7 @@ function Game:step(dt)
 					})
 					self:notify(
 						p,
-						item.species .. " hatched! +" .. C.Rarities[item.rarity].income .. " coins / 2s.",
+						item.species .. " hatched! +" .. C.Rarities[item.rarity].income .. " Coins/min.",
 						"win"
 					)
 					self:reconcilePets()
@@ -988,12 +1375,6 @@ function Game:step(dt)
 				end
 			else
 				slot.timer.Text = element:upper() .. " INCUBATOR\nAvailable"
-			end
-		end
-		if self.carry[p] and alive then
-			local element = self:nearIncubator(p)
-			if element and not pro.incubations[element] then
-				self:secure(p, element)
 			end
 		end
 		if pro.slowUntil > 0 and now >= pro.slowUntil then
@@ -1031,9 +1412,11 @@ function Game:step(dt)
 		end
 	end
 	self:bossStep(dt, now)
-	for _, nest in ipairs(self.world.nests) do
-		if not nest.egg and not nest.event and (not nest.respawn or now >= nest.respawn) then
-			self:spawnEgg(nest, nest.rarity)
+	if not workspace:GetAttribute("Night") then
+		for _, nest in ipairs(self.world.nests) do
+			if not nest.egg and (not nest.respawn or now >= nest.respawn) then
+				self:spawnEgg(nest, R.roll(self.rng, C.DayWeights), nest.creature)
+			end
 		end
 	end
 	self.syncTime += dt
@@ -1052,8 +1435,15 @@ function Game.new()
 		rng = Random.new(),
 		inventory = Inventory.new(),
 	}, Game)
+	R.validate()
 	self.world = World.build()
 	self.navigation = Navigation.new(self.world.decor)
+	self.holds = Holds.new(self)
+	self.incubation = Incubation.new(self)
+	self.speedLab = SpeedLab.new(self)
+	self.trials = Trials.new(self)
+	self.ranch = Ranch.new(self)
+	self.trades = Trade.new(self)
 	self.duels = Duel.new(self)
 	local folder = Instance.new("Folder")
 	folder.Name = "Stage3Net"
@@ -1085,19 +1475,89 @@ function Game.new()
 	self.phaseEnds = self:now() + R.nextNight(self.rng)
 	workspace:SetAttribute("PhaseEnds", self.phaseEnds)
 	for _, nest in ipairs(self.world.nests) do
-		if not nest.event then
-			self:spawnEgg(nest, nest.rarity)
+		self:spawnEgg(nest, R.roll(self.rng, C.DayWeights), nest.creature)
+	end
+	for _, b in ipairs(self.world.bases) do
+		self:prompt(b.treadmill, "Trainer options", "Your Speed Lab", function(p)
+			if b.owner == p then
+				self:feed(p, "openShop", { shop = "trainer" })
+			else
+				self:notify(p, "Use the Speed Lab at your own camp.")
+			end
+		end)
+		for _, element in ipairs(C.ElementOrder) do
+			local slot = b.incubators[element]
+			local prompt = self:prompt(slot.pad, "Review Egg", element .. " Incubator", function(p)
+				if b.owner ~= p then
+					self:notify(p, "This incubator belongs to another camp.")
+					return
+				end
+				local pro = self.profiles[p]
+				if pro and pro.incubatorPreview then
+					return -- The open preview owns confirmation until it is closed.
+				end
+				if self.carry[p] then
+					local ok, err = self.incubation:preview(p, element)
+					if not ok then
+						self:notify(p, err)
+					end
+				else
+					self:feed(p, "selectIncubatorEgg", { element = element })
+				end
+			end)
+			prompt.Name = "IncubatorPrompt"
+			prompt.HoldDuration = 0
+			prompt:SetAttribute("Element", element)
+			prompt:SetAttribute("BaseIndex", b.index)
+			slot.prompt = prompt
 		end
 	end
 	for _, b in ipairs(self.world.bases) do
-		self:prompt(b.treadmill, "Trainer options", "Your camp trainer", function(p)
-			if b.owner == p then
-				self:feed(p, "openShop", {})
-			else
-				self:notify(p, "Use the trainer at your own camp.")
+		self:prompt(b.penGate, "Honor Godly", "Ranch Gate", function(visitor)
+			if b.owner and b.owner ~= visitor then
+				local ok, err = self.ranch:requestReverence(visitor, b.owner)
+				if not ok then
+					self:notify(visitor, err)
+				end
 			end
 		end)
 	end
+	self:prompt(self.world.trainerShop, "Open upgrades", "Trainer Workshop", function(p)
+		self:feed(p, "openShop", { shop = "trainer" })
+	end)
+	self:prompt(self.world.trialStart, "Start Trial", "Grove Circuit", function(p)
+		local ok, err = self.trials:start(p)
+		if not ok then
+			self:notify(p, err)
+		end
+	end)
+	self:prompt(self.world.ranchShop, "Ranch upgrades", "Ranch & Pen Works", function(p)
+		local pro = self.profiles[p]
+		if not pro then
+			return
+		end
+		local nextLevel = pro.ranchLevel + 1
+		if nextLevel >= #C.Expansions then
+			self:notify(p, "Grand Ranch already built.")
+			return
+		end
+		local spec = C.Expansions[nextLevel + 1]
+		self:feed(p, "ranchUpgrade", {
+			level = nextLevel,
+			name = spec.name,
+			cost = spec.cost,
+			capacity = spec.capacity,
+		})
+	end)
+	self:prompt(self.world.tradingPost, "Find trader", "Trading Post", function(p)
+		self:feed(p, "openTrade", {
+			targets = self:tradeTargets(p),
+			unlocked = self.profiles[p].hatched >= 3 and self.profiles[p].onboardingComplete == true,
+		})
+	end)
+	self:prompt(self.world.exchangeShop, "Open Exchange", "The Exchange", function(p)
+		self:feed(p, "openExchange", {})
+	end)
 	self:prompt(self.world.shop, "Buy snare • 15 coins", "Trail Supplies", function(p)
 		local ok, err = self:buyTrap(p)
 		if not ok then
@@ -1114,11 +1574,17 @@ function Game.new()
 		self:setup(p)
 	end)
 	Players.PlayerRemoving:Connect(function(p)
+		self.incubation:cancel(p)
+		self.holds:cancel(p)
+		self.trades:leaving(p)
 		self.duels:leaving(p)
 		if self.carry[p] then
 			self:resetEgg(self.carry[p])
 		end
 		local pro = self.profiles[p]
+		if pro and pro.exchange then
+			self:exchangeCancel(p)
+		end
 		if pro then
 			for _, element in ipairs(C.ElementOrder) do
 				local inc = pro.incubations[element]

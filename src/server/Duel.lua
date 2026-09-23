@@ -16,7 +16,7 @@ function Duel:request(a, b)
 	if a == b or not g:alive(a) or not g:alive(b) then
 		return false, "Choose another active player."
 	end
-	if self.current or g.profiles[a].duel or g.profiles[b].duel then
+	if self.current or g:busy(a) or g:busy(b) then
 		return false, "The duel court is busy."
 	end
 	if g.carry[a] or g.carry[b] then
@@ -123,6 +123,8 @@ function Duel:confirm(p, revision)
 		end
 		s.started = g:now()
 		for _, who in ipairs({ s.a, s.b }) do
+			g.profiles[who].lab.untilTime = 0
+			g.holds:cancel(who)
 			who:SetAttribute("InDuel", true)
 			g:clearGear(who)
 		end
@@ -255,15 +257,26 @@ function Duel:finish(winner, reason)
 	if not s then
 		return
 	end
-	self.current = nil -- Idempotence barrier before notifications, respawns, or transfers.
+	if s.phase == "SettlementBlocked" then
+		return false, "Unresolved escrow must be inspected."
+	end
 	local g = self.game
 	if s.escrow then
-		local ok, err = g.inventory:settle(s.id, { s.offers[s.a], s.offers[s.b] }, winner and winner.UserId or nil)
+		local ok, changes = g.inventory:settle(s.id, { s.offers[s.a], s.offers[s.b] }, winner and winner.UserId or nil)
 		if not ok then
-			warn("[STAGE3] " .. err)
-			reason = "Escrow error: test must stop for inspection."
+			s.phase = "SettlementBlocked"
+			warn("[STAGE3 ESCROW BLOCKED] " .. tostring(changes))
+			g:pushAll()
+			return false, changes
+		end
+		for _, change in ipairs(changes) do
+			local owner = Players:GetPlayerByUserId(change.to)
+			if owner and g.profiles[owner] and change.item.kind == "Pet" then
+				g.ranch:acquired(owner, change.item)
+			end
 		end
 	end
+	self.current = nil -- Only clear the session after successful non-yielding settlement.
 	for _, p in ipairs({ s.a, s.b }) do
 		local profile = g.profiles[p]
 		if profile then
@@ -311,7 +324,7 @@ function Duel:leaving(p)
 end
 function Duel:step(now)
 	local s = self.current
-	if not s then
+	if not s or s.phase == "SettlementBlocked" then
 		return
 	end
 	if s.started and now - s.started > 600 then

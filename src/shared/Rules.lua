@@ -1,19 +1,30 @@
--- Pure rules are shared by the server and the real-engine regression tests.
+-- Shared, deterministic production rules. Tests exercise these functions directly.
+local C = require(script.Parent.Config)
 local R = {}
 function R.finite(n)
 	return type(n) == "number" and n == n and math.abs(n) < 1e12
 end
-function R.speed(points)
+function R.integer(n, lo, hi)
+	return R.finite(n) and n % 1 == 0 and n >= lo and n <= hi
+end
+function R.id(s)
+	return type(s) == "string" and #s > 0 and #s <= 80
+end
+function R.speed(points, overdrive)
 	if not R.finite(points) then
-		return 16
+		return C.BaseWalkSpeed
 	end
-	return 16 + 0.4 * math.sqrt(math.max(0, points))
+	local speed = math.clamp(
+		C.BaseWalkSpeed + C.SpeedFactor * math.sqrt(math.clamp(points, 0, C.SpeedCap)),
+		C.BaseWalkSpeed,
+		C.WalkSpeedCap
+	)
+	return overdrive and math.min(C.OverdriveCap, speed * C.OverdriveFactor) or speed
 end
 function R.vector(v)
 	return typeof(v) == "Vector3" and R.finite(v.X) and R.finite(v.Y) and R.finite(v.Z)
 end
 function R.nextNight(rng)
-	-- 80% in 4-5 minutes, 10% earlier, 10% later; hard bounds 2-10 minutes.
 	local roll = rng:NextNumber()
 	if roll < 0.8 then
 		return rng:NextInteger(240, 300)
@@ -23,15 +34,137 @@ function R.nextNight(rng)
 	end
 	return rng:NextInteger(301, 600)
 end
-function R.eligible(item, ownerId)
-	return item ~= nil and item.ownerId == ownerId and item.state == "Inventory"
+function R.eligible(item, owner)
+	return type(item) == "table"
+		and item.ownerId == owner
+		and item.state == "Inventory"
+		and item.reservation == nil
+		and item.duelId == nil
+		and not item.locked
+		and not item.favorite
+end
+function R.transferable(item, owner)
+	return R.eligible(item, owner) and item.petMode ~= "Active"
+end
+function R.itemSignature(item)
+	if type(item) ~= "table" then
+		return "missing"
+	end
+	return table.concat({
+		tostring(item.id),
+		tostring(item.ownerId),
+		tostring(item.revision),
+		tostring(item.kind),
+		tostring(item.rarity),
+		tostring(item.creature),
+		tostring(item.element),
+		tostring(item.itemType),
+		tostring(item.state),
+		tostring(item.reservation),
+		tostring(item.locked),
+		tostring(item.favorite),
+		tostring(item.petMode),
+	}, "|")
+end
+function R.exchangeValue(item)
+	if type(item) ~= "table" then
+		return 0
+	end
+	if item.kind == "Item" then
+		local spec = C.ItemTypes[item.itemType]
+		return spec and spec.exchange or 0
+	end
+	local spec = C.Rarities[item.rarity]
+	if not spec then
+		return 0
+	end
+	if item.kind == "Pet" then
+		return spec.income * 8
+	end
+	if item.kind == "Egg" then
+		return math.floor(spec.income * 8 * 0.6)
+	end
+	return 0
 end
 function R.clock(seconds)
+	if not R.finite(seconds) then
+		return "--:--"
+	end
 	seconds = math.max(0, math.ceil(seconds))
 	return string.format("%d:%02d", math.floor(seconds / 60), seconds % 60)
 end
 function R.within(position, center, halfX, halfZ, height)
 	local d = position - center
 	return math.abs(d.X) <= halfX and math.abs(d.Z) <= halfZ and d.Y >= -2 and d.Y <= height
+end
+function R.roll(rng, weights)
+	local draw = rng:NextInteger(1, 10000)
+	local sum = 0
+	for _, rarity in ipairs(C.RarityOrder) do
+		sum += weights[rarity] or 0
+		if draw <= sum then
+			return rarity
+		end
+	end
+	error("Invalid rarity distribution")
+end
+function R.trainDelta(momentum, dt, training)
+	assert(R.finite(dt) and dt >= 0, "Invalid training interval")
+	momentum = math.clamp(momentum, 0, 1)
+	if not training then
+		return math.max(0, momentum - dt / C.MomentumDecay), 0, 0
+	end
+	local rise = math.min(dt, (1 - momentum) * C.MomentumRamp)
+	local final = math.min(1, momentum + rise / C.MomentumRamp)
+	local integral = (momentum + final) * rise * 0.5 + (dt - rise)
+	local start = math.clamp((C.EnergyThreshold - momentum) * C.MomentumRamp, 0, rise)
+	local a = math.clamp((momentum + start / C.MomentumRamp - C.EnergyThreshold) / (1 - C.EnergyThreshold), 0, 1)
+	local b = math.clamp((final - C.EnergyThreshold) / (1 - C.EnergyThreshold), 0, 1)
+	local energy = (a + b) * (rise - start) * 0.5 + (dt - rise)
+	return final, integral, energy
+end
+function R.credit(balance, remainder, coinsPerMinute, dt)
+	assert(
+		R.integer(balance, 0, C.MaxCoins)
+			and R.finite(remainder)
+			and remainder >= 0
+			and remainder < 1.000001
+			and R.finite(coinsPerMinute)
+			and coinsPerMinute >= 0
+			and R.finite(dt)
+			and dt >= 0,
+		"Invalid currency input"
+	)
+	local value = remainder + coinsPerMinute * dt / 60
+	local whole = math.floor(value + 1e-9)
+	return math.min(C.MaxCoins, balance + whole), math.max(0, value - whole)
+end
+function R.validate()
+	assert(#C.RarityOrder == 7 and #C.Creatures == 4 and #C.ElementOrder == 4)
+	for _, weights in ipairs({ C.DayWeights, C.NightWeights }) do
+		local total = 0
+		for rarity, weight in pairs(weights) do
+			assert(C.Rarities[rarity] and R.integer(weight, 0, 10000), "Invalid rarity weight")
+			total += weight
+		end
+		assert(total == 10000, "Rarity weights must sum to 10000")
+	end
+	local previous = 0
+	for i, grade in ipairs(C.Grades) do
+		assert(
+			grade.cap > previous and grade.cap <= C.SpeedCap and grade.rate > 0 and R.integer(grade.cost, 0, C.MaxCoins)
+		)
+		assert(i ~= 1 or grade.cost == 0)
+		previous = grade.cap
+	end
+	assert(previous == C.SpeedCap)
+	for _, rarity in ipairs(C.RarityOrder) do
+		local s = C.Rarities[rarity]
+		assert(s.hatch > 0 and s.income > 0 and s.boss > 0 and not s.creature, "Rarity cannot imply creature")
+	end
+	for _, expansion in ipairs(C.Expansions) do
+		assert(expansion.capacity == expansion.columns * expansion.rows)
+	end
+	return true
 end
 return R

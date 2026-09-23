@@ -7,6 +7,7 @@ local HttpService = game:GetService("HttpService")
 local Shared = game:GetService("ReplicatedStorage").Stage3Shared
 local C = require(Shared.Config)
 local Rules = require(Shared.Rules)
+local ContractChecks = require(script.Parent.ContractChecks)
 local Tests = {}
 function Tests.run(g)
 	assert(RunService:IsStudio(), "Studio tests only")
@@ -50,6 +51,21 @@ function Tests.run(g)
 		g:humanoid(p):EquipTool(tool)
 		task.wait(0.12)
 	end
+	local function dayEgg(index)
+		local nest = g.world.nests[index]
+		assert(nest, "Missing Day nest " .. tostring(index))
+		if not nest.egg then
+			assert(
+				waitFor(function()
+					return nest.egg ~= nil
+				end, C.EggRespawnTime + 2),
+				"Day nest " .. index .. " did not respawn"
+			)
+		end
+		local egg = nest.egg
+		assert(egg and g.eggs[egg.id] == egg, "Day nest egg registry invariant failed")
+		return egg
+	end
 	local function report()
 		results.finished = os.time()
 		local text = HttpService:JSONEncode(results)
@@ -89,8 +105,9 @@ function Tests.run(g)
 		return a.Name < b.Name
 	end)
 	local a, b = ps[1], ps[2]
+	ContractChecks.run(g, check, a)
 	check("World, four elemental camps, respawns, pens and named models", function()
-		assert(#g.world.bases == 4 and #g.world.nests == 5)
+		assert(#g.world.bases == 4 and #g.world.nests == 4 and #g.world.hiddenNightSpots >= 4)
 		assert(g.world.guardian:FindFirstChild("Heart"))
 		assert(g.world.nests[1].egg and g.world.nests[4].egg)
 		assert(g.profiles[a].base ~= g.profiles[b].base)
@@ -105,9 +122,18 @@ function Tests.run(g)
 				< 0.1
 		)
 	end)
-	check("Movement curve and bounded night distribution", function()
-		assert(Rules.speed(0) == 16 and Rules.speed(100) == 20 and Rules.speed(400) == 24)
-		assert(Rules.speed(0 / 0) == 16 and not Rules.vector(Vector3.new(0 / 0, 0, 0)))
+	check("0.4.0 rules validate, Speed is monotonic/bounded, and Night cadence stays bounded", function()
+		assert(Rules.validate())
+		assert(Rules.speed(0) == C.BaseWalkSpeed)
+		local previous = Rules.speed(0)
+		for speed = 100, C.SpeedCap, 100 do
+			local mapped = Rules.speed(speed)
+			assert(mapped >= previous and mapped <= C.WalkSpeedCap)
+			previous = mapped
+		end
+		assert(math.abs(Rules.speed(C.SpeedCap) - C.WalkSpeedCap) < 0.001)
+		assert(Rules.speed(C.SpeedCap, true) <= C.OverdriveCap)
+		assert(Rules.speed(0 / 0) == C.BaseWalkSpeed and not Rules.vector(Vector3.new(0 / 0, 0, 0)))
 		local rng = Random.new(301)
 		local typical = 0
 		for _ = 1, 1000 do
@@ -118,6 +144,44 @@ function Tests.run(g)
 			end
 		end
 		assert(typical > 730 and typical < 870)
+	end)
+
+	check("Rarity, creature, and element are independent across all supported combinations", function()
+		local Inventory = require(script.Parent.Inventory)
+		local inv = Inventory.new()
+		local owner = -44040
+		for _, rarity in ipairs(C.RarityOrder) do
+			for _, creature in ipairs(C.Creatures) do
+				local egg = assert(inv:create(owner, "Egg", rarity, creature))
+				assert(egg.rarity == rarity and egg.creature == creature and egg.element == nil)
+				inv.items[egg.id] = nil
+				for _, element in ipairs(C.ElementOrder) do
+					local pet = assert(inv:create(owner, "Pet", rarity, creature, element))
+					assert(pet.rarity == rarity and pet.creature == creature and pet.element == element)
+					inv.items[pet.id] = nil
+				end
+			end
+		end
+		assert(C.DayWeights.Godly == 5 and C.NightWeights.Godly == 100)
+		assert(C.Rarities.Godly.hatch == 7200 and C.Rarities.Godly.income == 2500)
+	end)
+
+	check("Momentum, Overdrive bounds, fractional Coin credit, and Exchange values are deterministic", function()
+		local m, integral, energy = Rules.trainDelta(0, C.MomentumRamp, true)
+		assert(math.abs(m - 1) < 0.001 and integral > 14.9 and integral < 15.1)
+		assert(energy >= 0)
+		local decayed = select(1, Rules.trainDelta(1, C.MomentumDecay, false))
+		assert(decayed == 0)
+		local balance, remainder = Rules.credit(0, 0, 6, 5)
+		assert(balance == 0 and math.abs(remainder - 0.5) < 0.001)
+		balance, remainder = Rules.credit(balance, remainder, 6, 5)
+		assert(balance == 1 and remainder < 0.001)
+		local Inventory = require(script.Parent.Inventory)
+		local inv = Inventory.new()
+		local common = assert(inv:create(-44041, "Pet", "Common", "Skunk", "Earth"))
+		local godly = assert(inv:create(-44041, "Egg", "Godly", "Dragon"))
+		assert(Rules.exchangeValue(common) == 48)
+		assert(Rules.exchangeValue(godly) == 12000)
 	end)
 	check("Training accrues only on own treadmill", function()
 		workspace:SetAttribute("BossEnabled", false)
@@ -135,12 +199,14 @@ function Tests.run(g)
 		assert(pro.speed.Value == after)
 	end)
 	check("Remote pickup cannot bypass proximity", function()
+		local egg = dayEgg(1)
 		near(a, g.profiles[a].base.spawn.Position)
-		assert(not g:take(a, "nest-1"))
+		assert(not g:take(a, egg.id))
+		assert(egg.state == "Home" and egg.carrier == nil)
 	end)
 	local firstPet
 	local heistOK = check("Bat drops carried egg with BossEnabled false; no shared base ownership", function()
-		local egg = g.eggs["nest-1"]
+		local egg = dayEgg(1)
 		assert(egg)
 		near(a, egg.model:GetPivot().Position + Vector3.new(0, 2, -4))
 		assert(g:take(a, egg.id))
@@ -153,12 +219,8 @@ function Tests.run(g)
 		near(b, g.profiles[a].base.incubators.Fire.pad.Position + Vector3.new(0, 3, 0))
 		assert(not g:secure(b, "Fire"))
 		near(b, g.profiles[b].base.incubators.Fire.pad.Position + Vector3.new(0, 3, 0))
-		assert(
-			waitFor(function()
-				return g.profiles[b].incubations.Fire ~= nil
-			end, 2),
-			"Own elemental incubator did not auto-secure the carried egg"
-		)
+		assert(g:secure(b, "Fire"), "Explicit Fire incubator placement failed")
+		assert(g.profiles[b].incubations.Fire ~= nil, "Fire incubation did not start")
 		firstPet = g.profiles[b].incubations.Fire.itemId
 		assert(g.inventory.items[firstPet].ownerId == b.UserId)
 		assert(g.inventory.items[firstPet].creature == "Skunk")
@@ -166,9 +228,12 @@ function Tests.run(g)
 	end)
 	if heistOK then
 		check("Day hatch countdown and real 30x night acceleration", function()
-			task.wait(2)
+			task.wait(1)
 			local inc = g.profiles[b].incubations.Fire
-			assert(inc and inc.remaining > 10 and inc.remaining < 20)
+			local item = g.inventory.items[firstPet]
+			assert(inc and item and inc.remaining < C.Rarities[item.rarity].hatch)
+			-- Bound wall-clock test time without bypassing the production hatch conversion path.
+			inc.remaining = 30
 			g:setNight(true)
 			assert(waitFor(function()
 				return g.profiles[b].incubations.Fire == nil
@@ -178,37 +243,40 @@ function Tests.run(g)
 			assert(g.inventory.items[firstPet].petMode == "Active")
 			assert(g.petRecords:FindFirstChild(firstPet):GetAttribute("DisplayMode") == "Active")
 			local before = g.profiles[b].money.Value
-			task.wait(2.1)
+			g.profiles[b].coinRemainder = 0.95
+			task.wait(1)
 			assert(g.profiles[b].money.Value > before)
-			assert(g.world.nests[5].egg ~= nil)
+			assert(g.nightEgg ~= nil and g.nightEgg.rarity ~= nil)
+			assert(g.nightEgg.rarity == "Legendary" or g.nightEgg.rarity == "Mythic" or g.nightEgg.rarity == "Godly")
 			g:setNight(false)
 		end)
 	end
 	check("All four elements hatch independent Dragon variants without changing rarity", function()
-		near(b, g.profiles[b].base.center + Vector3.new(0, 3, 0))
-		assert(firstPet and g.inventory.items[firstPet].kind == "Pet", "First hatch prerequisite failed")
-		local baseline = g.inventory.items[firstPet]
-		assert(g:setPetMode(b, baseline.id, "Active"))
+		near(a, g.profiles[a].base.center + Vector3.new(0, 3, 0))
+		local baseline = assert(g.inventory:create(a.UserId, "Pet", "Common", "Skunk", "Fire"))
+		g:reconcilePets()
+		assert(g:setPetMode(a, baseline.id, "Active"))
 		local eggs = {}
 		for _, element in ipairs(C.ElementOrder) do
-			local item = assert(g.inventory:create(b.UserId, "Egg", "Common", "Dragon"))
+			local item = assert(g.inventory:create(a.UserId, "Egg", "Common", "Dragon"))
 			eggs[element] = item
-			assert(g:incubate(b, item.id, element))
-			assert(g.profiles[b].incubations[element].itemId == item.id)
+			near(a, g.profiles[a].base.incubators[element].pad.Position + Vector3.new(0, 3, 0))
+			assert(g:incubate(a, item.id, element))
+			assert(g.profiles[a].incubations[element].itemId == item.id)
 		end
-		local extra = assert(g.inventory:create(b.UserId, "Egg", "Common", "Skunk"))
-		assert(not g:incubate(b, extra.id, "Fire"), "Occupied incubator accepted another egg")
-		assert(not g:incubate(a, extra.id, "Water"), "Foreign item was accepted")
-		assert(not g:incubate(b, extra.id, "Lightning"), "Invalid element was accepted")
+		local extra = assert(g.inventory:create(a.UserId, "Egg", "Common", "Skunk"))
+		assert(not g:incubate(a, extra.id, "Fire"), "Occupied incubator accepted another egg")
+		assert(not g:incubate(b, extra.id, "Water"), "Foreign item was accepted")
+		assert(not g:incubate(a, extra.id, "Lightning"), "Invalid element was accepted")
 		assert(extra.state == "Inventory" and extra.element == nil)
 		task.wait(0.5)
 		for _, element in ipairs(C.ElementOrder) do
-			assert(g.profiles[b].incubations[element].remaining < 20)
+			assert(g.profiles[a].incubations[element].remaining < 20)
 		end
 		g:setNight(true)
 		assert(
 			waitFor(function()
-				return next(g.profiles[b].incubations) == nil
+				return next(g.profiles[a].incubations) == nil
 			end, 2),
 			"Four real night-accelerated hatches did not finish"
 		)
@@ -218,13 +286,48 @@ function Tests.run(g)
 			assert(item.kind == "Pet" and item.creature == "Dragon" and item.element == element)
 			assert(item.species == element .. " Dragon" and item.rarity == "Common" and item.petMode == "Pen")
 		end
-		assert(g:setPetMode(b, eggs.Water.id, "Active"))
-		assert(baseline.petMode == "Pen" and g.profiles[b].activePetId == eggs.Water.id)
-		assert(not g:setPetMode(a, eggs.Water.id, "Active"), "Another player activated a foreign pet")
+		assert(g:setPetMode(a, eggs.Water.id, "Active"))
+		assert(baseline.petMode == "Pen" and g.profiles[a].activePetId == eggs.Water.id)
+		assert(not g:setPetMode(b, eggs.Water.id, "Active"), "Another player activated a foreign pet")
 		assert(g.petRecords[eggs.Water.id]:GetAttribute("DisplayMode") == "Active")
-		assert(g:setPetMode(b, eggs.Water.id, "Pen"))
-		assert(g.profiles[b].activePetId == nil)
+		assert(g:setPetMode(a, eggs.Water.id, "Pen"))
+		assert(g.profiles[a].activePetId == nil)
 	end)
+	check("Night dormancy, hidden egg lifecycle, and cross-sunrise contests preserve ownership", function()
+		workspace:SetAttribute("BossEnabled", false)
+		g:setNight(false)
+		local carriedDay = dayEgg(2)
+		assert(carriedDay and carriedDay.state == "Home")
+		near(a, carriedDay.model:GetPivot().Position + Vector3.new(0, 2, -4))
+		assert(g:take(a, carriedDay.id))
+		g:setNight(true)
+		assert(g.carry[a] == carriedDay, "Moonrise deleted an already-carried Day egg")
+		assert(g.nightEgg and g.nightEgg.state == "Home", "Night did not create exactly one hidden egg")
+		local nightId = g.nightEgg.id
+		assert(g.eggs[nightId] == g.nightEgg)
+		local dormant = dayEgg(4)
+		if dormant and dormant.state == "Home" then
+			near(b, dormant.model:GetPivot().Position + Vector3.new(0, 2, -4))
+			assert(not g:take(b, dormant.id), "Dormant Day nest allowed a new Night pickup")
+		end
+		g:setNight(false)
+		assert(g.carry[a] == carriedDay, "Sunrise canceled the Day egg carry contest")
+		assert(g.eggs[nightId] == nil, "Unclaimed hidden Night egg survived dawn")
+		g:resetEgg(carriedDay)
+
+		g:setNight(true)
+		local active = g.nightEgg
+		assert(active and active.state == "Home")
+		near(a, active.model:GetPivot().Position + Vector3.new(0, 2, -4))
+		assert(g:take(a, active.id))
+		g:setNight(false)
+		assert(g.carry[a] == active and g.eggs[active.id] == active, "Active Night contest did not survive dawn")
+		assert(g:drop(a, "manual"))
+		assert(active.state == "Dropped" and g.eggs[active.id] == active)
+		g:resetEgg(active)
+		assert(g.eggs[active.id] == nil and g.nightEgg == nil, "Resolved post-dawn Night contest leaked an egg")
+	end)
+
 	check("All sixteen creature-element models are constructible and distinct", function()
 		local Art = require(Shared.Art)
 		local folder = Instance.new("Folder")
@@ -245,12 +348,13 @@ function Tests.run(g)
 		assert(count == 16)
 	end)
 	check("Pen paging keeps every displayed pet within the pen and preserves income", function()
-		for i = 1, 6 do
-			g.inventory:create(b.UserId, "Pet", "Common", "Skunk", "Earth")
+		local starterCapacity = C.Expansions[1].capacity
+		for _ = 1, starterCapacity + 1 do
+			assert(g.inventory:create(b.UserId, "Pet", "Common", "Skunk", "Earth"))
 		end
 		g:reconcilePets()
 		local pro = g.profiles[b]
-		assert(pro.penCount > C.MaxVisiblePets and pro.penPages >= 2)
+		assert(pro.penCount > starterCapacity and pro.penPages >= 2)
 		local income = g.inventory:income(b.UserId)
 		local shownIds = {}
 		for page = 1, pro.penPages do
@@ -258,14 +362,19 @@ function Tests.run(g)
 			local visible = 0
 			for _, r in ipairs(g.petRecords:GetChildren()) do
 				if r:GetAttribute("OwnerUserId") == b.UserId and r:GetAttribute("Displayed") then
-					local pos = r:GetAttribute("PenPosition")
-					assert(typeof(pos) == "Vector3" and math.abs(pos.X - pro.base.penCenter.X) <= 10)
-					assert(math.abs(pos.Z - pro.base.penCenter.Z) <= 3)
-					visible += 1
-					shownIds[r.Name] = true
+					local mode = r:GetAttribute("DisplayMode")
+					if mode == "Pen" then
+						local pos = r:GetAttribute("PenPosition")
+						assert(typeof(pos) == "Vector3" and math.abs(pos.X - pro.base.penCenter.X) <= 10)
+						assert(math.abs(pos.Z - pro.base.penCenter.Z) <= 3)
+						visible += 1
+						shownIds[r.Name] = true
+					elseif mode == "Active" then
+						assert(r:GetAttribute("PenPosition") == nil)
+					end
 				end
 			end
-			assert(visible > 0 and visible <= C.MaxVisiblePets)
+			assert(visible > 0 and visible <= starterCapacity)
 			assert(g.inventory:income(b.UserId) == income)
 		end
 		local count = 0
@@ -277,7 +386,7 @@ function Tests.run(g)
 		assert(g:setPenPage(b, 1))
 	end)
 	check("Egg storage preserves unhatched creature identity at the owner's camp only", function()
-		local egg = g.eggs["nest-3"]
+		local egg = dayEgg(3)
 		near(b, egg.model:GetPivot().Position + Vector3.new(0, 2, -4))
 		assert(g:take(b, egg.id))
 		assert(not g:storeEgg(b))
@@ -295,9 +404,9 @@ function Tests.run(g)
 		local pro = g.profiles[a]
 		near(a, pro.base.spawn.Position)
 		pro.money.Value = 0
-		assert(not g:buyUpgrade(a))
-		pro.money.Value = C.UpgradeCost
-		assert(g:buyUpgrade(a))
+		assert(not g:buyUpgrade(a, 2))
+		pro.money.Value = C.Grades[2].cost
+		assert(g:buyUpgrade(a, 2))
 		assert(pro.tier == 2 and pro.money.Value == 0)
 		assert(not g:buyUpgrade(a))
 		assert(pro.money.Value == 0)
@@ -322,7 +431,7 @@ function Tests.run(g)
 		assert(g:placeTrap(a))
 		local trap = g.traps[#g.traps]
 		assert(trap)
-		local egg = g.eggs["nest-2"]
+		local egg = dayEgg(2)
 		near(b, egg.model:GetPivot().Position + Vector3.new(0, 2, -4))
 		assert(g:take(b, egg.id))
 		task.wait(C.TrapArmTime + 0.1)
@@ -468,7 +577,7 @@ function Tests.run(g)
 	end)
 	check("Warden catches after unpause and returns finite transforms home", function()
 		prep()
-		local egg = g.eggs["nest-1"]
+		local egg = dayEgg(1)
 		assert(egg)
 		near(a, egg.model:GetPivot().Position + Vector3.new(0, 2, -5))
 		assert(g:take(a, egg.id))
@@ -520,6 +629,7 @@ function Tests.run(g)
 		wall:Destroy()
 		assert((pos - target).Magnitude < 2, "Warden failed to route around obstacle")
 	end)
+	require(script.Parent.LivingWorldChecks).run(g, check, a, b, results)
 	check("Actual client disconnect cancels selection without escrow loss", function()
 		prep()
 		assert(g.duels:request(a, b))

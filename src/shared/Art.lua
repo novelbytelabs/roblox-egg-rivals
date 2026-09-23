@@ -53,7 +53,8 @@ local function ear(m, pos, col, angle)
 end
 function Art.egg(rarity, parent, creature)
 	local col = Config.Rarities[rarity].color
-	creature = creature or Config.Rarities[rarity].creature
+	creature = creature or Config.Creatures[1]
+	assert(table.find(Config.Creatures, creature), "Unknown creature")
 	local m = Art.model("Egg_" .. rarity .. "_" .. creature, parent)
 	ball(m, "Shell", Vector3.new(2.7, 3.4, 2.7), Vector3.new(0, 0, 0), col)
 	for i = 1, 6 do
@@ -147,6 +148,10 @@ end
 
 function Art.pet(creature, rarity, element, parent)
 	element = element or "Earth"
+	assert(
+		table.find(Config.Creatures, creature) and Config.Rarities[rarity] and Config.Elements[element],
+		"Invalid pet definition"
+	)
 	local style = Config.Elements[element] or Config.Elements.Earth
 	local bodyCol = style.color
 	local accent = style.accent
@@ -199,6 +204,24 @@ function Art.pet(creature, rarity, element, parent)
 	local rarityGem =
 		ball(m, "RarityGem", Vector3.new(0.28, 0.28, 0.2), Vector3.new(0, 0.25, -1.7), Config.Rarities[rarity].color)
 	rarityGem.Material = Enum.Material.Neon
+	m:SetAttribute("Creature", creature)
+	m:SetAttribute("Element", element)
+	m:SetAttribute("Rarity", rarity)
+	if rarity == "Godly" then
+		for i = 1, 10 do
+			local angle = i * math.pi / 5
+			local shard = part(
+				m,
+				"GodlyHalo",
+				Vector3.new(0.16, 0.55, 0.25),
+				CFrame.new(math.cos(angle) * 1.65, 2.9, math.sin(angle) * 1.65) * CFrame.Angles(0, -angle, 0.3),
+				Config.Rarities.Godly.color,
+				nil,
+				Enum.Material.Neon
+			)
+			shard:SetAttribute("PetHaloRest", shard.CFrame)
+		end
+	end
 	return m
 end
 

@@ -64,8 +64,23 @@ function U.preview(parent, item, x, y, w, h)
 	v.Parent = parent
 	local world = Instance.new("WorldModel")
 	world.Parent = v
-	local m = item.kind == "Pet" and Art.pet(item.creature, item.rarity, item.element, world)
-		or Art.egg(item.rarity, world, item.creature)
+	local m
+	if item.kind == "Item" then
+		m = Art.model(item.species or item.itemType, world)
+		local tool = Art.tool(item.itemType)
+		for _, child in ipairs(tool:GetChildren()) do
+			if child:IsA("BasePart") then
+				child.Anchored = true
+				child.CanCollide = false
+				child.Parent = m
+			end
+		end
+		tool:Destroy()
+	elseif item.kind == "Pet" then
+		m = Art.pet(item.creature, item.rarity, item.element, world)
+	else
+		m = Art.egg(item.rarity, world, item.creature)
+	end
 	m:PivotTo(CFrame.new())
 	local camera = Instance.new("Camera")
 	camera.CFrame = CFrame.lookAt(Vector3.new(3.5, 2, -6), Vector3.new(0, 0.5, 0))
@@ -117,10 +132,10 @@ function U.card(parent, item, callback, selected)
 	U.text(
 		card,
 		"State",
-		item.state == "Inventory"
-				and (item.kind == "Pet" and ((item.petMode or "Pen"):upper() .. " • +" .. tostring(
-					item.income or C.Rarities[item.rarity].income
-				) .. " / 2s") or "Select creature + element")
+		item.locked and "LOCKED • FAVORITE"
+			or item.state == "Inventory" and (item.kind == "Pet" and ((item.petMode or "Pen"):upper() .. " • +" .. tostring(
+				item.income or C.Rarities[item.rarity].income
+			) .. " / min") or (item.kind == "Item" and "Consumable • tradable" or "Choose an element"))
 			or item.state,
 		9,
 		163,

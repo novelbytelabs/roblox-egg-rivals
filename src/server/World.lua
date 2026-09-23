@@ -1,6 +1,7 @@
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Stage3Shared")
 local Art = require(Shared.Art)
 local Config = require(Shared.Config)
+local Camp = require(script.Parent.Camp)
 local W = {}
 function W.build()
 	assert(
@@ -89,185 +90,15 @@ function W.build()
 		Color3.fromRGB(197, 161, 235),
 	}
 	for i = 1, 4 do
-		local x = (i - 2.5) * 42
-		local c = plotColors[i]
-		local m = Instance.new("Model")
-		m.Name = "Base" .. i
-		m.Parent = folder
-		p("Deck", Vector3.new(38, 0.6, 40), Vector3.new(x, 0.3, -47), wood, Enum.Material.WoodPlanks, true, m)
-		for _, side in ipairs({ -1, 1 }) do
-			p(
-				"CanopyPost",
-				Vector3.new(0.7, 9, 0.7),
-				Vector3.new(x + side * 16, 4.5, -59),
-				wood,
-				Enum.Material.Wood,
-				true,
-				m
-			)
+		local base = Camp.create(folder, i, plotColors[i])
+		table.insert(bases, base)
+		for _, descendant in ipairs(base.model:GetDescendants()) do
+			if descendant:IsA("BasePart") and descendant.Name == "BeltStripe" then
+				table.insert(belts, descendant)
+			end
 		end
-		local roof = p("Canopy", Vector3.new(36, 0.45, 20), Vector3.new(x, 9.2, -50), c, Enum.Material.Fabric, false, m)
-		roof.CFrame *= CFrame.Angles(0.04, 0, 0)
-		local banner = p("Nameplate", Vector3.new(0.2, 0.2, 0.2), Vector3.new(x, 7, -26), stone, nil, false, m)
-		banner.Transparency = 1
-		local name = Art.billboard(banner, "AVAILABLE BASE", c, 240, 44, Vector3.zero)
-
-		local treadmill = p(
-			"Treadmill",
-			Vector3.new(11, 0.9, 6),
-			Vector3.new(x - 11, 1, -39),
-			Color3.fromRGB(41, 57, 57),
-			Enum.Material.Metal,
-			true,
-			m
-		)
-		treadmill:SetAttribute("Treadmill", true)
-		for j = 1, 8 do
-			local line = p(
-				"BeltStripe",
-				Vector3.new(0.16, 0.06, 5.2),
-				Vector3.new(x - 16 + j * 1.2, 1.49, -39),
-				c,
-				Enum.Material.SmoothPlastic,
-				false,
-				m
-			)
-			line:SetAttribute("BeltCenter", treadmill.Position)
-			line:SetAttribute("BeltPhase", j / 8)
-			table.insert(belts, line)
-		end
-		for _, z in ipairs({ -42, -36 }) do
-			p("TreadmillRail", Vector3.new(11, 0.25, 0.25), Vector3.new(x - 11, 3, z), c, Enum.Material.Metal, false, m)
-		end
-		local screen = p(
-			"Console",
-			Vector3.new(0.25, 1.2, 3),
-			Vector3.new(x - 17, 3.1, -39),
-			Color3.fromRGB(36, 93, 84),
-			Enum.Material.Neon,
-			false,
-			m
-		)
-		Art.billboard(screen, "AUTO TRAIN\n+1 Speed / second", c, 180, 50, Vector3.new(0, 2, 0))
-
-		local respawnPad = Instance.new("SpawnLocation")
-		respawnPad.Name = "RespawnPad"
-		respawnPad.Size = Vector3.new(7, 0.35, 7)
-		respawnPad.CFrame = CFrame.lookAt(Vector3.new(x - 10, 0.55, -55), Vector3.new(x - 10, 0.55, 40))
-		respawnPad.Anchored = true
-		respawnPad.Neutral = true
-		respawnPad.Duration = 0
-		respawnPad.AllowTeamChangeOnTouch = false
-		respawnPad.Color = c
-		respawnPad.Material = Enum.Material.Neon
-		respawnPad.Parent = m
-		Art.billboard(respawnPad, "YOUR RESPAWN", c, 150, 34, Vector3.new(0, 3.2, 0))
-
-		local incubators = {}
-		local incLayout = {
-			Fire = Vector3.new(x + 5, 1, -38),
-			Water = Vector3.new(x + 13, 1, -38),
-			Wind = Vector3.new(x + 5, 1, -50),
-			Earth = Vector3.new(x + 13, 1, -50),
-		}
-		for _, element in ipairs(Config.ElementOrder) do
-			local style = Config.Elements[element]
-			local pos = incLayout[element]
-			local incubator =
-				p(element .. "Incubator", Vector3.new(6.5, 0.8, 6.5), pos, style.accent, Enum.Material.Metal, true, m)
-			incubator:SetAttribute("Element", element)
-			local ring = Art.part(
-				m,
-				element .. "Ring",
-				Vector3.new(0.2, 6.2, 6.2),
-				CFrame.new(pos + Vector3.new(0, 0.5, 0)) * CFrame.Angles(0, 0, math.pi / 2),
-				style.color,
-				Enum.PartType.Cylinder,
-				Enum.Material.Neon
-			)
-			local dome = Art.part(
-				m,
-				element .. "Dome",
-				Vector3.new(5.6, 5, 5.6),
-				CFrame.new(pos + Vector3.new(0, 2.8, 0)),
-				style.color,
-				Enum.PartType.Ball,
-				Enum.Material.Glass
-			)
-			dome.Transparency = 0.82
-			local timer = Art.billboard(
-				incubator,
-				element:upper() .. " INCUBATOR\nAvailable",
-				style.color,
-				170,
-				58,
-				Vector3.new(0, 5.6, 0)
-			)
-			incubators[element] = { element = element, pad = incubator, timer = timer, ring = ring, dome = dome }
-		end
-
-		local penCenter = Vector3.new(x, 0.2, -77)
-		p(
-			"PetPenFloor",
-			Vector3.new(30, 0.25, 14),
-			penCenter,
-			Color3.fromRGB(82, 120, 76),
-			Enum.Material.Grass,
-			true,
-			m
-		)
-		-- Six-stud entrance at the front; no jumping required to enter the pen.
-		p(
-			"PenFence",
-			Vector3.new(30, 2.4, 0.35),
-			penCenter + Vector3.new(0, 1.2, -7),
-			wood,
-			Enum.Material.Wood,
-			true,
-			m
-		)
-		for _, dx in ipairs({ -9, 9 }) do
-			p(
-				"PenFence",
-				Vector3.new(12, 2.4, 0.35),
-				penCenter + Vector3.new(dx, 1.2, 7),
-				wood,
-				Enum.Material.Wood,
-				true,
-				m
-			)
-		end
-		for _, dx in ipairs({ -15, 15 }) do
-			p(
-				"PenFence",
-				Vector3.new(0.35, 2.4, 14),
-				penCenter + Vector3.new(dx, 1.2, 0),
-				wood,
-				Enum.Material.Wood,
-				true,
-				m
-			)
-		end
-		local penSign =
-			p("PenSign", Vector3.new(0.2, 0.2, 0.2), penCenter + Vector3.new(0, 3.2, -6), stone, nil, false, m)
-		penSign.Transparency = 1
-		Art.billboard(penSign, "PET PEN\nStored companions", c, 180, 46, Vector3.zero)
-
-		local b = {
-			model = m,
-			x = x,
-			center = Vector3.new(x, 0.5, -47),
-			spawn = CFrame.lookAt(respawnPad.Position + Vector3.new(0, 3.5, 0), Vector3.new(x, 4, 40)),
-			respawnPad = respawnPad,
-			treadmill = treadmill,
-			incubators = incubators,
-			penCenter = penCenter,
-			nameLabel = name,
-			color = c,
-			owner = nil,
-		}
-		table.insert(bases, b)
 	end
+
 	local shop = p("SupplyCounter", Vector3.new(9, 3, 4), Vector3.new(71, 1.5, 4), wood, Enum.Material.WoodPlanks, true)
 	p(
 		"ShopAwning",
@@ -286,7 +117,9 @@ function W.build()
 		{ Vector3.new(-28, 2.4, 70), Vector3.new(28, 2.4, 70), Vector3.new(-28, 2.4, 113), Vector3.new(28, 2.4, 150) }
 	for i, pos in ipairs(positions) do
 		local rarity = Config.RarityOrder[i]
+		local creature = Config.Creatures[i]
 		local spec = Config.Rarities[rarity]
+		local hints = { 100, 250, 500, 900 }
 		local platform =
 			p("Nest" .. i, Vector3.new(8, 1, 8), pos - Vector3.new(0, 1.8, 0), stone, Enum.Material.Slate, true)
 		for j = 1, 10 do
@@ -301,15 +134,23 @@ function W.build()
 			)
 			twig.CFrame *= CFrame.Angles(0, -a + math.pi / 2, 0)
 		end
-		Art.billboard(
+		local label = Art.billboard(
 			platform,
-			rarity:upper() .. " " .. spec.creature:upper() .. " EGG\nSuggested Speed " .. spec.hint,
+			creature:upper() .. " EGG • " .. rarity:upper() .. "\nSuggested Speed " .. hints[i],
 			spec.color,
 			200,
 			55,
 			Vector3.new(0, 6.6, 0)
 		)
-		table.insert(nests, { id = i, position = pos, rarity = rarity, part = platform, event = false })
+		table.insert(nests, {
+			id = i,
+			position = pos,
+			rarity = rarity,
+			creature = creature,
+			part = platform,
+			label = label,
+			event = false,
+		})
 	end
 	local shrinePos = Vector3.new(42, 3, 113)
 	local shrine = p(
@@ -340,7 +181,14 @@ function W.build()
 	)
 	moon.CFrame *= CFrame.Angles(0, 0, math.pi / 4)
 	Art.billboard(shrine, "MOON SHRINE\nAwakens at night", Config.Colors.Gold, 200, 60, Vector3.new(0, 9, 0))
-	table.insert(nests, { id = 5, position = shrinePos, rarity = "Legendary", part = shrine, event = true })
+	local hiddenNightSpots = {
+		Vector3.new(-72, 2.4, 154),
+		Vector3.new(72, 2.4, 171),
+		Vector3.new(-63, 2.4, 92),
+		Vector3.new(61, 2.4, 126),
+		Vector3.new(0, 2.4, 181),
+		Vector3.new(-49, 2.4, 43),
+	}
 	-- Seeded scenery avoids dropping colliders into the tested heist corridors.
 	local rng = Random.new(303)
 	for i = 1, 75 do
@@ -444,6 +292,47 @@ function W.build()
 			l.Parent = lamp
 		end
 	end
+	local function servicePoint(name, pos, color, title)
+		local counter = p(name, Vector3.new(10, 3, 5), pos, Color3.fromRGB(84, 67, 52), Enum.Material.WoodPlanks, true)
+		Art.billboard(counter, title, color, 230, 58, Vector3.new(0, 5, 0))
+		return counter
+	end
+	local trainerShop = servicePoint(
+		"TrainerWorkshop",
+		Vector3.new(45, 1.5, 4),
+		Config.Colors.Blue,
+		"TRAINER WORKSHOP\nSpeed Lab upgrades"
+	)
+	local ranchShop =
+		servicePoint("RanchWorks", Vector3.new(20, 1.5, 4), Config.Colors.Mint, "RANCH & PEN WORKS\nExpand your ranch")
+	local exchangeShop =
+		servicePoint("Exchange", Vector3.new(-20, 1.5, 4), Config.Colors.Gold, "THE EXCHANGE\nEggs • pets • items")
+	local tradingPost =
+		servicePoint("TradingPost", Vector3.new(-45, 1.5, 4), Config.Colors.Text, "TRADING POST\nSafe player trades")
+
+	local trialStart = p(
+		"TrialStart",
+		Vector3.new(8, 0.25, 8),
+		Vector3.new(-52, 0.4, 24),
+		Config.Colors.Blue,
+		Enum.Material.Neon,
+		false
+	)
+	Art.billboard(trialStart, "GROVE CIRCUIT\nStart Trial", Config.Colors.Blue, 190, 48, Vector3.new(0, 3, 0))
+	local trialGates = {
+		Vector3.new(-52, 3, 55),
+		Vector3.new(-23, 3, 93),
+		Vector3.new(20, 3, 129),
+		Vector3.new(52, 3, 94),
+		Vector3.new(24, 3, 55),
+		Vector3.new(-52, 3, 24),
+	}
+	for i, pos in ipairs(trialGates) do
+		local gate = p("TrialGate" .. i, Vector3.new(0.5, 8, 8), pos, Config.Colors.Blue, Enum.Material.Neon, false)
+		gate.Transparency = 0.7
+		gate:SetAttribute("TrialGate", i)
+	end
+
 	local guardian = Art.guardian(dynamic)
 	local home = Vector3.new(0, 4, 91)
 	guardian:PivotTo(CFrame.new(home))
@@ -577,6 +466,15 @@ function W.build()
 		nests = nests,
 		spawn = spawn,
 		shop = shop,
+		trainerShop = trainerShop,
+		ranchShop = ranchShop,
+		exchangeShop = exchangeShop,
+		tradingPost = tradingPost,
+		trialStart = trialStart,
+		trialGates = trialGates,
+		shrine = shrine,
+		moon = moon,
+		hiddenNightSpots = hiddenNightSpots,
 		guardian = guardian,
 		guardianHome = home,
 		guardianLabel = guardianLabel,
