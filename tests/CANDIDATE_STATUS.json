@@ -1,0 +1,23 @@
+{
+  "candidate": "MOONWOOD-0.3.2-r2",
+  "source_digest": "0539ceee262ad0044f00984ed6e2ab6b9a29ed4a9d6ccaf117def73dfa3a719e",
+  "source_parse_and_format": "PASS",
+  "native_build": "PASS",
+  "built_source_byte_comparison": "PASS",
+  "candidate_engine_suite": "PASS",
+  "engine_passed": 24,
+  "engine_failed": 0,
+  "engine_seconds": 77,
+  "human_presentation_acceptance": "PENDING",
+  "artifacts": {
+    "PLAY": {
+      "path": "/home/irbsurfer/Projects/roblox-egg-rivals-poc/stage3/dist/verification-20260922T235605Z/Moonwood_0.3.2-r2_PLAY.rbxlx",
+      "sha256": "0ed5b0baf104d422937cdf495daf126aa742b27c490ccf36dff41186d13bb875"
+    },
+    "TEST": {
+      "path": "/home/irbsurfer/Projects/roblox-egg-rivals-poc/stage3/dist/verification-20260922T235605Z/Moonwood_0.3.2-r2_TEST.rbxlx",
+      "sha256": "8b57759fc9962c9bdf7c3eb887e69de2bee980f8c6167f0384b657120a60422b"
+    }
+  },
+  "scope": "PC Studio vertical slice; session-only progression. No public publishing or persistent saving."
+}

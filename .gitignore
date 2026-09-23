@@ -1,0 +1,40 @@
+# Roblox Studio generated files
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+*.lock
+
+# Build and recovery output
+dist/
+build/
+AutoSaves/
+*_AutoRecovery_*
+
+# Local/editor files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.tmp
+
+# This initial repository contains documentation, not an active runtime.
+.DS_Store
+Thumbs.db
+__pycache__/
+*.py[cod]
+.venv/
+node_modules/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+/runtime-data/
+/local-workspaces/
+/local-secrets/
+# Ignore rules are hygiene, not an access-control mechanism.
+.vscode/
+site/

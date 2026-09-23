@@ -1,0 +1,31 @@
+{
+  "name": "EggRivals",
+  "tree": {
+    "$className": "DataModel",
+    "Workspace": {
+      "$properties": {
+        "Gravity": 196.2
+      },
+      "$attributes": {
+        "Stage3AutoTest": false
+      }
+    },
+    "ReplicatedStorage": {
+      "Stage3Shared": {
+        "$path": "src/shared"
+      }
+    },
+    "ServerScriptService": {
+      "Stage3": {
+        "$path": "src/server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Stage3Client": {
+          "$path": "src/client"
+        }
+      }
+    }
+  }
+}
