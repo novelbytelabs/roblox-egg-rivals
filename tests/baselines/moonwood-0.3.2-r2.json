@@ -1,0 +1,152 @@
+{
+  "starting_commit": "59ecbbe5e6ab3160edea0d7b9f6bdc47843f318a",
+  "branch": "feature/0.4.0-living-world",
+  "source_equivalent_to": "MOONWOOD-0.3.2-r2",
+  "imported_source_digest": "0539ceee262ad0044f00984ed6e2ab6b9a29ed4a9d6ccaf117def73dfa3a719e",
+  "files": {
+    "src/server/Navigation.lua": "e5485ae9be2e8ffc8e3d629c11b018aa5bad1ce029d45cb7b8a17162dabd5acf",
+    "src/server/World.lua": "61fe831bce82ba6a6b871400481c35b70e1b6759fbb760b32f2b84c4c3b8bc80",
+    "src/server/Tests.lua": "cb8876a2e07ecd99229c0c786f6f944af460874b799e1cd5717b76f2bf6669de",
+    "src/server/Inventory.lua": "5d5923af14c4000db4d99c1b7caf5c54ad961e6818e1d65baeed555f10b7be8f",
+    "src/server/Main.server.lua": "fd834325da4150f52b360ea4b131138728c335b1954bc283660ba30db5b38889",
+    "src/server/Duel.lua": "f61fa2d6b931b2eccf0787043f76dc58677796fdfefad669e98c6e6da46ef842",
+    "src/server/Game.lua": "68f660f3e1c093ce3a2f077c04e8b2c9e5b51a014503745b47adb7d2c8db8147",
+    "src/shared/Rules.lua": "5cdb52766e9e9a296a698d23ce574a582ecd9e1b3e7338092bc2d7d4fe2764bc",
+    "src/shared/Art.lua": "5df8e9279299d571743595b3c5daabd1bf11f63f063e250b3afb1181e6b9353e",
+    "src/shared/Config.lua": "907719aa0d19cbb6407789de7777b243ca565971a5521ea4691e676186322ade",
+    "src/client/UI.lua": "a44732fa3493f2ced67595e7863a8d284125e12cf28c96d871d6475699392f19",
+    "src/client/Effects.lua": "a1e631b45be1f0c4610456a4043fb81002c509a4298d150d050b2529618bf860",
+    "src/client/Main.client.lua": "2c8fd82abfe34ade93554204d3378c12f9b85abbfcea15fd4fab62ea337a8237"
+  },
+  "artifacts": {
+    "source.tar.gz": {
+      "path": "/home/irbsurfer/Projects/novelbytelabs/roblox-egg-rivals/build/baseline-20260923T025142Z/source.tar.gz",
+      "sha256": "becadb53c9cbb85dc54068614012e329ce507c045b230d9f618f3ea3e30285b2"
+    },
+    "Moonwood_0.3.2-r2_TEST.rbxlx": {
+      "path": "/home/irbsurfer/Projects/novelbytelabs/roblox-egg-rivals/build/baseline-20260923T025142Z/Moonwood_0.3.2-r2_TEST.rbxlx",
+      "sha256": "dc0ab1beb873ce7d07b80d29066f04e2d6cc32510df641442ddadbdb4bd34b04"
+    },
+    "Moonwood_0.3.2-r2_PLAY.rbxlx": {
+      "path": "/home/irbsurfer/Projects/novelbytelabs/roblox-egg-rivals/build/baseline-20260923T025142Z/Moonwood_0.3.2-r2_PLAY.rbxlx",
+      "sha256": "0e2e740ad64ad2ea9b109060e575c7d21fd2037790e8da7623e28aac42aeeae1"
+    }
+  },
+  "historical_engine_result": {
+    "clientDiagnostics": {
+      "build": "MOONWOOD-0.3.2-r2",
+      "audioLoaded": true,
+      "token": "post-duel-71.91931010000553",
+      "cameraMode": "Enum.CameraMode.Classic",
+      "boundTools": 2,
+      "itemCards": 2,
+      "passed": true,
+      "cameraDistance": 12.500000953674316
+    },
+    "finished": 1790121559,
+    "failed": 0,
+    "started": 1790121482,
+    "sourceDigest": "0539ceee262ad0044f00984ed6e2ab6b9a29ed4a9d6ccaf117def73dfa3a719e",
+    "tests": [
+      {
+        "name": "World, four elemental camps, respawns, pens and named models",
+        "passed": true
+      },
+      {
+        "name": "Movement curve and bounded night distribution",
+        "passed": true
+      },
+      {
+        "name": "Training accrues only on own treadmill",
+        "passed": true
+      },
+      {
+        "name": "Remote pickup cannot bypass proximity",
+        "passed": true
+      },
+      {
+        "name": "Bat drops carried egg with BossEnabled false; no shared base ownership",
+        "passed": true
+      },
+      {
+        "name": "Day hatch countdown and real 30x night acceleration",
+        "passed": true
+      },
+      {
+        "name": "All four elements hatch independent Dragon variants without changing rarity",
+        "passed": true
+      },
+      {
+        "name": "All sixteen creature-element models are constructible and distinct",
+        "passed": true
+      },
+      {
+        "name": "Pen paging keeps every displayed pet within the pen and preserves income",
+        "passed": true
+      },
+      {
+        "name": "Egg storage preserves unhatched creature identity at the owner's camp only",
+        "passed": true
+      },
+      {
+        "name": "Upgrade price, ownership, double-purchase rejection",
+        "passed": true
+      },
+      {
+        "name": "Safe-zone bat and snare rejection",
+        "passed": true
+      },
+      {
+        "name": "Snare arms, affects only carriers, expires slow independently of boss",
+        "passed": true
+      },
+      {
+        "name": "Duel decline changes no ownership",
+        "passed": true
+      },
+      {
+        "name": "Offer ownership, stale confirmation, revision reset and cancel",
+        "passed": true
+      },
+      {
+        "name": "Both confirmations create exact escrow and equip both blasters",
+        "passed": true
+      },
+      {
+        "name": "Blaster finite-input guard and real arena cover occlusion",
+        "passed": true
+      },
+      {
+        "name": "Five real damage eliminations finish once; selected pet transfers income ownership",
+        "passed": true
+      },
+      {
+        "name": "Offer timeout returns to the world without item loss",
+        "passed": true
+      },
+      {
+        "name": "Client HUD, collection key input, tool bindings and post-duel camera",
+        "passed": true
+      },
+      {
+        "name": "Warden catches after unpause and returns finite transforms home",
+        "passed": true
+      },
+      {
+        "name": "Death respawn returns to the owner's marked pad with normal gear",
+        "passed": true
+      },
+      {
+        "name": "Warden navigation does not tunnel through a wall",
+        "passed": true
+      },
+      {
+        "name": "Actual client disconnect cancels selection without escrow loss",
+        "passed": true
+      }
+    ],
+    "passed": 24,
+    "build": "MOONWOOD-0.3.2-r2"
+  },
+  "note": "Baseline source equivalence and native builds passed. Historical engine run preserved; not reused as proof of 0.4.0. Initial REPL helper declaration failed and was corrected before evidence was written."
+}
