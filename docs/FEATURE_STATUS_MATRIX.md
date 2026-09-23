@@ -5,6 +5,7 @@ Purpose: distinguish approved design from implemented and verified behavior.
 Status meanings:
 
 - **VERIFIED BASELINE** — present in `MOONWOOD-0.3.2-r2` and covered by the 24/24 engine suite.
+- **ENGINEERING VERIFIED / PRESENTATION PENDING** — implemented in the 0.4.0 engineering candidate and covered by exact-source regression; human presentation/gameplay acceptance remains pending where experiential.
 - **APPROVED / NOT YET IMPLEMENTED** — canonical design direction, but not part of the verified baseline.
 - **PARTIAL / REFINEMENT PENDING** — a simpler baseline exists, but the newly approved design extends or changes it.
 - **DEFERRED** — intentionally postponed.
@@ -26,13 +27,13 @@ Status meanings:
 | First-to-five DuelBlaster duel | VERIFIED BASELINE | Studio staking architecture tested |
 | System | Status | Notes |
 |---|---|---|
-| Godly rarity | APPROVED / NOT YET IMPLEMENTED | New top standard rarity |
-| Godly reverence behavior | APPROVED / NOT YET IMPLEMENTED | Same-element pets bow |
-| Free new-pet welcome party | APPROVED / NOT YET IMPLEMENTED | Ranch social behavior |
+| Godly rarity | ENGINEERING VERIFIED / PRESENTATION PENDING | Independent top rarity covered by exact-source rules and transfer checks |
+| Godly reverence behavior | ENGINEERING VERIFIED / PRESENTATION PENDING | Eligible resident selection and same-element bow routing passed; visual feel remains human-review scope |
+| Free new-pet welcome party | ENGINEERING VERIFIED / PRESENTATION PENDING | Batched acquisition behavior passed; presentation feel remains pending |
 | Owner homecoming greetings | APPROVED / NOT YET IMPLEMENTED | Pet reactions at base |
 | Walk-through pen gate | PARTIAL / REFINEMENT PENDING | Physical pen exists |
 | Rich autonomous pet social behavior | PARTIAL / REFINEMENT PENDING | Baseline display exists |
-| Ranch Expansion branch | APPROVED / NOT YET IMPLEMENTED | Physical sections |
+| Ranch Expansion branch | ENGINEERING VERIFIED / PRESENTATION PENDING | 8/12/16/24-slot geometry and duplicate-purchase rejection passed |
 | Habitat Builder | APPROVED / NOT YET IMPLEMENTED | Elemental habitats |
 | Creature Comforts | APPROVED / NOT YET IMPLEMENTED | Toys/beds/pools/etc. |
 | Showcase Upgrades | APPROVED / NOT YET IMPLEMENTED | Featured pets/podiums |
@@ -44,41 +45,41 @@ Status meanings:
 | Pet Activity Upgrades | APPROVED / NOT YET IMPLEMENTED | Rich play routines |
 | System | Status | Notes |
 |---|---|---|
-| Momentum training | APPROVED / NOT YET IMPLEMENTED | Speed Lab |
+| Momentum training | ENGINEERING VERIFIED / PRESENTATION PENDING | Integral, threshold and decay behavior passed |
 | Visible treadmill modules | APPROVED / NOT YET IMPLEMENTED | Motor/Belt/Cooling/etc. |
-| Overdrive | APPROVED / NOT YET IMPLEMENTED | Earn through training |
+| Overdrive | ENGINEERING VERIFIED / PRESENTATION PENDING | Bounds, repeat rejection, expiry and duel/trial restrictions passed |
 | Speed Mastery | APPROVED / NOT YET IMPLEMENTED | Control-focused unlocks |
-| Training Trials | APPROVED / NOT YET IMPLEMENTED | Timed movement gates |
-| Personal ghost racer | APPROVED / NOT YET IMPLEMENTED | Race best run |
+| Training Trials | ENGINEERING VERIFIED / PRESENTATION PENDING | Ordered gates, anti-teleport checks and real-client completion passed |
+| Personal ghost racer | ENGINEERING VERIFIED / PRESENTATION PENDING | Replayable personal-best path passed |
 | Elemental treadmill tuning | APPROVED / NOT YET IMPLEMENTED | Tactical sidegrades |
 | Pet treadmill spectators | APPROVED / NOT YET IMPLEMENTED | Ranch reaction |
 | Speed milestone celebrations | APPROVED / NOT YET IMPLEMENTED | Major progression moments |
-| Machine Grades | APPROVED / NOT YET IMPLEMENTED | No Speed reset |
+| Machine Grades | ENGINEERING VERIFIED / PRESENTATION PENDING | All seven grade caps and ownership preservation passed |
 | Heat/cooling presentation | APPROVED / NOT YET IMPLEMENTED | Nonpunitive |
 | Social drafting | APPROVED / NOT YET IMPLEMENTED | Group training bonus |
 | Sprint Challenges | APPROVED / NOT YET IMPLEMENTED | Movement rivalry |
-| Motion Energy | APPROVED / NOT YET IMPLEMENTED | Powers camp presentation |
+| Motion Energy | ENGINEERING VERIFIED / PRESENTATION PENDING | Energy accounting and camp-power behavior passed; presentation feel remains pending |
 | Machine personal records | APPROVED / NOT YET IMPLEMENTED | Prestige/status |
 | System | Status | Notes |
 |---|---|---|
 | Night 30x incubation | VERIFIED BASELINE | Existing acceleration |
-| No normal egg taking at Night | APPROVED / NOT YET IMPLEMENTED | Newer Night rule |
-| One hidden Night egg | APPROVED / NOT YET IMPLEMENTED | Random curated hiding spot |
+| No normal egg taking at Night | ENGINEERING VERIFIED / PRESENTATION PENDING | Night dormancy and cross-sunrise ownership checks passed |
+| One hidden Night egg | ENGINEERING VERIFIED / PRESENTATION PENDING | Hidden-egg lifecycle and sunrise cleanup passed |
 | Environmental Night clues | APPROVED / NOT YET IMPLEMENTED | No exact waypoint |
 | Full neon-blacklight transformation | APPROVED / NOT YET IMPLEMENTED | Major visual pass |
 | Element-specific Night palette | APPROVED / NOT YET IMPLEMENTED | Fire/Water/Wind/Earth |
-| Particle motion trails | APPROVED / NOT YET IMPLEMENTED | Speed-scaled |
-| Full-stop collision splatter | APPROVED / NOT YET IMPLEMENTED | Trail material becomes burst |
+| Particle motion trails | ENGINEERING VERIFIED / PRESENTATION PENDING | Client pool reuse/budget checks passed; visual quality remains pending |
+| Full-stop collision splatter | ENGINEERING VERIFIED / PRESENTATION PENDING | Contact/full-stop classifier passed; visual quality remains pending |
 | Moon Shrine Night clue role | APPROVED / NOT YET IMPLEMENTED | Exact clue strength tunable |
 | Night Market | APPROVED / NOT YET IMPLEMENTED | Closed by day |
 | Arena neon collision effects | DEFERRED | Revisit with arena polish |
 | System | Status | Notes |
 |---|---|---|
 | Trail Supplies | VERIFIED BASELINE / PARTIAL | Existing snare shop |
-| Ranch & Pen Works | APPROVED / NOT YET IMPLEMENTED | Ranch progression |
-| Trading Post | APPROVED / NOT YET IMPLEMENTED | Safe two-sided trade |
-| Exchange | APPROVED / NOT YET IMPLEMENTED | Items, eggs, pets |
-| Trainer Workshop | APPROVED / NOT YET IMPLEMENTED | Speed Lab progression |
+| Ranch & Pen Works | ENGINEERING VERIFIED / PRESENTATION PENDING | Ranch expansion transaction and geometry checks passed |
+| Trading Post | ENGINEERING VERIFIED / PRESENTATION PENDING | Real timed holds, concurrency, mutation, timeout and disconnect paths passed |
+| Exchange | ENGINEERING VERIFIED / PRESENTATION PENDING | Pets, eggs, consumables, Godly holds and stale/departure paths passed |
+| Trainer Workshop | ENGINEERING VERIFIED / PRESENTATION PENDING | Grade progression and Speed Lab transaction rules passed |
 | Duel Armory | APPROVED / NOT YET IMPLEMENTED | Balanced sidegrades/cosmetics |
 | Pet Outfitter | APPROVED / NOT YET IMPLEMENTED | Cosmetics |
 | Quest Board / Ranger Station | APPROVED / NOT YET IMPLEMENTED | Rotating core-loop objectives |
@@ -105,7 +106,7 @@ Do not update this matrix from aspiration alone.
 
 ## 0.4.0 targeted implementation set
 
-The following approved systems are now explicitly targeted by the next major slice but remain **NOT YET VERIFIED** until exact-source regression succeeds:
+The 0.4.0 exact-source engineering candidate passed 77/77 checks. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above. Visual or experiential scope that lacks human acceptance remains unpromoted even when implementation exists:
 
 - Economy / Speed / rarity v2;
 - Godly rarity and reverence;
@@ -122,4 +123,4 @@ The following approved systems are now explicitly targeted by the next major sli
 - Exchange;
 - Trading Post.
 
-Do not relabel any item above as VERIFIED merely because it appears in the 0.4.0 plan.
+Do not promote presentation-dependent scope to **VERIFIED BASELINE** from engine evidence alone. Human presentation/gameplay acceptance remains a separate gate.

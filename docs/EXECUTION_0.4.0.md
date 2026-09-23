@@ -22,7 +22,23 @@ Camp construction and client presentation stay separate from transaction authori
 Duel/Navigation retain their tested responsibilities and receive only integration/regression changes.
 Tests will retain equivalent baseline coverage while extending it for the new rules.
 
-## First unresolved gate
+## Historical first unresolved gate
 
-Phase 1: canonical configuration, item reservations, currency accumulation and schema migration.
-Implementation and current-candidate verification are not yet complete.
+At the start of this execution record, Phase 1 was the first unresolved gate: canonical configuration, item reservations, currency accumulation and schema migration. That statement is retained as historical execution context.
+
+## Final engineering verification
+
+- Final candidate: `EGG-RIVALS-0.4.0-rc1`.
+- Exact HEAD: `e185b078b7fd9f598e62130fb1dcaf008885fdb1`.
+- Exact source digest: `33d29059abad739b7c3cdfeabf7cf27409328acf510edbb1f3c6b67da318d4e4`.
+- StyLua check: PASS.
+- Native PLAY and TEST builds: PASS.
+- PLAY/TEST gameplay script-byte identity: PASS across 26 scripts.
+- Fresh real Studio topology: one server plus two clients.
+- Exact-source engine result: `tests/engine-20260923T204200Z.json`, 77 passed / 0 failed.
+- Engine result SHA-256: `86b1edf0b8a7b15e0c6dcc40b513e2c2104dc285221dec5b3cc847e25309089d`.
+- Source remained unchanged after the run.
+- Final engineering status: **ENGINEERING CANDIDATE VERIFIED; HUMAN PRESENTATION ACCEPTANCE PENDING**.
+- No merge to `main`. No Roblox publication.
+
+See `docs/STAGE3_040_VERIFICATION.md` and `tests/CANDIDATE_STATUS.json` for the bounded verification record. Historical failed engine results remain preserved.
