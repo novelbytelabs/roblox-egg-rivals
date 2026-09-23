@@ -1374,7 +1374,7 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 		end
 		task.spawn(function()
 			local out = { token = data.token, build = C.Build, kind = data.kind }
-			local virtual = UserInputService:CreateVirtualInput()
+			local virtual = data.kind ~= "Position" and UserInputService:CreateVirtualInput() or nil
 			local function waitFor(fn, seconds)
 				local untilTime = os.clock() + seconds
 				repeat
@@ -1401,7 +1401,28 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 			end
 			local cleanup
 			local ok, err = xpcall(function()
-				if data.kind == "Hold" then
+				if data.kind == "Position" then
+					-- Observe the normal replicated teleport. Do not move the character,
+					-- change network ownership, or inject input to make the fixture pass.
+					assert(typeof(data.target) == "Vector3")
+					local began, stableSince = os.clock(), nil
+					local settled = waitFor(function()
+						local char = player.Character
+						local actor = char and char:FindFirstChild("HumanoidRootPart")
+						local offset = actor and actor.Position - data.target
+						if actor then
+							out.position = { actor.Position.X, actor.Position.Y, actor.Position.Z }
+						end
+						if offset and Vector2.new(offset.X, offset.Z).Magnitude <= 3 and math.abs(offset.Y) <= 6 then
+							stableSince = stableSince or os.clock()
+						else
+							stableSince = nil
+						end
+						return stableSince and os.clock() - stableSince >= 0.15
+					end, 4)
+					out.elapsed = os.clock() - began
+					assert(settled, "Client did not observe the requested fixture position")
+				elseif data.kind == "Hold" then
 					local button
 					if data.holdKind == "incubator" then
 						assert(
@@ -1789,7 +1810,9 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 				end
 			end, debug.traceback)
 			pcall(function()
-				virtual:SendKey(false, Enum.KeyCode.E, false)
+				if virtual then
+					virtual:SendKey(false, Enum.KeyCode.E, false)
+				end
 			end)
 			if cleanup then
 				cleanup()

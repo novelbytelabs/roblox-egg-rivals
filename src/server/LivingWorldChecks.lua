@@ -92,9 +92,53 @@ function Checks.run(g, check, a, b, results)
 			"Early hold was not rejected by the timer: " .. tostring(err)
 		)
 	end
+	local fixtureSerial = 0
 	local function near(p, pos)
+		fixtureSerial += 1
+		local token = "fixture-position-" .. fixtureSerial .. "-" .. tostring(g:now())
+		local started = g:now()
 		g:teleport(p, CFrame.new(pos))
-		task.wait(0.12)
+		g:feed(p, "completionInputProbe", { token = token, kind = "Position", target = pos })
+		local stableSince
+		local settled = waitFor(function()
+			local root = g:root(p)
+			local offset = root and root.Position - pos
+			if offset and Vector2.new(offset.X, offset.Z).Magnitude <= 3 and math.abs(offset.Y) <= 6 then
+				stableSince = stableSince or g:now()
+			else
+				stableSince = nil
+			end
+			local diag = g.clientDiagnostics[p]
+			if not diag or diag.token ~= token then
+				return false
+			end
+			if not diag.passed then
+				return true
+			end -- Preserve the observed failure below.
+			return stableSince and g:now() - stableSince >= 0.25
+		end, 5)
+		local root = g:root(p)
+		local diag = g.clientDiagnostics[p]
+		local observed = diag and diag.token == token and diag or nil
+		results.fixturePositions = results.fixturePositions or {}
+		table.insert(results.fixturePositions, {
+			token = token,
+			userId = p.UserId,
+			target = { pos.X, pos.Y, pos.Z },
+			server = root and { root.Position.X, root.Position.Y, root.Position.Z } or nil,
+			client = observed,
+			elapsed = g:now() - started,
+			teleportSerial = g.profiles[p].teleportSerial,
+		})
+		assert(
+			settled and observed and observed.passed and stableSince,
+			"Fixture position did not settle: target="
+				.. tostring(pos)
+				.. " server="
+				.. tostring(root and root.Position)
+				.. " client="
+				.. tostring(observed and observed.error)
+		)
 	end
 	local function quiet()
 		for _, p in ipairs({ a, b }) do
