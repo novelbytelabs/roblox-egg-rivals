@@ -1,3 +1,5 @@
+> Historical reference only. The earlier 300-billion Speed target and multiplier ladders are abolished. Current rules are in ECONOMY_SPEED_RARITY_V2.md.
+
 # Egg Rivals — World and Balance References
 
 Status: historical approved baselines and compatible future direction. These values are **not** stronger than later decisions in `DECISION_LEDGER.md`.

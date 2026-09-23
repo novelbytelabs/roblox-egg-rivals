@@ -91,6 +91,8 @@ nav:
       - Game Design Overview: GAME_DESIGN.md
       - Design Bible: DESIGN_BIBLE.md
       - Decision Ledger: DECISION_LEDGER.md
+      - Resolved 0.4.0 Decisions: RESOLVED_DESIGN_DECISIONS_0.4.0.md
+      - Economy, Speed & Rarity v2: ECONOMY_SPEED_RARITY_V2.md
       - Feature Status Matrix: FEATURE_STATUS_MATRIX.md
       - Core Gameplay: CORE_GAMEPLAY.md
       - Base, Incubators & Respawn: BASE_INCUBATION_RESPAWN.md
@@ -104,6 +106,8 @@ nav:
       - Production Guardrails: PRODUCTION_GUARDRAILS.md
       - World & Balance References: WORLD_AND_BALANCE_REFERENCES.md
   - Development:
+      - 0.4.0 Living World Plan: NEXT_SLICE_0.4.0_LIVING_WORLD.md
+      - Astra 0.4.0 Execution Packet: ASTRA_0.4.0_EXECUTION_PACKET.md
       - Roadmap: ROADMAP.md
       - Stage 3 Elemental Refinement: STAGE3_ELEMENTAL_REFINEMENT_0.3.2.md
       - Stage 3 Verification: STAGE3_032_VERIFICATION.md

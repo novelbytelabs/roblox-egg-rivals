@@ -19,6 +19,9 @@ Start with:
 - `docs/GAME_DESIGN.md` — concise overview and document map.
 - `docs/DESIGN_BIBLE.md` — canonical product identity and design pillars.
 - `docs/DECISION_LEDGER.md` — approvals, superseded decisions, deferrals, and unresolved questions.
+- `docs/ECONOMY_SPEED_RARITY_V2.md` — canonical Speed/economy/rarity replacement.
+- `docs/NEXT_SLICE_0.4.0_LIVING_WORLD.md` — next major implementation slice.
+- `docs/ASTRA_0.4.0_EXECUTION_PACKET.md` — long-running implementation packet.
 
 Detailed system specifications cover core gameplay, camp/incubation/respawn, pet ranch, Speed Lab, Night, shops/social economy, PvP/duels, live operations, and production guardrails.
 

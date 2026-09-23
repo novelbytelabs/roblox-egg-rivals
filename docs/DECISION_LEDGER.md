@@ -156,27 +156,13 @@ Upgrade branches may enhance the presentation with confetti, music, elemental ef
 - treadmill as visible prestige/status object.
 
 **APPROVED PHYSICS PRINCIPLE**
-Huge Speed progression values must map to controlled avatar movement with diminishing/bounded scaling.
+Permanent Speed maps to controlled avatar movement with bounded scaling.
 
-**OWNER-PROVIDED TARGET**
-- 300 billion eventual Speed ceiling / scale target.
+**SUPERSEDED SPEED MODEL**
+The former 300-billion target and 2x / 4x / 6x / 8x / 10x treadmill ladder are abolished.
 
-Do not directly use that number as Roblox `WalkSpeed`.
-## Treadmill numerical ladder
+Canonical Speed/economy values are now defined in `ECONOMY_SPEED_RARITY_V2.md`.
 
-**OWNER-PROVIDED VALUES**
-- 2x = 100 coins
-- 4x = 1,000 coins
-- 6x = 10,000 coins
-- 8x = typed as `25,0000` coins
-- 10x = 100,000 coins
-
-**UNRESOLVED**
-The same instruction said treadmill speed has a maximum of `5x`, while the list contains five upgrade levels ending at `10x`.
-
-Likely interpretation: **five upgrade levels, 10x maximum**, but this has not been explicitly confirmed.
-
-The typed `25,0000` value is also ambiguous. Do not normalize it silently.
 
 ## Night mechanics
 
@@ -341,18 +327,17 @@ Earlier zone concepts such as Forest, Lake, Desert, Jungle, Arctic, Volcano, and
 - multiplayer regression is required after bounded implementation batches;
 - human gameplay / appearance acceptance remains separate from automated engineering verification.
 
-## Open clarification queue
+## Ambiguity resolution status
 
-Before locking economy implementation, explicitly resolve:
+The former treadmill and economy ambiguity queue was resolved for 0.4.0.
 
-1. Does "maximum 5x" mean five treadmill upgrade levels?
-2. Is 10x the actual maximum training multiplier?
-3. What was intended by the typed 8x price `25,0000`?
-4. What rarity distribution can the single hidden Night egg use now that Godly is the top standard rarity?
-5. Exact Godly frequency and acquisition path.
-6. Exact public duel-stake behavior after Roblox policy review.
+Canonical resolutions are in:
+- ECONOMY_SPEED_RARITY_V2.md
+- RESOLVED_DESIGN_DECISIONS_0.4.0.md
 
-No implementation should invent answers to these questions.
+The 300-billion Speed target, ambiguous 5x/10x ladder, and typed 25,0000 price are abolished.
+
+Public duel staking remains a policy-gated future deployment question, not a 0.4.0 design ambiguity.
 
 ## Historical balance preservation
 
@@ -361,3 +346,17 @@ Earlier zone, rarity-weight, hatch-time, income-multiplier, treadmill, and Night
 Those values are historical references where later decisions supersede them.
 
 In particular, the earlier approximately 80% Legendary / 20% Mythic Night special-spawn mix is superseded by the newer one-hidden-Night-egg rule. The hidden egg's final rarity distribution remains unresolved.
+
+## 0.4.0 resolution packet adopted
+
+The owner approved the assistant's proposed ambiguity resolutions and authorized forward planning on that basis.
+
+Canonical implementation decisions are therefore the values and rules in:
+
+- `RESOLVED_DESIGN_DECISIONS_0.4.0.md`;
+- `ECONOMY_SPEED_RARITY_V2.md`;
+- `NEXT_SLICE_0.4.0_LIVING_WORLD.md`.
+
+These later documents supersede conflicting earlier Speed, treadmill, rarity, Night-transition, trading, Exchange, and ranch-capacity assumptions.
+
+The next authorized planning target is a major multi-hour 0.4.0 Living World + Progression slice. This authorization does not authorize merging an implementation branch into `main` without owner review.

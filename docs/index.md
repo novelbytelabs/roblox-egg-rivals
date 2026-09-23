@@ -13,6 +13,9 @@ The current verified engineering baseline is `MOONWOOD-0.3.2-r2`: 24/24 two-clie
 - [Game Design Overview](GAME_DESIGN.md)
 - [Design Bible](DESIGN_BIBLE.md)
 - [Decision Ledger](DECISION_LEDGER.md)
+- [Resolved 0.4.0 Decisions](RESOLVED_DESIGN_DECISIONS_0.4.0.md)
+- [Economy, Speed, and Rarity v2](ECONOMY_SPEED_RARITY_V2.md)
+- [0.4.0 Living World Plan](NEXT_SLICE_0.4.0_LIVING_WORLD.md)
 - [Feature Status Matrix](FEATURE_STATUS_MATRIX.md)
 
 ## System specifications

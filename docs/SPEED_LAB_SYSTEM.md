@@ -1,37 +1,58 @@
 # Egg Rivals — Speed Lab and Treadmill System
 
-Status: approved design direction. Some numerical tier values remain unresolved; see `DECISION_LEDGER.md`.
+Status: canonical design direction for 0.4.0 and beyond.
 
-The treadmill should become one of Egg Rivals' signature progression systems. It is the player's personal Speed Lab: a machine that visibly evolves, records mastery, creates tactical opportunities, and becomes a status object at the base.
+The treadmill is a signature progression machine, not a passive multiplier pad.
 
-## Permanent Speed versus avatar movement
+Canonical numerical rules now live in `ECONOMY_SPEED_RARITY_V2.md`.
 
-The player's persistent Speed stat may grow to extremely large values.
+The former 300-billion Speed target and 2x / 4x / 6x / 8x / 10x ladder are abolished.
 
-Huge progression values must not map linearly to Roblox `WalkSpeed`. A bounded or diminishing-return movement function converts progression into controllable avatar speed.
+## Core concepts
 
-Treadmill multipliers affect **Speed earned per second**, not literal movement multiplied by the same factor.
+Egg Rivals exposes three understandable layers:
 
-The user proposed an eventual Speed ceiling of 300 billion. Treat that value as an approved target direction, but do not bind final movement physics directly to it.
+- **Speed** — permanent progression, currently 0..10,000;
+- **Machine Grade** — the treadmill's capability tier;
+- **Momentum** — temporary training performance while actively running.
 
-## Momentum training
+Two supporting meters add tactical / presentation value:
 
-Remaining on the treadmill builds a Momentum meter.
+- **Overdrive** — a stored movement burst earned by training;
+- **Motion Energy** — temporary camp-power presentation energy.
 
-Momentum represents training efficiency and machine intensity. The treadmill visibly spools up:
+This keeps the system deep without creating a wall of independent stats.
 
-- belt motion increases;
-- sound pitch / intensity increases;
-- air and particle effects strengthen;
-- machine components animate;
-- lights, vibration, and energy presentation increase.
+## Movement mapping
 
-Momentum reaches a cap. Leaving the machine causes it to fall or reset according to final tuning.
-## Physical machine modules
+Permanent Speed is not Roblox `WalkSpeed`.
 
-Progress should not feel like pressing a generic "+2x" button.
+0.4.0 mapping:
 
-Approved visible module families include:
+`WalkSpeed = clamp(16 + 0.42 * sqrt(Speed), 16, 58)`
+
+Overdrive may temporarily raise mapped movement, but never above 68 studs/s.
+## Machine grades
+
+Canonical 0.4.0 grades:
+
+| Grade | Rate | Speed ceiling | Cost |
+|---|---:|---:|---:|
+| Starter | +1.00/s | 250 | Free |
+| Boost | +1.50/s | 600 | 150 Coins |
+| Turbo | +2.25/s | 1,200 | 650 Coins |
+| Hyper | +3.25/s | 2,200 | 2,000 Coins |
+| Flux | +4.50/s | 3,800 | 6,000 Coins |
+| Quantum | +6.00/s | 6,000 | 18,000 Coins |
+| Apex | +8.00/s | 10,000 | 55,000 Coins |
+
+A player's Speed cannot train beyond the ceiling of the current grade.
+
+Machine Grade never resets accumulated Speed.
+
+## Physical machine progression
+
+The treadmill visibly evolves through:
 
 - Motor;
 - Belt;
@@ -40,180 +61,177 @@ Approved visible module families include:
 - Power Core;
 - Control Unit.
 
-Module upgrades should physically change the treadmill. A starter mechanical belt may eventually evolve into a highly advanced magnetic / energy-driven machine with turbines, illuminated rails, energy rings, and other visible technology.
+For 0.4.0, grade changes may drive the complete module appearance as one coherent machine upgrade.
 
-The machine's final training multiplier is the aggregate result of its progression, not the only thing the player sees.
+Independent per-module purchase trees remain a future extension. Do not build a 30-upgrade component economy into 0.4.0.
+
+The player should see substantial physical differences between Starter and Apex machinery.
+## Momentum
+
+Continuous training raises Momentum from 0% to 100% in 30 seconds.
+
+Training efficiency interpolates from 1.00x to 1.75x.
+
+Leaving the treadmill decays Momentum over 10 seconds.
+
+Presentation strengthens with Momentum:
+
+- belt speed;
+- pitch / mechanical intensity;
+- wind;
+- particles;
+- energy rings;
+- machine lighting;
+- pet reactions.
+
+Heat is exciting presentation and a future tuning hook, not a breakdown punishment.
 
 ## Overdrive
 
-Training can charge a temporary Overdrive resource.
+Rules:
 
-The player leaves the treadmill with a stored burst that can be activated during gameplay. Its primary use is tactical acceleration during theft / escape.
+- 0..100 charge;
+- full-Momentum charge rate: 2/s;
+- proportional charge at lower Momentum;
+- activation requires full charge;
+- consumes full charge;
+- lasts 5 seconds;
+- adds 20% mapped movement;
+- hard physical cap: 68 studs/s;
+- allowed during open-world egg carrying;
+- disabled in the duel arena;
+- recharged only through treadmill training;
+- survives ordinary death.
 
-Overdrive is earned through training, tying the base activity directly to the heist loop.
-
-Overdrive should not permanently replace the value of the persistent Speed stat.
-## Speed Mastery
-
-Keep the main visible progression understandable: one primary Speed stat.
-
-At meaningful milestones, the player can unlock movement mastery improvements rather than exposing a cluttered spreadsheet of sub-stats.
-
-Approved mastery directions include:
-
-- quicker acceleration;
-- tighter high-speed turning;
-- improved recovery after knockback / interruption;
-- better jump control;
-- longer or more efficient Overdrive.
-
-These should improve control and expression, not create an unreadable number system.
-
-## Training Trials
-
-The Speed Lab can launch timed movement courses.
-
-A trial sends the player through a sequence of glowing gates around the Meadow / Forest and back to the camp.
-
-Trials measure actual movement execution rather than simply accumulated Speed.
-
-Rewards can include machine cosmetics, effects, titles, records, and progression unlocks.
-## Personal ghost racing
-
-The game records a player's best Training Trial.
-
-A transparent ghost reproduces the best route/time so the player can race their previous performance.
-
-Later social extensions may include racing a friend's stored ghost even when that friend is not actively racing.
-
-Ghost racing turns Speed into a mastery loop rather than pure idle accumulation.
-
-## Elemental tuning
-
-The Speed Lab may temporarily tune toward Fire, Water, Wind, or Earth.
-
-This does **not** create four permanent Speed stats.
-
-Approved directional identities:
-
-- Fire: faster Overdrive build;
-- Water: smoother acceleration / control;
-- Wind: stronger top-end movement;
-- Earth: better recovery / resistance to interruption.
-
-These should remain tactical sidegrades and small identities, not mandatory elemental power tiers.
-## Pet integration
-
-The ranch should react to training.
-
-The active pet can run, fly, or hover alongside the treadmill, sit nearby, or cheer.
-
-Penned pets may gather at the fence or visibly react when the owner reaches a meaningful record or Speed milestone.
-
-Pet reactions make training feel connected to the living ranch rather than isolated machinery.
-
-## Milestone celebrations
-
-Large Speed milestones should be events.
-
-Candidate milestone scales include 100, 1K, 10K, 1M, 1B, and later large values appropriate to the final economy.
-
-A milestone can trigger:
-
-- machine effects;
-- camp lighting changes;
-- pet celebrations;
-- badges / titles;
-- cosmetic unlocks;
-- record-board updates.
-
-The exact milestones are tuning values.
-## Machine grades
-
-Progression should not require wiping the player's Speed.
-
-Instead, the treadmill itself can earn visible Machine Grades, such as:
-
-`Starter -> Performance -> Turbo -> Hyper -> Quantum`
-
-Names remain tunable.
-
-Higher grades unlock technology, presentation, trials, module capability, and training efficiency while preserving accumulated Speed.
-
-## Heat and cooling
-
-High Momentum can create visible heat / energy tension.
-
-Better cooling lets the machine sustain maximum training efficiency longer.
-
-Heat should be exciting visual feedback, **not** an annoying breakdown mechanic that destroys progress or forces maintenance chores.
-
-## Social drafting
-
-Nearby players training together can create a small social "draft" bonus.
-
-The visual presentation can connect machines with wind / energy effects as more players train nearby.
-
-The bonus should encourage congregation without making solo play nonviable.
-## Sprint Challenges
-
-Not all rivalry needs guns.
-
-Players may issue a Sprint Challenge that uses a short course and category / normalized rules appropriate to the mode.
-
-Possible rewards include:
-
-- titles;
-- trophies;
-- coins;
-- cosmetic records;
-- non-staked recognition.
-
-This provides competitive Speed expression separate from FPS duels.
-
+Overdrive directly connects training to theft/escape gameplay.
 ## Motion Energy
 
-Training can also generate a secondary temporary resource: Motion Energy.
+Motion Energy is a temporary 0..100 camp-power meter.
 
-Motion Energy powers camp presentation and interactive ranch machinery rather than replacing Money or permanent Speed.
+It starts charging once Momentum exceeds 75%.
 
-Candidate uses include:
+At full training intensity it gains approximately 1.5 units/s.
+
+It can power:
 
 - camp lights;
-- pet toys;
 - fountains;
+- pet toys;
 - habitat effects;
 - celebration devices;
 - cosmetic machinery.
 
-The design idea is literal: running makes the player's home come alive.
-## Personal machine records
+It is not spendable Money and does not modify pet income or duel damage.
 
-The treadmill should remember the player.
+The emotional idea remains: **running makes the player's home come alive**.
 
-A local machine display can show:
+## Training Trial
+
+0.4.0 implements one polished timed course inside the existing Meadow / Forest footprint.
+
+The course validates:
+
+- start;
+- ordered gates;
+- finish;
+- elapsed time;
+- personal best.
+
+Skipping or taking gates out of order invalidates the attempt.
+
+The trial exists to test real movement execution instead of accumulated numbers alone.
+## Personal ghost
+
+A valid personal-best Training Trial stores replay data sufficient for a local translucent ghost.
+
+The ghost:
+
+- replays the best run;
+- cannot collide;
+- cannot trigger gates;
+- cannot activate prompts;
+- cannot affect world state.
+
+Later friend-ghost support remains compatible.
+
+## Elemental tuning
+
+The approved concept remains, but it does not need to ship in 0.4.0 unless the core Speed Lab is already stable.
+
+Elemental tuning is a treadmill mode, not a pet-stat bonus.
+
+Directional identities:
+
+- Fire — faster Overdrive charge;
+- Water — smoother acceleration/control;
+- Wind — stronger top-end movement feel;
+- Earth — stronger recovery after interruption.
+
+Any implementation must remain a tactical sidegrade rather than an objectively superior element.
+
+## Pet integration
+
+The active pet should react to training.
+
+Approved behaviors include:
+
+- running beside the treadmill;
+- flying / hovering nearby;
+- sitting and watching;
+- cheering at a personal record;
+- ranch residents reacting to milestone achievements.
+## Milestones and machine records
+
+The treadmill remembers meaningful player history.
+
+Candidate records:
 
 - Best Momentum;
-- Top movement / training record;
-- Total distance trained;
-- Best Trial;
-- Overdrives earned or used;
-- notable milestone records.
+- highest Speed reached;
+- total training distance/time;
+- best Trial time;
+- Overdrives earned / used;
+- major Speed milestones;
+- current Machine Grade.
 
-Other players walking past the base should be able to recognize that the owner has an exceptional machine.
+Milestone events may trigger:
 
-The long-term emotional target is similar to a customized car in a racing game: the treadmill itself becomes a prestige object.
+- machine effects;
+- ranch lighting;
+- pet celebration;
+- title / badge presentation;
+- cosmetic unlocks.
 
-## Economy values requiring final reconciliation
+Exact milestone values remain tuning parameters.
 
-The user proposed the following upgrade values:
+## Social drafting
 
-- 2x training: 100 coins;
-- 4x training: 1,000 coins;
-- 6x training: 10,000 coins;
-- 8x training: typed as `25,0000` coins;
-- 10x training: 100,000 coins.
+Nearby players training together may receive a small social training bonus with connected wind/energy presentation.
 
-The same discussion also described "maximum of 5x" while listing five upgrade levels ending at 10x.
+The bonus must encourage congregation without making solo training nonviable.
 
-Do **not** silently resolve those contradictions in implementation. The likely interpretation is five upgrade levels with a 10x maximum, but this remains an explicit clarification gate.
+This is approved design but is not required for the 0.4.0 acceptance gate unless added without destabilizing the slice.
+
+## Sprint Challenges
+
+0.4.0 normalized Sprint Challenges use:
+
+- WalkSpeed 45;
+- standard jump settings;
+- no Overdrive;
+- no pet/element movement bonus.
+
+This makes Sprint Challenges a movement-skill contest.
+
+An Open Class mode using actual permanent Speed is deferred.
+## Design rules
+
+- no rebirth / Speed wipe is required for machine progression;
+- do not inflate numbers merely to imitate simulator conventions;
+- do not directly multiply Roblox movement by treadmill upgrade factors;
+- do not sell competitive movement power for Robux;
+- keep permanent progression server-authoritative;
+- keep visual effects client-efficient;
+- preserve movement control at every progression tier.
+
+The Speed Lab should feel like a customized racing machine whose performance and appearance communicate the owner's mastery.

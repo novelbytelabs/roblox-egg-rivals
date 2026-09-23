@@ -102,3 +102,24 @@ A feature moving from **APPROVED** to **VERIFIED BASELINE** requires:
 6. human presentation / gameplay acceptance where the feature is experiential.
 
 Do not update this matrix from aspiration alone.
+
+## 0.4.0 targeted implementation set
+
+The following approved systems are now explicitly targeted by the next major slice but remain **NOT YET VERIFIED** until exact-source regression succeeds:
+
+- Economy / Speed / rarity v2;
+- Godly rarity and reverence;
+- Welcome Party and homecoming ranch behavior;
+- physical ranch expansions;
+- Speed Lab grades, Momentum, Overdrive, Motion Energy, records;
+- one Training Trial and personal ghost;
+- four-corner incubator UX;
+- Night dormant nests and hidden Night egg;
+- blacklight / neon Night transformation;
+- particle trails and full-stop collision splatter;
+- Trainer Workshop;
+- Ranch & Pen Works;
+- Exchange;
+- Trading Post.
+
+Do not relabel any item above as VERIFIED merely because it appears in the 0.4.0 plan.

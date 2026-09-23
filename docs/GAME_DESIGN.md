@@ -40,6 +40,9 @@ The egg determines creature identity. The incubator determines elemental form. R
 - [Production Guardrails](PRODUCTION_GUARDRAILS.md)
 - [World and Balance References](WORLD_AND_BALANCE_REFERENCES.md)
 - [Decision Ledger](DECISION_LEDGER.md)
+- [Resolved 0.4.0 Decisions](RESOLVED_DESIGN_DECISIONS_0.4.0.md)
+- [Economy, Speed, and Rarity v2](ECONOMY_SPEED_RARITY_V2.md)
+- [0.4.0 Living World Plan](NEXT_SLICE_0.4.0_LIVING_WORLD.md)
 - [Feature Status Matrix](FEATURE_STATUS_MATRIX.md)
 
 ## Current engineering baseline

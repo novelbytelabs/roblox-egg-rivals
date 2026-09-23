@@ -2,38 +2,32 @@
 
 ## Verified baseline
 
-`MOONWOOD-0.3.2-r2` is the current engineering reference.
+MOONWOOD-0.3.2-r2 remains the current verified engineering reference with 24/24 two-client Studio checks.
 
-Its two-client Roblox Studio regression suite passed 24/24 checks.
+## Canonical next slice
 
-## Design reconciliation
+The next major implementation target is:
 
-The approved conversation-level design has now been promoted into canonical repository documentation.
+**EGG-RIVALS-0.4.0 — LIVING WORLD**
 
-The design set explicitly records:
+The old Speed-number ambiguity is resolved. The next slice is specified by:
+- docs/ECONOMY_SPEED_RARITY_V2.md
+- docs/RESOLVED_DESIGN_DECISIONS_0.4.0.md
+- docs/NEXT_SLICE_0.4.0_LIVING_WORLD.md
+- docs/ASTRA_0.4.0_EXECUTION_PACKET.md
 
-- Egg Rivals identity and rarity ladder through Godly;
-- elemental incubation and personal respawn;
-- living pet ranch and branched ranch progression;
-- Godly reverence and new-pet welcoming behavior;
-- Speed Lab / treadmill redesign;
-- neon-blacklight Night and hidden Night egg;
-- particle trail / full-stop collision visual direction;
-- approved hub shops and Exchange;
-- open-world interference and first-to-five duels;
-- live-operations and production guardrails;
-- superseded ideas and unresolved numeric questions.
+## 0.4.0 scope
 
-## Immediate next gate
+The push deepens Meadow + Forest rather than expanding the map.
 
-Do not immediately implement every documented idea at once.
+It integrates Speed Lab v2, rational economy/rarity, Living Ranch v1, Godly behavior, four-corner incubation, Night 2.0, Trainer Workshop, Ranch & Pen Works, Exchange, Trading Post, one Training Trial, a personal ghost, and expanded multiplayer verification.
 
-First resolve the explicit numerical ambiguities in `DECISION_LEDGER.md`, especially the treadmill tier cap / multiplier and typed 8x price.
+## Acceptance
 
-Then select one bounded refinement packet, preserve `MOONWOOD-0.3.2-r2` as the reference, implement the packet, and rerun multiplayer regression before acceptance.
+0.3.2-r2 remains preserved. 0.4.0 must earn independent exact-source verification.
 
-## Later stages
+No feature branch merges to main until owner review authorizes it.
 
-MVP / Alpha work includes persistence, broader zones, cross-platform controls, production analytics, economy balancing, monetization validation, and public-launch policy review.
+## Later
 
-Live operations should follow a stable persistent core rather than precede it.
+Persistence, broader zones, mobile/console support, additional shops, additional creatures, public policy-reviewed staking, and broader live operations remain later work.
