@@ -2,6 +2,8 @@
 
 Status: IMPLEMENTED; MOONWOOD-0.3.2-r2 passed 24/24 engine checks. Human acceptance remains open.
 
+This is a historical bounded engineering specification. Later canonical design decisions in DESIGN_BIBLE.md and DECISION_LEDGER.md govern future work, including Godly rarity and the revised hidden-Night-egg rules.
+
 ## Locked design decisions
 
 - Preserve the accepted Stage 2 PoC and the 0.3.1 Moonwood candidate.

@@ -2,27 +2,38 @@
 
 ## Verified baseline
 
-`MOONWOOD-0.3.2-r2` is the imported engineering baseline. Its two-client Studio regression suite passed 24/24 checks.
+`MOONWOOD-0.3.2-r2` is the current engineering reference.
 
-## Current design refinement
+Its two-client Roblox Studio regression suite passed 24/24 checks.
 
-Refine the vertical slice around the permanent Egg Rivals identity.
+## Design reconciliation
 
-Primary approved directions:
-- seven-rank rarity ladder through Godly;
-- richer pet-pen social behavior and progression;
-- Speed Lab treadmill progression;
-- four-corner elemental incubator layout;
-- stronger personal respawn/homecoming presentation;
-- Night as a complete neon-blacklight visual transformation;
-- expanded hub economy through themed shops and exchange systems.
+The approved conversation-level design has now been promoted into canonical repository documentation.
+
+The design set explicitly records:
+
+- Egg Rivals identity and rarity ladder through Godly;
+- elemental incubation and personal respawn;
+- living pet ranch and branched ranch progression;
+- Godly reverence and new-pet welcoming behavior;
+- Speed Lab / treadmill redesign;
+- neon-blacklight Night and hidden Night egg;
+- particle trail / full-stop collision visual direction;
+- approved hub shops and Exchange;
+- open-world interference and first-to-five duels;
+- live-operations and production guardrails;
+- superseded ideas and unresolved numeric questions.
 
 ## Immediate next gate
 
-Update the master design before implementing the next feature batch. Preserve the verified baseline as a recoverable reference.
+Do not immediately implement every documented idea at once.
 
-Then implement a bounded refinement candidate and rerun multiplayer regression before acceptance.
+First resolve the explicit numerical ambiguities in `DECISION_LEDGER.md`, especially the treadmill tier cap / multiplier and typed 8x price.
 
-## Later
+Then select one bounded refinement packet, preserve `MOONWOOD-0.3.2-r2` as the reference, implement the packet, and rerun multiplayer regression before acceptance.
 
-Persistence, broader zones, cross-platform controls, production analytics, public economy balancing, monetization, and publication-policy review belong to later MVP/Alpha work.
+## Later stages
+
+MVP / Alpha work includes persistence, broader zones, cross-platform controls, production analytics, economy balancing, monetization validation, and public-launch policy review.
+
+Live operations should follow a stable persistent core rather than precede it.

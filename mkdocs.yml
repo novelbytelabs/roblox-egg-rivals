@@ -1,21 +1,17 @@
 site_name: Egg Rivals
-site_description: Design direction and verification record for Egg Rivals.
+site_description: Canonical design and engineering record for Egg Rivals.
 repo_name: novelbytelabs/roblox-egg-rivals
 repo_url: https://github.com/novelbytelabs/roblox-egg-rivals
+edit_uri: edit/main/docs/
 dev_addr: 127.0.0.1:49187
 
-repo_url: https://github.com/novelbytelabs/state-foundation/
-repo_name: novelbytelabs/state-foundation
-edit_uri: edit/main/docs/
-
-copyright: "Copyright &copy; 2025 Novel Byte Labs - All rights reserved."
+copyright: "Copyright &copy; 2026 Novel Byte Labs - All rights reserved."
 
 theme:
   name: material
   logo: assets/favicon.ico
   favicon: assets/favicon.ico
   features:
-    #   - navigation.tabs
     - navigation.sections
     - navigation.top
     - navigation.tracking
@@ -27,7 +23,6 @@ theme:
     - search.suggest
     - navigation.instant
   palette:
-    # Dark mode is the default
     - scheme: slate
       primary: deep purple
       accent: amber
@@ -42,12 +37,11 @@ theme:
         name: Switch to Dark mode
   icon:
     repo: fontawesome/brands/github
-
 extra_css:
   - stylesheets/extra.css
 
 plugins:
-  - search:
+  - search
   - git-revision-date-localized:
       enable_creation_date: true
       fallback_to_build_date: true
@@ -79,16 +73,13 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
-
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/novelbytelabs/ArqonConstitutiveEngine
+      link: https://github.com/novelbytelabs/roblox-egg-rivals
     - icon: fontawesome/brands/x-twitter
       link: https://twitter.com/novelbytelabs
   generator: false
-
-# extra_css already defined above
 
 extra_javascript:
   - https://unpkg.com/mermaid@10/dist/mermaid.min.js
@@ -96,9 +87,22 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - Game Design: GAME_DESIGN.md
-  - Visual Direction:
-      - Night: NIGHT_VISUAL_DIRECTION.md
+  - Design:
+      - Game Design Overview: GAME_DESIGN.md
+      - Design Bible: DESIGN_BIBLE.md
+      - Decision Ledger: DECISION_LEDGER.md
+      - Feature Status Matrix: FEATURE_STATUS_MATRIX.md
+      - Core Gameplay: CORE_GAMEPLAY.md
+      - Base, Incubators & Respawn: BASE_INCUBATION_RESPAWN.md
+      - Pet Pen & Ranch: PET_PEN_SYSTEM.md
+      - Speed Lab & Treadmill: SPEED_LAB_SYSTEM.md
+      - Night System: NIGHT_SYSTEM.md
+      - Night Visual Direction (compatibility): NIGHT_VISUAL_DIRECTION.md
+      - Shops & Social Economy: HUB_SHOPS_AND_SOCIAL_ECONOMY.md
+      - PvP & Duels: PVP_AND_DUELS.md
+      - Live Operations: LIVE_OPERATIONS.md
+      - Production Guardrails: PRODUCTION_GUARDRAILS.md
+      - World & Balance References: WORLD_AND_BALANCE_REFERENCES.md
   - Development:
       - Roadmap: ROADMAP.md
       - Stage 3 Elemental Refinement: STAGE3_ELEMENTAL_REFINEMENT_0.3.2.md
