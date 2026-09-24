@@ -5,7 +5,7 @@ Purpose: distinguish approved design from implemented and verified behavior.
 Status meanings:
 
 - **VERIFIED BASELINE** — present in `MOONWOOD-0.3.2-r2` and covered by the 24/24 engine suite.
-- **ENGINEERING VERIFIED / PRESENTATION PENDING** — implemented in the 0.4.0 engineering candidate and covered by exact-source regression; human presentation/gameplay acceptance remains pending where experiential.
+- **ENGINEERING VERIFIED / PRESENTATION PENDING** — implemented in a current engineering candidate and covered by exact-source regression; human presentation/gameplay acceptance remains pending where experiential.
 - **APPROVED / NOT YET IMPLEMENTED** — canonical design direction, but not part of the verified baseline.
 - **PARTIAL / REFINEMENT PENDING** — a simpler baseline exists, but the newly approved design extends or changes it.
 - **DEFERRED** — intentionally postponed.
@@ -57,7 +57,7 @@ Status meanings:
 | Machine Grades | ENGINEERING VERIFIED / PRESENTATION PENDING | All seven grade caps and ownership preservation passed |
 | Heat/cooling presentation | APPROVED / NOT YET IMPLEMENTED | Nonpunitive |
 | Social drafting | APPROVED / NOT YET IMPLEMENTED | Group training bonus |
-| Sprint Challenges | DESIGN PACKET READY / NOT YET IMPLEMENTED | 0.4.1 normalized two-player Grove Circuit design is specified; no race service exists yet |
+| Sprint Challenges | ENGINEERING VERIFIED / PRESENTATION PENDING | Normalized two-player Grove Circuit race, real-client completion, DNF cleanup and session records passed 0.4.1 regression |
 | Motion Energy | ENGINEERING VERIFIED / PRESENTATION PENDING | Energy accounting and camp-power behavior passed; presentation feel remains pending |
 | Machine personal records | SOURCE PATH PRESENT / TEST COVERAGE PARTIAL | Session training time, distance, best Momentum and Overdrive earned/used exist; richer display/persistence remain open |
 | System | Status | Notes |
@@ -104,20 +104,20 @@ A feature moving from **APPROVED** to **VERIFIED BASELINE** requires:
 
 Do not update this matrix from aspiration alone.
 
-## 0.4.0 engineering candidate status
+## Current engineering candidate status
 
-The current rc2 exact-source engineering candidate passed **86/86** checks. The prior rc1 77/77 result remains preserved historical evidence. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
+The current 0.4.1 exact-source engineering candidate passed **90/90** checks. The prior rc2 86/86 and rc1 77/77 results remain preserved historical evidence. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
 
 The original Living World plan intentionally mixed mechanical requirements with experiential aspirations. The green engineering suite does not imply that every presentation goal shipped. Important approved gaps still visible in this matrix include:
 
 - owner homecoming reactions and richer autonomous pet life;
 - visible treadmill modules, records, milestones and pet training reactions;
-- elemental treadmill tuning, social drafting and Sprint Challenges;
+- elemental treadmill tuning and social drafting;
 - environmental Night clues, Moon Shrine activation and full blacklight transformation;
 - broader ranch habitats, comforts, showcases, themes and visitor expression;
 - Night Market, Duel Armory, Pet Outfitter, Quest Board and Elemental Bazaar.
 
-The active gate is owner playtesting of the exact verified candidate. Record findings in `PLAYTEST_0.4.0.md`.
+The active product gate remains owner playtesting of the exact verified candidate. Sprint feel and presentation should be evaluated alongside the retained 0.4.0 systems.
 
 Do not promote presentation-dependent scope to **VERIFIED BASELINE** from engine evidence alone. Human presentation/gameplay acceptance remains a separate gate.
 
