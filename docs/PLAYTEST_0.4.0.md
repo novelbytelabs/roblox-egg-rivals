@@ -2,10 +2,10 @@
 
 Status: **IN PROGRESS — OWNER PRESENTATION / GAMEPLAY ACCEPTANCE PENDING**
 
-Candidate: `EGG-RIVALS-0.4.0-rc1`  
-Tested source: `e185b078b7fd9f598e62130fb1dcaf008885fdb1`  
-Source digest: `33d29059abad739b7c3cdfeabf7cf27409328acf510edbb1f3c6b67da318d4e4`  
-Engineering evidence: **77 passed / 0 failed**
+Candidate: `EGG-RIVALS-0.4.0-rc2`  
+Tested source: `bc6ecffb62b13a2b50cfc029935e3decd6d597dc`  
+Source digest: `cd3456d8f2dcaef01b967582d599ec426ecb41d6dd51d2044c01912a0ef87a7f`  
+Engineering evidence: **86 passed / 0 failed**
 
 ## Purpose
 
@@ -67,7 +67,7 @@ Do not mark 0.4.0 owner-accepted until the owner explicitly accepts the presenta
 
 Engineering status remains:
 
-**ENGINEERING CANDIDATE VERIFIED; HUMAN PRESENTATION ACCEPTANCE PENDING**
+**ENGINEERING CANDIDATE VERIFIED; OWNER PRESENTATION RECHECK PENDING**
 
 ## Owner feedback — 2026-09-24
 
@@ -76,11 +76,11 @@ The owner reported that the current game is fine for this development stage. Sma
 | ID | Type | Owner observation / request | Action / evidence state |
 |---|---|---|---|
 | PT-01 | KEEP | Overall game is fine for now; prioritize mechanics and play. | Preserve existing core systems and the rc1 77/0 evidence. |
-| PT-02 | PRESENTATION | Objects disappear into darkness; every object edge should have neon tracing. | rc2 adds shape-aware edge lights for supported visible world primitives and pet models; runtime and visual review pending. |
-| PT-03 | TUNING | Glow is a tiny bit too intense. | rc2 reduces bloom intensity from 1.2 to 1.02, narrows its size and raises the threshold. Initial tuning, not owner-accepted appearance. |
-| PT-04 | PRESENTATION | Particle trails are too short and too sparse. | rc2 uses 1.8-second lifetime, higher emission and bounded larger pools. Runtime and feel review pending. |
-| PT-05 | DESIGN | Give players a flashlight for Night visibility. | Free hands-free personal flashlight, L toggle, no battery/price or item mutation; F remains duel-forfeit only. Runtime review pending. |
-| PT-06 | DESIGN | More Forest eggs and Godly eggs available in the map. | Twelve nests including one marked Godly nest; longer dedicated respawn. Runtime and economy tuning review pending. |
+| PT-02 | PRESENTATION | Objects disappear into darkness; every object edge should have neon tracing. | rc2 edge lifecycle/geometry is engineering-verified; owner presentation recheck pending. |
+| PT-03 | TUNING | Glow is a tiny bit too intense. | rc2 softer bloom is engineering-verified; exact appearance remains owner-tunable. |
+| PT-04 | PRESENTATION | Particle trails are too short and too sparse. | rc2 longer/denser bounded trails are engineering-verified; owner feel recheck pending. |
+| PT-05 | DESIGN | Give players a flashlight for Night visibility. | Free L-toggle flashlight is engineering-verified with no inventory/economy authority; owner feel recheck pending. |
+| PT-06 | DESIGN | More Forest eggs and Godly eggs available in the map. | Twelve nests + marked Godly nest are engineering-verified; count/cooldown/economy remain playtest tuning. |
 
 Implementation-selected tuning: twelve total nests and a 600-second Godly-nest cooldown after successful removal. The owner asked for availability, not these exact numbers. Ordinary day/night roll tables remain unchanged; the dedicated nest nevertheless increases total Godly supply. That economy consequence is explicit and remains subject to playtest tuning.
 
