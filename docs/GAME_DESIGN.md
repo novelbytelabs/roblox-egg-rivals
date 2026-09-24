@@ -44,14 +44,37 @@ The egg determines creature identity. The incubator determines elemental form. R
 - [Economy, Speed, and Rarity v2](ECONOMY_SPEED_RARITY_V2.md)
 - [0.4.0 Living World Plan](NEXT_SLICE_0.4.0_LIVING_WORLD.md)
 - [Feature Status Matrix](FEATURE_STATUS_MATRIX.md)
+- [0.4.0 Engineering Verification](STAGE3_040_VERIFICATION.md)
+- [0.4.0 Owner Playtest](PLAYTEST_0.4.0.md)
 
-## Current engineering baseline
+## Current engineering state
 
-`MOONWOOD-0.3.2-r2` is the current verified reference.
+`EGG-RIVALS-0.4.0-rc1` is the current verified engineering candidate.
 
-It passed 24/24 two-client Roblox Studio engineering checks. Human presentation and gameplay-feel acceptance is a separate gate.
+It passed **77/77** exact-source checks in a real two-client Roblox Studio regression. Tested source commit: `e185b078b7fd9f598e62130fb1dcaf008885fdb1`. The previous `MOONWOOD-0.3.2-r2` 24/24 candidate remains preserved as historical baseline evidence.
 
-The verified baseline does **not** automatically implement every newly documented approved design direction. New features must be delivered as bounded candidates and regression-tested.
+Engineering verification establishes the tested mechanical candidate. It does **not** establish human visual quality, gameplay feel, fun, or presentation acceptance.
+
+## Current product gate
+
+The active gate is owner playtesting of the exact verified PLAY candidate.
+
+The review should focus on:
+
+- whether the core loop is fun and understandable;
+- Speed and movement feel;
+- camp and incubator readability;
+- theft / escape tension;
+- pet life and personality;
+- ranch progression and social expression;
+- Godly spectacle;
+- Night beauty and readability;
+- trail / impact effects;
+- shop and trading clarity;
+- Training Trial / ghost feel;
+- desire to continue playing.
+
+Approved design does not imply implementation. `FEATURE_STATUS_MATRIX.md` distinguishes verified mechanics, partial presentation, approved future work, deferred work, and exclusions.
 
 ## Design discipline
 
