@@ -196,6 +196,6 @@ Traces follow object motion, rebuild on size changes, and disappear at dawn. Con
 
 Bloom is slightly reduced rather than removing glow. Trails last longer, emit more densely and retain bounded client pools and the original genuine-stop collision rule.
 
-Every player receives a free, hands-free personal flashlight controlled by F or its HUD button. It is local presentation, casts shadows, has no battery or purchase requirement, and does not change inventory, economy, hidden-egg identity or competitive authority. Text entry must not toggle it.
+Every player receives a free, hands-free personal flashlight controlled by L or its HUD button. F remains reserved for duel forfeit. It is local presentation, casts shadows, has no battery or purchase requirement, and does not change inventory, economy, hidden-egg identity or competitive authority. Text entry must not toggle it.
 
 The marked Godly Forest nest introduced by the same owner feedback is a Day nest. It does not replace or multiply the hidden Night egg.

@@ -20,10 +20,10 @@ function Checks.run(effects, virtual, out, kind)
 	local fixture, box, pool
 	local lamp = effects.flashlight
 	local prior = lamp.wanted
-	local function pressF()
-		virtual:SendKey(true, Enum.KeyCode.F, false)
+	local function pressFlashlight()
+		virtual:SendKey(true, C.FlashlightKey, false)
 		task.wait(0.08)
-		virtual:SendKey(false, Enum.KeyCode.F, false)
+		virtual:SendKey(false, C.FlashlightKey, false)
 		task.wait(0.15)
 	end
 	local ok, err = xpcall(function()
@@ -99,12 +99,12 @@ function Checks.run(effects, virtual, out, kind)
 			out.bloom = bloom.Intensity
 		elseif kind == "Flashlight" then
 			local before = lamp.toggles
-			pressF()
+			pressFlashlight()
 			assert(
 				waitFor(function()
 					return lamp.wanted ~= prior and lamp.light.Enabled == lamp.wanted
 				end, 3),
-				"Real F input did not toggle the light"
+				"Real flashlight input did not toggle the light"
 			)
 			assert(lamp.toggles == before + 1, "One key press toggled more than once")
 			out.afterToggle = lamp:snapshot()
@@ -124,12 +124,15 @@ function Checks.run(effects, virtual, out, kind)
 				"Text field did not receive input focus"
 			)
 			local wanted = lamp.wanted
-			pressF()
-			assert(lamp.wanted == wanted and lamp.toggles == before + 1, "Typing F toggled the flashlight")
+			pressFlashlight()
+			assert(
+				lamp.wanted == wanted and lamp.toggles == before + 1,
+				"Typing the flashlight key toggled the flashlight"
+			)
 			box:ReleaseFocus(false)
 			box:Destroy()
 			box = nil
-			pressF()
+			pressFlashlight()
 			assert(
 				waitFor(function()
 					return lamp.wanted == prior
@@ -177,7 +180,7 @@ function Checks.run(effects, virtual, out, kind)
 			error("Unknown Night/Forest probe")
 		end
 	end, debug.traceback)
-	virtual:SendKey(false, Enum.KeyCode.F, false)
+	virtual:SendKey(false, C.FlashlightKey, false)
 	if box then
 		box:ReleaseFocus(false)
 		box:Destroy()
@@ -192,7 +195,7 @@ function Checks.run(effects, virtual, out, kind)
 		end
 	end
 	if lamp.wanted ~= prior then
-		pressF()
+		pressFlashlight()
 	end
 	assert(ok, err)
 end

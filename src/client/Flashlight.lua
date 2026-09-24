@@ -43,7 +43,7 @@ function F.new(parent)
 	button.TextColor3 = C.Colors.Text
 	button.Font = Enum.Font.GothamMedium
 	button.TextSize = 14
-	button.Text = "[F] Flashlight: OFF"
+	button.Text = "[L] Flashlight: OFF"
 	button.Parent = gui
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 8)
@@ -67,7 +67,7 @@ function F.new(parent)
 		self:toggle()
 	end)
 	connect(UIS.InputBegan, function(input, processed)
-		if input.KeyCode ~= Enum.KeyCode.F then
+		if input.KeyCode ~= C.FlashlightKey then
 			return
 		end
 		if not processed and not self.keyDown and not UIS:GetFocusedTextBox() and not GuiService.MenuIsOpen then
@@ -76,7 +76,7 @@ function F.new(parent)
 		self.keyDown = true
 	end)
 	connect(UIS.InputEnded, function(input)
-		if input.KeyCode == Enum.KeyCode.F then
+		if input.KeyCode == C.FlashlightKey then
 			self.keyDown = false
 		end
 	end)
@@ -116,7 +116,7 @@ function F:update()
 	local enabled = self.wanted and allowed and true or false
 	self.light.Enabled = enabled
 	self.body.Transparency = enabled and 0 or 1
-	self.button.Text = "[F] Flashlight: " .. (enabled and "ON" or (self.wanted and "PAUSED" or "OFF"))
+	self.button.Text = "[L] Flashlight: " .. (enabled and "ON" or (self.wanted and "PAUSED" or "OFF"))
 	if enabled then
 		local direction = camera.CFrame.LookVector
 		local desired = head.Position + camera.CFrame.RightVector * 0.55 + Vector3.new(0, -0.3, 0) + direction * 0.45

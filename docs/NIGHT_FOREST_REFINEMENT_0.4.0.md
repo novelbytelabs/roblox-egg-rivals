@@ -9,7 +9,7 @@ Authority: owner playtest feedback on 2026-09-24. Work remains on `feature/0.4.0
 | Trace object edges | Self-lit Beam strips on all eligible nearby primitive edges; rounded shapes receive contours/rims | Actual engine edge count, resize/despawn cleanup and budget diagnostics; human readability remains separate |
 | Slightly softer glow | Bloom intensity 1.02 instead of 1.2; size 28 instead of 32; threshold 0.8 instead of 0.65 | Runtime reaches configured values; owner judges appearance |
 | Longer, denser trails | 1.8-second lifetime; speed-scaled emission up to 96/s; up to 160 trail particles per object | Lifetime, density, expiry, reuse and existing stop/impact checks |
-| Flashlight | Free hands-free personal light; F/HUD toggle; 56-stud range; shadows; no battery or economy | Real F input, text-focus rejection, nonphysical light rig |
+| Flashlight | Free hands-free personal light; L/HUD toggle; 56-stud range; shadows; no battery or economy | Real L input, text-focus rejection, nonphysical light rig |
 | More eggs | Twelve distinct nest sites, preserving the original four and the existing world footprint | World construction, spacing and the complete theft/Trial regression |
 | Godly eggs | One marked, defended Godly Day nest; random supported creature; 600-second replacement after removal | Actual Godly identity, pickup, Night transition and production respawn schedule |
 
@@ -21,7 +21,7 @@ Edge strips are client-only Beams and attachments, not colliding Parts. The curr
 
 Invisible triggers, transient particles, and the deferred duel arena are excluded. Edges are distance-culled at 180 studs, with a 1600-part bound and batched creation. Coverage overflow is reported by diagnostics rather than hidden. The high/low motion-particle budgets are 960/320. None of these settings establishes performance on mobile or console.
 
-The flashlight is personal client presentation, not a new transferable inventory item. It pauses when the character is absent/dead, the client loses focus, or the player is in a duel. Respawn turns it off. It does not grant competitive power or reveal objects through walls.
+The flashlight is personal client presentation, not a new transferable inventory item. L is reserved for the flashlight so F remains exclusively available for duel forfeit. It pauses when the character is absent/dead, the client loses focus, or the player is in a duel. Respawn turns it off. It does not grant competitive power or reveal objects through walls.
 
 ## Regression plan
 

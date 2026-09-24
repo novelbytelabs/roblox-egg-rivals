@@ -79,7 +79,7 @@ The owner reported that the current game is fine for this development stage. Sma
 | PT-02 | PRESENTATION | Objects disappear into darkness; every object edge should have neon tracing. | rc2 adds shape-aware edge lights for supported visible world primitives and pet models; runtime and visual review pending. |
 | PT-03 | TUNING | Glow is a tiny bit too intense. | rc2 reduces bloom intensity from 1.2 to 1.02, narrows its size and raises the threshold. Initial tuning, not owner-accepted appearance. |
 | PT-04 | PRESENTATION | Particle trails are too short and too sparse. | rc2 uses 1.8-second lifetime, higher emission and bounded larger pools. Runtime and feel review pending. |
-| PT-05 | DESIGN | Give players a flashlight for Night visibility. | Free hands-free personal flashlight, F toggle, no battery/price or item mutation. Runtime review pending. |
+| PT-05 | DESIGN | Give players a flashlight for Night visibility. | Free hands-free personal flashlight, L toggle, no battery/price or item mutation; F remains duel-forfeit only. Runtime review pending. |
 | PT-06 | DESIGN | More Forest eggs and Godly eggs available in the map. | Twelve nests including one marked Godly nest; longer dedicated respawn. Runtime and economy tuning review pending. |
 
 Implementation-selected tuning: twelve total nests and a 600-second Godly-nest cooldown after successful removal. The owner asked for availability, not these exact numbers. Ordinary day/night roll tables remain unchanged; the dedicated nest nevertheless increases total Godly supply. That economy consequence is explicit and remains subject to playtest tuning.

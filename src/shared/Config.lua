@@ -41,6 +41,7 @@ local C = {
 	BetweenRounds = 1.5,
 	InventoryKey = Enum.KeyCode.I,
 	OverdriveKey = Enum.KeyCode.Q,
+	FlashlightKey = Enum.KeyCode.L,
 	MomentumRamp = 30,
 	MomentumDecay = 10,
 	MomentumBonus = 0.75,

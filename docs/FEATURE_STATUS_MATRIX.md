@@ -128,7 +128,7 @@ Do not promote presentation-dependent scope to **VERIFIED BASELINE** from engine
 | Broad Night edge traces | IMPLEMENTED / REGRESSION PENDING | Supported object edges and smooth contours remain readable without through-wall highlighting |
 | Softer bloom | IMPLEMENTED / REGRESSION PENDING | Slightly less intense glow; human appearance review remains separate |
 | Longer, denser trails | IMPLEMENTED / REGRESSION PENDING | Longer visual wake while preserving reuse and hard allocation limits |
-| Personal flashlight | IMPLEMENTED / REGRESSION PENDING | Free F-toggle light; no battery, purchase or authority mutation |
+| Personal flashlight | IMPLEMENTED / REGRESSION PENDING | Free L-toggle light; no battery, purchase or authority mutation; F remains duel-forfeit only |
 | Forest egg supply | IMPLEMENTED / REGRESSION PENDING | Twelve nests within the existing footprint |
 | Marked Godly opportunity | IMPLEMENTED / REGRESSION PENDING | Real Godly theft target, independent creature roll and longer replacement delay |
 

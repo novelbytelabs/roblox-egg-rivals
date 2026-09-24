@@ -141,7 +141,7 @@ function Checks.run(g, check, a, b, results)
 		g.phaseEnds = g:now() + 600
 		probe("NightEdges")
 	end)
-	check("Real F input toggles a nonphysical personal flashlight and text entry cannot toggle it", function()
+	check("Real flashlight input toggles a nonphysical personal light without colliding with duel controls", function()
 		probe("Flashlight")
 	end)
 	check("Longer denser trails retain bounded allocation and expired-particle reuse", function()
