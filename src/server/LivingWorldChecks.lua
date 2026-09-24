@@ -97,16 +97,25 @@ function Checks.run(g, check, a, b, results)
 		fixtureSerial += 1
 		local token = "fixture-position-" .. fixtureSerial .. "-" .. tostring(g:now())
 		local started = g:now()
+		local attempts = 1
+		local nextReassert = started + 0.6
 		g:teleport(p, CFrame.new(pos))
 		g:feed(p, "completionInputProbe", { token = token, kind = "Position", target = pos })
 		local stableSince
 		local settled = waitFor(function()
 			local root = g:root(p)
 			local offset = root and root.Position - pos
-			if offset and Vector2.new(offset.X, offset.Z).Magnitude <= 3 and math.abs(offset.Y) <= 6 then
+			local serverNear =
+				offset and Vector2.new(offset.X, offset.Z).Magnitude <= 3 and math.abs(offset.Y) <= 6
+			if serverNear then
 				stableSince = stableSince or g:now()
 			else
 				stableSince = nil
+				if attempts < 3 and g:now() >= nextReassert then
+					attempts += 1
+					nextReassert = g:now() + 0.6
+					g:teleport(p, CFrame.new(pos))
+				end
 			end
 			local diag = g.clientDiagnostics[p]
 			if not diag or diag.token ~= token then
@@ -128,11 +137,14 @@ function Checks.run(g, check, a, b, results)
 			server = root and { root.Position.X, root.Position.Y, root.Position.Z } or nil,
 			client = observed,
 			elapsed = g:now() - started,
+			attempts = attempts,
 			teleportSerial = g.profiles[p].teleportSerial,
 		})
 		assert(
 			settled and observed and observed.passed and stableSince,
-			"Fixture position did not settle: target="
+			"Fixture position did not settle after "
+				.. attempts
+				.. " server placement attempt(s): target="
 				.. tostring(pos)
 				.. " server="
 				.. tostring(root and root.Position)
