@@ -16,10 +16,10 @@ Precedence rule: a later explicit owner decision overrides an earlier conflictin
 - Starter systems should feel complete; upgrades add richness rather than fix intentionally bad starter experiences.
 
 **CURRENT ENGINEERING CANDIDATE**
-- `EGG-RIVALS-0.4.0-rc2`.
-- Tested source: `bc6ecffb62b13a2b50cfc029935e3decd6d597dc`.
-- 86/86 exact-source two-client Studio checks passed.
-- rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 remain preserved historical references.
+- `EGG-RIVALS-0.4.1-rc1`.
+- Tested source: `25e300647b0c4ba38916f41452c7268d6bb6df76`.
+- 90/90 exact-source two-client Studio checks passed.
+- 0.4.0-rc2 86/86, rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 remain preserved historical references.
 - Human presentation / gameplay-feel acceptance remains a distinct gate.
 
 ## Rarity
@@ -164,6 +164,23 @@ Permanent Speed maps to controlled avatar movement with bounded scaling.
 The former 300-billion target and 2x / 4x / 6x / 8x / 10x treadmill ladder are abolished.
 
 Canonical Speed/economy values are now defined in `ECONOMY_SPEED_RARITY_V2.md`.
+
+## Sprint rivalry — 0.4.1 verified
+
+**IMPLEMENTED / ENGINEERING VERIFIED**
+- explicit nearby two-player Sprint challenge;
+- explicit accept / decline;
+- normalized WalkSpeed 45 and standard jump settings;
+- no Overdrive, permanent-Speed, pet or element movement advantage;
+- Grove Circuit gate order and discontinuity / teleport validation shared with Training Trial;
+- racer-to-racer body blocking disabled without disabling world collision;
+- first valid finish determines winner;
+- DNF / death / disconnect cleanup is deterministic;
+- session records track entries, wins, DNFs, best time and streaks;
+- no item stakes, race currency or Sprint-specific Coin reward;
+- real two-client race completion passed exact-source regression.
+
+Evidence: `STAGE3_041_VERIFICATION.md`. Human race feel and presentation remain separate from engineering verification.
 
 
 ## Night mechanics
@@ -373,4 +390,4 @@ The rc2 implementation uses twelve Forest nests with one marked Godly target and
 
 The hidden Night egg remains a separate single-egg event. All ordinary Forest nests, including the marked Godly nest, become dormant at Night. An already-carried egg survives the transition.
 
-Current candidate and evidence status is in `tests/CANDIDATE_STATUS.json`. rc2 now has an 86/86 exact-source two-client result. The earlier rc1 77/77 result remains historical and was not substituted. Owner presentation recheck and later design obligations remain distinct from engineering verification.
+Current candidate and evidence status is in `tests/CANDIDATE_STATUS.json`. The rc2 86/86 result remains historical and was not substituted by the later 0.4.1 90/90 Sprint candidate. Owner presentation review and later design obligations remain distinct from engineering verification.
