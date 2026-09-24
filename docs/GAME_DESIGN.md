@@ -30,29 +30,27 @@ The egg determines creature identity. The incubator determines elemental form. R
 
 ## Current engineering state
 
-`EGG-RIVALS-0.4.0-rc2` is the current verified engineering candidate.
+`EGG-RIVALS-0.4.1-rc1` is the current verified engineering candidate.
 
-It passed **86/86** exact-source checks in a real two-client Roblox Studio regression. Tested source commit: `bc6ecffb62b13a2b50cfc029935e3decd6d597dc`. Source digest: `cd3456d8f2dcaef01b967582d599ec426ecb41d6dd51d2044c01912a0ef87a7f`.
+It passed **90/90** exact-source checks in a real two-client Roblox Studio regression. Tested source commit: `25e300647b0c4ba38916f41452c7268d6bb6df76`. Source digest: `84225f0b18b3886fa2d8a0cd0c2f8aa46b5438064b2fa3529a08b63cb6ab6a74`.
 
-rc2 retains the full 0.4.0 Living World mechanics and adds the owner-directed Night/Forest refinement. Engineering verification establishes the tested mechanics, not owner acceptance of appearance, pacing, fun, or tuning.
+0.4.1 retains the full verified Night/Forest refinement and adds normalized two-player Sprint Rivalry using the shared Grove Circuit route validator. Engineering verification establishes tested mechanics, not owner acceptance of appearance, pacing, fun, or tuning.
 
 The source audit also corrected several stale “not implemented” labels. Current source already contains grade-driven treadmill modules, session machine records, Speed milestone events, owner-homecoming behavior, autonomous ranch states, Night clue regions, and Moon Shrine presentation paths.
 
 ## Current design direction
 
-The owner wants mechanics-first continuation. The next bounded design target is a normalized two-player Sprint Challenge that reuses the existing validated Grove Circuit movement/gate system.
+Sprint Rivalry is now engineering-verified. The next mechanics-first target is a **Ranger Contracts / Quest Board** layer that directs players back through systems already present in the game.
 
 The design goals are:
 
-- opt-in two-player movement rivalry;
-- equal `45` WalkSpeed and standard jump settings;
-- no Overdrive, pet bonus, element bonus, item stakes, or economic reward;
-- server-owned countdown, gate order, finish, timeout and winner;
-- reuse of existing anti-teleport/discontinuous-movement validation;
-- session-only records and visible progression feedback;
-- no new zone, currency, persistence system, or public-wagering dependency.
+- reinforce training, theft, hatching, Night, Grove Circuit and Sprint;
+- use server-owned progress and exact one-time completion;
+- use Coins as the only progression reward;
+- avoid a new zone, currency, persistence requirement or public-wagering dependency;
+- create short session goals that make the existing vertical slice more replayable.
 
-See [0.4.1 Sprint Rivalry](NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md).
+See [0.4.2 Ranger Contracts](NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md).
 
 ## Canonical detailed specifications
 
@@ -70,6 +68,8 @@ See [0.4.1 Sprint Rivalry](NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md).
 - [rc2 Engineering Verification](STAGE3_040_RC2_VERIFICATION.md)
 - [Owner Playtest](PLAYTEST_0.4.0.md)
 - [0.4.1 Sprint Rivalry](NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md)
+- [0.4.1 Engineering Verification](STAGE3_041_VERIFICATION.md)
+- [0.4.2 Ranger Contracts](NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md)
 
 ## Design discipline
 
