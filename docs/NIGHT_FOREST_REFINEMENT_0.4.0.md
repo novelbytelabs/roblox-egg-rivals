@@ -39,7 +39,13 @@ Potential next mechanics packet: a clearly scoped normalized two-player Sprint C
 
 ## Status
 
-Implementation prepared. Exact-source Studio regression and human review of the changed presentation remain pending.
+**ENGINEERING VERIFIED; OWNER PRESENTATION RECHECK PENDING.**
+
+Exact-source rc2 verification passed **86/86** checks at source commit `bc6ecffb62b13a2b50cfc029935e3decd6d597dc`, source digest `cd3456d8f2dcaef01b967582d599ec426ecb41d6dd51d2044c01912a0ef87a7f`.
+
+Two prior 85/1 runs are preserved. The final synchronization repair strengthened fixture isolation without changing production movement/proximity rules. See `STAGE3_040_RC2_VERIFICATION.md`.
+
+Human review still controls the final tuning of edge density, bloom, trail length/density, flashlight feel, nest count and Godly cooldown.
 
 ## API references
 
