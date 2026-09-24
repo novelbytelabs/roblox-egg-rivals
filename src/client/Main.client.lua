@@ -741,7 +741,12 @@ render = function()
 	end
 	local active = d and d.phase ~= "Requested" and d.phase ~= "Selecting"
 	local sprintActive = sprint
-		and (sprint.phase == "Staging" or sprint.phase == "Countdown" or sprint.phase == "Active" or sprint.phase == "Finishing")
+		and (
+			sprint.phase == "Staging"
+			or sprint.phase == "Countdown"
+			or sprint.phase == "Active"
+			or sprint.phase == "Finishing"
+		)
 	local selecting = d and d.phase == "Selecting"
 	if d or sprint then
 		menu = nil
@@ -866,10 +871,10 @@ render = function()
 			.. tostring(math.floor(state.lab.charge))
 			.. "%"
 		local records = state.lab.records or {}
-		shopDescription.Text ..= "\n\nSPRINTS: "
-			.. tostring(records.sprintWins or 0)
-			.. " wins • best "
-			.. (records.bestSprint and string.format("%.2fs", records.bestSprint) or "—")
+		shopDescription.Text ..= "\n\nSPRINTS: " .. tostring(records.sprintWins or 0) .. " wins • best " .. (records.bestSprint and string.format(
+			"%.2fs",
+			records.bestSprint
+		) or "—")
 		if nextGrade then
 			shopDescription.Text ..= "\n\nNEXT: " .. nextGrade.name:upper() .. " • " .. nextGrade.cost .. " Coins"
 			buyButton.Text = "INSTALL " .. nextGrade.name:upper() .. " • " .. nextGrade.cost .. " COINS"
@@ -898,7 +903,10 @@ render = function()
 			"05 / UPGRADE YOUR TRAINER",
 			"Pets earn Coins automatically. At 150 Coins, visit your Speed Lab or Trainer Workshop.",
 		},
-		{ "THE GROVE IS YOURS", "Collect Forest pets, try a snare, duel with R, or challenge a normalized Sprint with T." },
+		{
+			"THE GROVE IS YOURS",
+			"Collect Forest pets, try a snare, duel with R, or challenge a normalized Sprint with T.",
+		},
 	}
 	local objectiveData = objectives[math.clamp(state.tutorial, 1, 6)]
 	objectiveTitle.Text = objectiveData[1]
@@ -1114,7 +1122,11 @@ local function bindTool(tool)
 	end
 	boundTools[tool] = true
 	tool.Activated:Connect(function()
-		if menu or (state and state.sprint) or (state and state.duel and (state.duel.phase == "Selecting" or state.duel.phase == "Requested")) then
+		if
+			menu
+			or (state and state.sprint)
+			or (state and state.duel and (state.duel.phase == "Selecting" or state.duel.phase == "Requested"))
+		then
 			return
 		end
 		if tool.Name == "Bat" then
@@ -1773,7 +1785,9 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 					local humanoid = char and char:FindFirstChildOfClass("Humanoid")
 					local actor = char and char:FindFirstChild("HumanoidRootPart")
 					assert(actor and humanoid and waitFor(function()
-						return state and state.sprint and (state.sprint.phase == "Active" or state.sprint.phase == "Finishing")
+						return state
+							and state.sprint
+							and (state.sprint.phase == "Active" or state.sprint.phase == "Finishing")
 					end, 4))
 					assert(humanoid.WalkSpeed == C.TrialSpeed, "Sprint movement is not normalized")
 					assert(trialHUD.Visible, "Sprint HUD is not visible")

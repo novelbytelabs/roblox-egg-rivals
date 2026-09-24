@@ -35,11 +35,7 @@ end
 function Sprint:available(p)
 	local g = self.game
 	local pro = g.profiles[p]
-	return g:alive(p)
-		and pro ~= nil
-		and not g:busy(p)
-		and g.carry[p] == nil
-		and pro.lab.untilTime <= g:now()
+	return g:alive(p) and pro ~= nil and not g:busy(p) and g.carry[p] == nil and pro.lab.untilTime <= g:now()
 end
 
 function Sprint:context(s, requireNear)
@@ -315,7 +311,11 @@ function Sprint:complete(s, winner, reason)
 			if pro then
 				p:SetAttribute(
 					"Busy",
-					pro.duel ~= nil or pro.trade ~= nil or pro.exchange ~= nil or pro.trial ~= nil or pro.incubatorPreview ~= nil
+					pro.duel ~= nil
+						or pro.trade ~= nil
+						or pro.exchange ~= nil
+						or pro.trial ~= nil
+						or pro.incubatorPreview ~= nil
 				)
 				g:applySpeed(p)
 				g:push(p)

@@ -59,30 +59,33 @@ function Checks.run(g, check, a, b, results)
 		assert(#g.inventory:list(a.UserId) == countA and #g.inventory:list(b.UserId) == countB)
 	end)
 
-	check("Sprint countdown locks movement then applies equal normalized movement without spending Overdrive", function()
-		stage()
-		local recordsA, recordsB = g.profiles[a].lab.records, g.profiles[b].lab.records
-		local enteredA, enteredB = recordsA.sprintEntered or 0, recordsB.sprintEntered or 0
-		assert(g.sprints:request(a, b))
-		assert(g.sprints:reply(b, true))
-		assert(waitFor(function()
-			return g.profiles[a].sprint and g.profiles[a].sprint.phase == "Countdown"
-		end, 2))
-		assert(g:humanoid(a).WalkSpeed == 0 and g:humanoid(b).WalkSpeed == 0)
-		assert(waitFor(function()
-			return g.profiles[a].sprint and g.profiles[a].sprint.phase == "Active"
-		end, C.SprintCountdown + 2))
-		assert(g:humanoid(a).WalkSpeed == C.TrialSpeed and g:humanoid(b).WalkSpeed == C.TrialSpeed)
-		assert((recordsA.sprintEntered or 0) == enteredA + 1 and (recordsB.sprintEntered or 0) == enteredB + 1)
-		local charge = g.profiles[a].lab.charge
-		g.profiles[a].lab.charge = 100
-		local ok = g.speedLab:activate(a)
-		assert(not ok and g.profiles[a].lab.charge == 100, "Sprint consumed or allowed Overdrive")
-		g.profiles[a].lab.charge = charge
-		assert(g.sprints:cancel(a))
-		assert(g.profiles[a].sprint == nil and g.profiles[b].sprint == nil)
-		assert(g:humanoid(a).WalkSpeed ~= C.TrialSpeed and g:humanoid(b).WalkSpeed ~= C.TrialSpeed)
-	end)
+	check(
+		"Sprint countdown locks movement then applies equal normalized movement without spending Overdrive",
+		function()
+			stage()
+			local recordsA, recordsB = g.profiles[a].lab.records, g.profiles[b].lab.records
+			local enteredA, enteredB = recordsA.sprintEntered or 0, recordsB.sprintEntered or 0
+			assert(g.sprints:request(a, b))
+			assert(g.sprints:reply(b, true))
+			assert(waitFor(function()
+				return g.profiles[a].sprint and g.profiles[a].sprint.phase == "Countdown"
+			end, 2))
+			assert(g:humanoid(a).WalkSpeed == 0 and g:humanoid(b).WalkSpeed == 0)
+			assert(waitFor(function()
+				return g.profiles[a].sprint and g.profiles[a].sprint.phase == "Active"
+			end, C.SprintCountdown + 2))
+			assert(g:humanoid(a).WalkSpeed == C.TrialSpeed and g:humanoid(b).WalkSpeed == C.TrialSpeed)
+			assert((recordsA.sprintEntered or 0) == enteredA + 1 and (recordsB.sprintEntered or 0) == enteredB + 1)
+			local charge = g.profiles[a].lab.charge
+			g.profiles[a].lab.charge = 100
+			local ok = g.speedLab:activate(a)
+			assert(not ok and g.profiles[a].lab.charge == 100, "Sprint consumed or allowed Overdrive")
+			g.profiles[a].lab.charge = charge
+			assert(g.sprints:cancel(a))
+			assert(g.profiles[a].sprint == nil and g.profiles[b].sprint == nil)
+			assert(g:humanoid(a).WalkSpeed ~= C.TrialSpeed and g:humanoid(b).WalkSpeed ~= C.TrialSpeed)
+		end
+	)
 
 	check("Sprint teleport discontinuity produces DNF and deterministic cleanup", function()
 		stage()
