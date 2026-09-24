@@ -140,7 +140,11 @@ function Contracts:observe(p, event, data)
 			if contract.progress >= contract.target then
 				contract.completed = true
 				changed = true
-				self.game:notify(p, contract.name .. " complete! Visit Ranger Station to claim " .. contract.rewardCoins .. " Coins.", "win")
+				self.game:notify(
+					p,
+					contract.name .. " complete! Visit Ranger Station to claim " .. contract.rewardCoins .. " Coins.",
+					"win"
+				)
 			end
 		end
 	end

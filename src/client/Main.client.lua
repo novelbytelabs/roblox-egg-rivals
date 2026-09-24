@@ -329,7 +329,8 @@ for i = 1, C.ContractCount do
 			send("contractClaim", { id = contract.id })
 		end
 	end, C.Colors.Blue)
-	contractRows[index] = { frame = row, title = title, objective = objective, progress = progress, claim = claim, id = nil }
+	contractRows[index] =
+		{ frame = row, title = title, objective = objective, progress = progress, claim = claim, id = nil }
 end
 
 local incubatorPanel = U.frame(root, "IncubationPreview", 245, 150, 590, 345, C.Colors.Panel)
@@ -1513,9 +1514,12 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 			local ok, err = xpcall(function()
 				if data.kind == "ContractClaim" then
 					assert(type(data.contractId) == "string" and type(data.rewardCoins) == "number")
-					assert(waitFor(function()
-						return contractPanel.Visible and state and state.contracts
-					end, 3), "Contract panel did not open")
+					assert(
+						waitFor(function()
+							return contractPanel.Visible and state and state.contracts
+						end, 3),
+						"Contract panel did not open"
+					)
 					local target
 					for _, row in ipairs(contractRows) do
 						if row.id == data.contractId then
@@ -1526,16 +1530,19 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 					assert(target and target.claim.Active, "Exact completed contract claim button is unavailable")
 					local before = state.money
 					mouse(target.claim, 0.08)
-					assert(waitFor(function()
-						for _, contract in ipairs(state.contracts or {}) do
-							if contract.id == data.contractId and contract.claimed then
-								out.claimed = true
-								out.moneyDelta = state.money - before
-								return true
+					assert(
+						waitFor(function()
+							for _, contract in ipairs(state.contracts or {}) do
+								if contract.id == data.contractId and contract.claimed then
+									out.claimed = true
+									out.moneyDelta = state.money - before
+									return true
+								end
 							end
-						end
-						return false
-					end, 4), "Rendered contract claim did not reach authoritative state")
+							return false
+						end, 4),
+						"Rendered contract claim did not reach authoritative state"
+					)
 					assert(out.moneyDelta >= data.rewardCoins, "Claim did not credit the advertised reward")
 				elseif
 					data.kind == "NightEdges"
