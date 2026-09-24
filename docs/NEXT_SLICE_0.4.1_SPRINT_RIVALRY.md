@@ -1,8 +1,18 @@
 # Egg Rivals 0.4.1 — Sprint Rivalry + Progression Feedback
 
-Status: **DESIGN PACKET READY — IMPLEMENTATION NOT YET STARTED**
+Status: **ENGINEERING VERIFIED — 90/90 EXACT-SOURCE REGRESSION; OWNER FEEL REVIEW PENDING**
 
 Purpose: add a second skill-forward rivalry mode without creating a new zone, economy, weapon system, or progression reset.
+
+## Implementation / verification status
+
+The 0.4.1 implementation is now present and engineering-verified. The final exact-source candidate passed **90/90** checks with one real Studio server and two real clients.
+
+Sprint reuses the shared Grove Circuit route validator, applies normalized movement, records session results, suppresses racer body-blocking without disabling world collision, and creates no stakes or race currency.
+
+Exact evidence: `STAGE3_041_VERIFICATION.md` and `tests/engine-20260924T172227857145Z.json`.
+
+Owner race feel, UI clarity and pacing remain playtest questions rather than engineering claims.
 
 This packet follows the owner's mechanics-first direction. It reuses the already-validated Grove Circuit and Trial movement rules rather than creating a competing race framework.
 
@@ -241,4 +251,4 @@ Final acceptance requires a fresh exact-source one-server/two-client Studio run 
 
 ## Claim boundary
 
-This document authorizes design clarity only. It does not claim Sprint Challenge implementation or verification.
+This document began as the implementation design packet. The bounded implementation is now engineering-verified at 90/90. Human race feel, presentation quality and longer-term retention value remain separate claims.
