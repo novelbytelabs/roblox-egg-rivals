@@ -121,7 +121,10 @@ function Checks.run(g, check, a, b, results)
 		local incomeA, incomeB = g.inventory:income(a.UserId), g.inventory:income(b.UserId)
 		local wealthA = proA.money.Value + proA.coinRemainder
 		local wealthB = proB.money.Value + proB.coinRemainder
-		assert(proA.money.Value < C.MaxCoins and proB.money.Value < C.MaxCoins, "Sprint economy fixture hit Coin ceiling")
+		assert(
+			proA.money.Value < C.MaxCoins and proB.money.Value < C.MaxCoins,
+			"Sprint economy fixture hit Coin ceiling"
+		)
 		local expectedPassiveA, expectedPassiveB = 0, 0
 		local economyConnection = RunService.Heartbeat:Connect(function(dt)
 			expectedPassiveA += incomeA * dt / 60
@@ -180,8 +183,14 @@ function Checks.run(g, check, a, b, results)
 		assert(raceOK, raceErr)
 		local actualPassiveA = proA.money.Value + proA.coinRemainder - wealthA
 		local actualPassiveB = proB.money.Value + proB.coinRemainder - wealthB
-		assert(math.abs(actualPassiveA - expectedPassiveA) < 0.01, "Sprint changed player A Coins beyond passive income")
-		assert(math.abs(actualPassiveB - expectedPassiveB) < 0.01, "Sprint changed player B Coins beyond passive income")
+		assert(
+			math.abs(actualPassiveA - expectedPassiveA) < 0.01,
+			"Sprint changed player A Coins beyond passive income"
+		)
+		assert(
+			math.abs(actualPassiveB - expectedPassiveB) < 0.01,
+			"Sprint changed player B Coins beyond passive income"
+		)
 		assert(g.inventory:income(a.UserId) == incomeA and g.inventory:income(b.UserId) == incomeB)
 		assert(inventorySignature(a) == inventoryA and inventorySignature(b) == inventoryB)
 	end)
