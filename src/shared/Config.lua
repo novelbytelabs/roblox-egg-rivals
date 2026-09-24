@@ -1,6 +1,6 @@
--- Canonical 0.4.0 tuning. No persistence, Robux commerce, or public item staking.
+-- Canonical session-only tuning. No persistence, Robux commerce, or public item staking.
 local C = {
-	Build = "EGG-RIVALS-0.4.1-rc1",
+	Build = "EGG-RIVALS-0.4.2-rc1",
 	SchemaVersion = 4,
 	MaxPlayers = 4,
 	MaxItems = 80,
@@ -85,6 +85,7 @@ local C = {
 	SprintFinishGrace = 10,
 	SprintRange = 12,
 	SprintStartRadius = 11,
+	ContractCount = 3,
 }
 -- Owner feedback 2026-09-24: more Forest eggs plus an available Godly target.
 -- The marked Godly nest is separate from normal weighted rolls and the hidden Night egg.

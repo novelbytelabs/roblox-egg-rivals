@@ -71,6 +71,7 @@ function Trials:finish(p, valid, reason)
 		else
 			g:notify(p, string.format("Circuit complete • %.2fs. Best %.2fs.", elapsed, pro.bestTrial.time), "win")
 		end
+		g.contracts:observe(p, "trial_finish")
 	else
 		g:notify(p, reason or "Trial canceled. No record changed.")
 	end

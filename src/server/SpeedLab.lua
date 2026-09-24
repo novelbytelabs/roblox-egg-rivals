@@ -40,12 +40,16 @@ function SpeedLab:step(p, dt, now)
 	lab.momentum = momentum
 	pro.speed.Value = math.clamp(pro.speed.Value, 0, grade.cap)
 	if training then
+		local speedBefore = pro.speed.Value
 		lab.fraction += grade.rate * (dt + C.MomentumBonus * integral)
 		local whole = math.floor(lab.fraction + 1e-9)
 		pro.speed.Value = math.min(grade.cap, pro.speed.Value + whole)
 		lab.fraction = math.max(0, lab.fraction - whole)
 		if pro.speed.Value >= grade.cap then
 			lab.fraction = 0
+		end
+		if pro.speed.Value > speedBefore then
+			g.contracts:observe(p, "speed", { value = pro.speed.Value })
 		end
 		local before = lab.charge
 		if now >= lab.untilTime then

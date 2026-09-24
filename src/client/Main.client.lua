@@ -84,7 +84,7 @@ workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(bindCamera)
 bindCamera()
 local brand = U.frame(root, "Brand", 16, 12, 258, 62, C.Colors.Ink)
 U.text(brand, "Title", "EGG RIVALS", 14, 7, 230, 27, 24, C.Colors.Gold)
-U.text(brand, "Subtitle", "LIVING WORLD • 0.4.0", 14, 36, 232, 17, 11, C.Colors.Muted)
+U.text(brand, "Subtitle", "SESSION MASTERY • 0.4.2", 14, 36, 232, 17, 11, C.Colors.Muted)
 local phasePanel = U.frame(root, "Phase", 395, 12, 290, 62, C.Colors.Ink)
 local phaseTitle = U.text(phasePanel, "Title", "DAYTIME", 12, 6, 266, 25, 19)
 phaseTitle.TextXAlignment = Enum.TextXAlignment.Center
@@ -310,6 +310,28 @@ local exchangeConfirm = U.button(
 	C.Colors.Gold
 )
 
+local contractPanel = U.frame(root, "ContractsPanel", 230, 120, 620, 450, C.Colors.Panel)
+contractPanel.Visible = false
+U.text(contractPanel, "Title", "RANGER CONTRACTS", 18, 12, 520, 34, 24, C.Colors.Blue)
+U.button(contractPanel, "Close", "X", 566, 14, 36, 31, function()
+	menu = nil
+end, C.Colors.Muted)
+local contractRows = {}
+for i = 1, C.ContractCount do
+	local index = i
+	local row = U.frame(contractPanel, "Contract" .. i, 18, 58 + (i - 1) * 122, 584, 108, C.Colors.Ink)
+	local title = U.text(row, "Title", "", 12, 7, 410, 24, 17, C.Colors.Gold)
+	local objective = U.text(row, "Objective", "", 12, 31, 550, 38, 13, C.Colors.Text)
+	local progress = U.text(row, "Progress", "", 12, 76, 385, 24, 13, C.Colors.Muted)
+	local claim = U.button(row, "Claim", "IN PROGRESS", 414, 72, 156, 28, function()
+		local contract = contractRows[index]
+		if contract and contract.id then
+			send("contractClaim", { id = contract.id })
+		end
+	end, C.Colors.Blue)
+	contractRows[index] = { frame = row, title = title, objective = objective, progress = progress, claim = claim, id = nil }
+end
+
 local incubatorPanel = U.frame(root, "IncubationPreview", 245, 150, 590, 345, C.Colors.Panel)
 incubatorPanel.Visible = false
 local incubatorTitle = U.text(incubatorPanel, "Title", "CHOOSE YOUR ELEMENT", 20, 12, 520, 32, 22, C.Colors.Gold)
@@ -440,7 +462,7 @@ end, C.Colors.Muted)
 U.text(
 	guide,
 	"Instructions",
-	"1. Train at your Speed Lab. Momentum improves training and charges Overdrive.\n2. Follow the lantern trail into the Forest and steal an egg.\n3. Escape the Warden. Choose Fire, Water, Wind, or Earth deliberately at your camp.\n4. One pet follows; the rest live in your ranch and all still earn Coins.\n5. At Night the daytime nests go dormant and one valuable egg is hidden.\n6. Upgrade your Speed Lab, expand your ranch, trade safely, and master the Grove Circuit.\n\nWASD: move • Space: jump • Q: Overdrive • I: collection • U: Speed Lab • H: guide\n1 / 2: equip tools • Click: use equipped tool\n\nProgress is session-only in this engineering slice.",
+	"1. Train at your Speed Lab. Momentum improves training and charges Overdrive.\n2. Follow the lantern trail into the Forest and steal an egg.\n3. Escape the Warden. Choose Fire, Water, Wind, or Earth deliberately at your camp.\n4. One pet follows; the rest live in your ranch and all still earn Coins.\n5. At Night the daytime nests go dormant and one valuable egg is hidden.\n6. Upgrade your Speed Lab, expand your ranch, trade safely, and master the Grove Circuit.\n7. Visit Ranger Station for three session contracts that reward the systems you already use.\n\nWASD: move • Space: jump • Q: Overdrive • I: collection • U: Speed Lab • H: guide\n1 / 2: equip tools • Click: use equipped tool\n\nProgress is session-only in this engineering slice.",
 	20,
 	59,
 	620,
@@ -762,7 +784,24 @@ render = function()
 	ranchPanel.Visible = menu == "ranch"
 	tradePanel.Visible = menu == "trade"
 	exchangePanel.Visible = menu == "exchange"
+	contractPanel.Visible = menu == "contracts"
 	guide.Visible = menu == "help"
+	if contractPanel.Visible then
+		for i, row in ipairs(contractRows) do
+			local contract = state.contracts and state.contracts[i]
+			row.frame.Visible = contract ~= nil
+			row.id = contract and contract.id or nil
+			if contract then
+				row.title.Text = contract.name .. " • " .. contract.rewardCoins .. " COINS"
+				row.objective.Text = contract.objective
+				row.progress.Text = contract.kind .. " • " .. contract.progress .. " / " .. contract.target
+				row.claim.Text = contract.claimed and "CLAIMED"
+					or (contract.completed and ("CLAIM +" .. contract.rewardCoins) or "IN PROGRESS")
+				row.claim.Active = contract.completed and not contract.claimed
+				row.claim.AutoButtonColor = row.claim.Active
+			end
+		end
+	end
 	if tradePanel.Visible then
 		paintTrade()
 	end
@@ -990,6 +1029,9 @@ feed.OnClientEvent:Connect(function(kind, data)
 		TweenService:Create(damage, TweenInfo.new(0.25), { BackgroundTransparency = 1 }):Play()
 	elseif kind == "openShop" then
 		menu = "shop"
+		render()
+	elseif kind == "openContracts" then
+		menu = "contracts"
 		render()
 	elseif kind == "ranchUpgrade" then
 		pendingRanchUpgrade = data
@@ -1469,7 +1511,33 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 			end
 			local cleanup
 			local ok, err = xpcall(function()
-				if
+				if data.kind == "ContractClaim" then
+					assert(type(data.contractId) == "string" and type(data.rewardCoins) == "number")
+					assert(waitFor(function()
+						return contractPanel.Visible and state and state.contracts
+					end, 3), "Contract panel did not open")
+					local target
+					for _, row in ipairs(contractRows) do
+						if row.id == data.contractId then
+							target = row
+							break
+						end
+					end
+					assert(target and target.claim.Active, "Exact completed contract claim button is unavailable")
+					local before = state.money
+					mouse(target.claim, 0.08)
+					assert(waitFor(function()
+						for _, contract in ipairs(state.contracts or {}) do
+							if contract.id == data.contractId and contract.claimed then
+								out.claimed = true
+								out.moneyDelta = state.money - before
+								return true
+							end
+						end
+						return false
+					end, 4), "Rendered contract claim did not reach authoritative state")
+					assert(out.moneyDelta >= data.rewardCoins, "Claim did not credit the advertised reward")
+				elseif
 					data.kind == "NightEdges"
 					or data.kind == "Flashlight"
 					or data.kind == "LongTrails"

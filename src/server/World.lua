@@ -316,6 +316,8 @@ function W.build()
 		servicePoint("Exchange", Vector3.new(-20, 1.5, 4), Config.Colors.Gold, "THE EXCHANGE\nEggs • pets • items")
 	local tradingPost =
 		servicePoint("TradingPost", Vector3.new(-45, 1.5, 4), Config.Colors.Text, "TRADING POST\nSafe player trades")
+	local rangerStation =
+		servicePoint("RangerStation", Vector3.new(-71, 1.5, 4), Config.Colors.Blue, "RANGER STATION\nSession contracts")
 
 	local trialStart = p(
 		"TrialStart",
@@ -477,6 +479,7 @@ function W.build()
 		ranchShop = ranchShop,
 		exchangeShop = exchangeShop,
 		tradingPost = tradingPost,
+		rangerStation = rangerStation,
 		trialStart = trialStart,
 		trialGates = trialGates,
 		shrine = shrine,

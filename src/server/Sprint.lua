@@ -276,6 +276,9 @@ function Sprint:complete(s, winner, reason)
 				elseif winner then
 					records.sprintStreak = 0
 				end
+				if s.finished[p] then
+					g.contracts:observe(p, "sprint_finish")
+				end
 			end
 		end
 	end

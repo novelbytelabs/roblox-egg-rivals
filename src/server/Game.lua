@@ -13,6 +13,7 @@ local Holds = require(script.Parent.Holds)
 local SpeedLab = require(script.Parent.SpeedLab)
 local Trials = require(script.Parent.Trials)
 local Sprint = require(script.Parent.Sprint)
+local Contracts = require(script.Parent.Contracts)
 local Ranch = require(script.Parent.Ranch)
 local Trade = require(script.Parent.Trade)
 local Incubation = require(script.Parent.Incubation)
@@ -199,6 +200,7 @@ function Game:setup(p)
 	assert(self.inventory:createConsumable(p.UserId, "SnarePod"))
 	pro.charges = #self.inventory:consumables(p.UserId, true)
 	self.speedLab:setup(pro)
+	self.contracts:setup(p)
 	self.ranch:setup(p)
 	base.applyGrade(pro.tier)
 	base.applyExpansion(pro.ranchLevel)
@@ -569,6 +571,7 @@ function Game:secure(p, element)
 		self.inventory.items[item.id] = nil
 		return false, incErr
 	end
+	self.contracts:observe(p, egg.nightEvent and "night_secure" or "forest_secure")
 	self:retireEgg(egg)
 	pro.tutorial = math.max(pro.tutorial, 4)
 	self:notify(p, egg.creature .. " egg secured in the " .. element .. " incubator.", "pickup")
@@ -1015,6 +1018,7 @@ function Game:push(p)
 		lab = self.speedLab:snapshot(p),
 		trial = self.trials:snapshot(p),
 		sprint = self.sprints:snapshot(p),
+		contracts = self.contracts:snapshot(p),
 		ranchLevel = pro.ranchLevel,
 		ranchCapacity = C.Expansions[pro.ranchLevel + 1].capacity,
 		ranch = self.ranch:snapshot(p),
@@ -1111,6 +1115,8 @@ function Game:action(p, name, data)
 		return self.sprints:reply(p, data.accept)
 	elseif name == "sprintCancel" then
 		return self.sprints:cancel(p)
+	elseif name == "contractClaim" then
+		return self.contracts:claim(p, data.id)
 	elseif name == "ranchExpand" then
 		return self.ranch:buyExpansion(p, data.level)
 	elseif name == "ranchRevere" then
@@ -1391,6 +1397,7 @@ function Game:step(dt)
 					pro.incubations[element] = nil
 					pro.tutorial = math.max(pro.tutorial, 5)
 					pro.hatched += 1
+					self.contracts:observe(p, "hatch")
 					if pro.tier > 1 then
 						pro.tutorial = 6
 						pro.onboardingComplete = true
@@ -1481,6 +1488,7 @@ function Game.new()
 	self.speedLab = SpeedLab.new(self)
 	self.trials = Trials.new(self)
 	self.sprints = Sprint.new(self)
+	self.contracts = Contracts.new(self)
 	self.ranch = Ranch.new(self)
 	self.trades = Trade.new(self)
 	self.duels = Duel.new(self)
@@ -1564,6 +1572,13 @@ function Game.new()
 	self:prompt(self.world.trainerShop, "Open upgrades", "Trainer Workshop", function(p)
 		self:feed(p, "openShop", { shop = "trainer" })
 	end)
+	self:prompt(self.world.rangerStation, "Review contracts", "Ranger Station", function(p)
+		if self:busy(p) then
+			self:notify(p, "Finish your current activity before reviewing contracts.")
+			return
+		end
+		self:feed(p, "openContracts", {})
+	end)
 	self:prompt(self.world.trialStart, "Start Trial", "Grove Circuit", function(p)
 		local ok, err = self.trials:start(p)
 		if not ok then
@@ -1617,6 +1632,7 @@ function Game.new()
 		self.holds:cancel(p)
 		self.trades:leaving(p)
 		self.sprints:leaving(p)
+		self.contracts:remove(p)
 		self.duels:leaving(p)
 		if self.carry[p] then
 			self:resetEgg(self.carry[p])
