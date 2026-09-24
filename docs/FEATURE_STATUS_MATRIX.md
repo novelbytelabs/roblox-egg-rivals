@@ -104,23 +104,19 @@ A feature moving from **APPROVED** to **VERIFIED BASELINE** requires:
 
 Do not update this matrix from aspiration alone.
 
-## 0.4.0 targeted implementation set
+## 0.4.0 engineering candidate status
 
-The 0.4.0 exact-source engineering candidate passed 77/77 checks. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above. Visual or experiential scope that lacks human acceptance remains unpromoted even when implementation exists:
+The 0.4.0 exact-source engineering candidate passed **77/77** checks. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
 
-- Economy / Speed / rarity v2;
-- Godly rarity and reverence;
-- Welcome Party and homecoming ranch behavior;
-- physical ranch expansions;
-- Speed Lab grades, Momentum, Overdrive, Motion Energy, records;
-- one Training Trial and personal ghost;
-- four-corner incubator UX;
-- Night dormant nests and hidden Night egg;
-- blacklight / neon Night transformation;
-- particle trails and full-stop collision splatter;
-- Trainer Workshop;
-- Ranch & Pen Works;
-- Exchange;
-- Trading Post.
+The original Living World plan intentionally mixed mechanical requirements with experiential aspirations. The green engineering suite does not imply that every presentation goal shipped. Important approved gaps still visible in this matrix include:
+
+- owner homecoming reactions and richer autonomous pet life;
+- visible treadmill modules, records, milestones and pet training reactions;
+- elemental treadmill tuning, social drafting and Sprint Challenges;
+- environmental Night clues, Moon Shrine activation and full blacklight transformation;
+- broader ranch habitats, comforts, showcases, themes and visitor expression;
+- Night Market, Duel Armory, Pet Outfitter, Quest Board and Elemental Bazaar.
+
+The active gate is owner playtesting of the exact verified candidate. Record findings in `PLAYTEST_0.4.0.md`.
 
 Do not promote presentation-dependent scope to **VERIFIED BASELINE** from engine evidence alone. Human presentation/gameplay acceptance remains a separate gate.
