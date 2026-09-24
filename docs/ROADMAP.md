@@ -2,96 +2,66 @@
 
 ## Current engineering candidate
 
-**EGG-RIVALS-0.4.0-rc1 — LIVING WORLD** is the current verified engineering candidate.
+**EGG-RIVALS-0.4.0-rc2** is the current verified engineering candidate.
 
-- Tested source commit: `e185b078b7fd9f598e62130fb1dcaf008885fdb1`
-- Exact-source multiplayer regression: **77 passed / 0 failed**
+- Tested source commit: `bc6ecffb62b13a2b50cfc029935e3decd6d597dc`
+- Source digest: `cd3456d8f2dcaef01b967582d599ec426ecb41d6dd51d2044c01912a0ef87a7f`
+- Exact-source multiplayer regression: **86 passed / 0 failed**
 - Real Studio topology: one server + two clients
-- Human presentation/gameplay acceptance: **PENDING**
+- Human presentation/gameplay recheck: **PENDING**
 - Roblox publication: **NOT PERFORMED**
 - Merge to `main`: **NOT AUTHORIZED**
 
-`MOONWOOD-0.3.2-r2` remains preserved as the historical 24/24 baseline.
+The rc1 77/77 candidate and `MOONWOOD-0.3.2-r2` 24/24 baseline remain preserved as historical references.
 
-## Current gate — owner playtest
+## rc2 Night / Forest refinement
 
-Do not begin the next major implementation slice merely because engineering verification is green.
+Engineering verification now covers:
 
-The owner playtest now decides which gaps matter most in actual play. Capture evidence in `docs/PLAYTEST_0.4.0.md`.
+- twelve Forest nest sites in the existing world footprint;
+- one marked Godly Day nest with server-owned theft and 600-second replacement;
+- broader shape-aware Night edge tracing;
+- softer bloom tuning;
+- longer/denser bounded particle trails;
+- free personal flashlight on `L`;
+- dawn cleanup and all retained rc1 invariants.
 
-Primary review areas:
+Appearance and tuning remain owner-playtest adjustable.
 
-1. fun and core-loop clarity;
-2. Speed / movement feel;
-3. camp and incubator readability;
-4. theft tension;
-5. pet life and ranch personality;
-6. Godly spectacle;
-7. Night beauty/readability;
-8. trails and collision impacts;
-9. shops / trading UX;
-10. Training Trial / ghost feel;
-11. replay desire.
+## Source-audit corrections
 
-## 0.4.0 achieved mechanically
+Several earlier “missing” labels were stale. Current source already contains:
 
-The verified candidate includes substantial mechanical coverage for:
+- grade-driven treadmill module geometry;
+- session machine records;
+- Speed milestone effects and notifications;
+- owner-homecoming behavior;
+- ranch Idle/Wander/Rest/Play/Greet/Revere states;
+- active-pet treadmill reaction;
+- Night clue regions and Moon Shrine presentation.
 
-- Economy / Speed / rarity v2;
-- seven Machine Grades;
-- Momentum, Overdrive and Motion Energy;
-- Godly rarity and transfer protections;
-- deliberate four-corner incubation confirmation;
-- Trading Post and Exchange;
-- physical Ranch Expansion tiers;
-- Welcome Party and Godly reverence routing;
-- Night egg lifecycle and dormant Day nests;
-- particle-pool and full-stop impact rules;
-- one Training Trial and personal-best ghost;
-- prior Bat, Snare, Warden, respawn and duel invariants.
+These should be refined or extended rather than restarted.
 
-Exact status is maintained in `docs/FEATURE_STATUS_MATRIX.md`.
+## Next mechanics-first design target
 
-## Major experience gaps still defined in the docs
+**0.4.1 — Sprint Rivalry + Progression Feedback**
 
-The design aspirations remain broader than the verified mechanics. Important outstanding areas include:
+The first packet is [NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md](NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md).
 
-- richer autonomous pet behavior and owner homecoming;
-- visible treadmill machine evolution, records and milestone spectacle;
-- deeper ranch customization, habitats and visitor expression;
-- full blacklight / neon Night world transformation;
-- environmental hidden-egg clues and Moon Shrine activation;
-- broader shop ecosystem and cosmetic expression;
-- Sprint Challenges and additional rivalry;
-- persistence;
-- mobile / console support;
-- future zones, creatures and live operations.
+Primary target:
 
-These are candidates for later slices. Playtest evidence should determine priority.
+1. two-player opt-in Sprint Challenge;
+2. normalized movement at WalkSpeed 45;
+3. existing Grove Circuit route and gate validation;
+4. no stakes, Coins, premium rewards or new currency;
+5. no Overdrive/pet/element movement advantage;
+6. server-owned invitation, countdown, route validity, finish and winner;
+7. session records exposed through the existing Speed Lab record surface.
 
-## Historical 0.4.0 implementation sources
-
-The completed Living World push was specified by:
-
-- `docs/ECONOMY_SPEED_RARITY_V2.md`
-- `docs/RESOLVED_DESIGN_DECISIONS_0.4.0.md`
-- `docs/NEXT_SLICE_0.4.0_LIVING_WORLD.md`
-- `docs/ASTRA_0.4.0_EXECUTION_PACKET.md`
-
-Those documents remain preserved as design and execution history.
+This is deliberately narrower than a new zone or broad content expansion.
 
 ## Later production gates
 
-Persistence, broader zones, mobile/console support, additional shops, additional creatures, public policy-reviewed staking, monetization implementation, broader live operations, and public Roblox release remain later work.
+Persistence, broader zones, mobile/console support, additional creatures, broader shop ecosystems, public policy-reviewed staking, monetization implementation, live operations and public Roblox release remain later work.
 
 No feature branch merges to `main` until owner review explicitly authorizes it.
-
-## Active update — owner feedback, 2026-09-24
-
-The owner has now authorized mechanics-first continuation with specific Night/Forest changes. This supersedes the earlier instruction to wait for feedback before any further work.
-
-Active bounded work: edge readability, softer bloom, longer/denser trails, a free flashlight, and twelve Forest nests including a marked Godly opportunity. See `NIGHT_FOREST_REFINEMENT_0.4.0.md` and the PT-01 through PT-06 findings in `PLAYTEST_0.4.0.md`.
-
-Important correction: existing source already includes Night lighting, localized clue effects and an active-pet treadmill reaction. Earlier lists of missing features were not a complete source audit. Preserve and refine these implementations instead of restarting them.
-
-After this refinement, the next design work is a requirement-to-source-to-check audit of the still-open 0.4.0 mechanics, followed by a bounded implementation packet. Candidate topics include richer normalized movement rivalry and clearer progression feedback. These topics are not silently promoted into new implementation scope. Persistence, new zones, extra currencies and public release remain outside this update.
