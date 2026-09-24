@@ -15,9 +15,11 @@ Precedence rule: a later explicit owner decision overrides an earlier conflictin
 - VR is out of scope.
 - Starter systems should feel complete; upgrades add richness rather than fix intentionally bad starter experiences.
 
-**CURRENT ENGINEERING BASELINE**
-- `MOONWOOD-0.3.2-r2`.
-- 24/24 two-client Studio regression checks passed.
+**CURRENT ENGINEERING CANDIDATE**
+- `EGG-RIVALS-0.4.0-rc2`.
+- Tested source: `bc6ecffb62b13a2b50cfc029935e3decd6d597dc`.
+- 86/86 exact-source two-client Studio checks passed.
+- rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 remain preserved historical references.
 - Human presentation / gameplay-feel acceptance remains a distinct gate.
 
 ## Rarity
@@ -371,4 +373,4 @@ The rc2 implementation uses twelve Forest nests with one marked Godly target and
 
 The hidden Night egg remains a separate single-egg event. All ordinary Forest nests, including the marked Godly nest, become dormant at Night. An already-carried egg survives the transition.
 
-Current candidate and evidence status is in `tests/CANDIDATE_STATUS.json`. The 77/0 result proves rc1 only, not a source-changed rc2. Preserve the original execution packet and its remaining requirements; a test-suite pass does not retire unverified design obligations.
+Current candidate and evidence status is in `tests/CANDIDATE_STATUS.json`. rc2 now has an 86/86 exact-source two-client result. The earlier rc1 77/77 result remains historical and was not substituted. Owner presentation recheck and later design obligations remain distinct from engineering verification.
