@@ -261,7 +261,6 @@ function Game:setup(p)
 		h.Died:Connect(function()
 			self.incubation:cancel(p)
 			self.trades:leaving(p)
-		self.sprints:leaving(p)
 			if pro.exchange then
 				self:exchangeCancel(p, "Exchange canceled on respawn.")
 			end
@@ -1617,6 +1616,7 @@ function Game.new()
 		self.incubation:cancel(p)
 		self.holds:cancel(p)
 		self.trades:leaving(p)
+		self.sprints:leaving(p)
 		self.duels:leaving(p)
 		if self.carry[p] then
 			self:resetEgg(self.carry[p])
