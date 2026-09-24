@@ -180,6 +180,12 @@ function Checks.run(g, check, a, b, results)
 			assert(type(proB.lab.records.bestSprint) == "number")
 		end, debug.traceback)
 		economyConnection:Disconnect()
+		if not raceOK then
+			local session = proA.sprint or proB.sprint
+			if session then
+				g.sprints:complete(session, nil, "Fixture cleanup after failed real-client Sprint probe.")
+			end
+		end
 		assert(raceOK, raceErr)
 		local actualPassiveA = proA.money.Value + proA.coinRemainder - wealthA
 		local actualPassiveB = proB.money.Value + proB.coinRemainder - wealthB
