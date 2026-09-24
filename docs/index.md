@@ -2,11 +2,11 @@
 
 Egg Rivals is a Roblox speed-heist, elemental-pet collection, living-ranch, social-economy, and opt-in rivalry game.
 
-Current engineering candidate: `EGG-RIVALS-0.4.0-rc2`.
+Current engineering candidate: `EGG-RIVALS-0.4.1-rc1`.
 
-**86/86** exact-source checks passed in a real two-client Studio regression.
+**90/90** exact-source checks passed in a real two-client Studio regression.
 
-Status: **ENGINEERING CANDIDATE VERIFIED; OWNER PRESENTATION RECHECK PENDING**.
+Status: **ENGINEERING CANDIDATE VERIFIED; OWNER SPRINT FEEL REVIEW PENDING**.
 
 ## Core loop
 
@@ -14,7 +14,7 @@ Status: **ENGINEERING CANDIDATE VERIFIED; OWNER PRESENTATION RECHECK PENDING**.
 
 ## Current direction
 
-Mechanics-first development continues. The next design packet is [0.4.1 Sprint Rivalry](NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md).
+Sprint Rivalry is engineering-verified. Mechanics-first development continues with [0.4.2 Ranger Contracts](NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md).
 
 ## Start here
 
@@ -23,9 +23,11 @@ Mechanics-first development continues. The next design packet is [0.4.1 Sprint R
 - [Decision Ledger](DECISION_LEDGER.md)
 - [Feature Status Matrix](FEATURE_STATUS_MATRIX.md)
 - [rc2 Engineering Verification](STAGE3_040_RC2_VERIFICATION.md)
+- [0.4.1 Sprint Verification](STAGE3_041_VERIFICATION.md)
 - [Owner Playtest](PLAYTEST_0.4.0.md)
 - [Night/Forest rc2 Refinement](NIGHT_FOREST_REFINEMENT_0.4.0.md)
 - [0.4.1 Sprint Rivalry](NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md)
+- [0.4.2 Ranger Contracts](NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md)
 
 ## System specifications
 
