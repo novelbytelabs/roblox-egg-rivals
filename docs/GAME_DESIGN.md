@@ -30,46 +30,27 @@ The egg determines creature identity. The incubator determines elemental form. R
 
 ## Current engineering state
 
-`EGG-RIVALS-0.4.1-rc1` is the current verified engineering candidate.
+`EGG-RIVALS-0.4.2-rc1` is the current verified engineering candidate.
 
-It passed **90/90** exact-source checks in a real two-client Roblox Studio regression. Tested source commit: `25e300647b0c4ba38916f41452c7268d6bb6df76`. Source digest: `84225f0b18b3886fa2d8a0cd0c2f8aa46b5438064b2fa3529a08b63cb6ab6a74`.
+It passed **99/99** exact-source checks in a real two-client Roblox Studio regression. Tested source commit: `d0c14e6742b7cc14ddb4680a1fd9cd2dca5f7a1e`. Source digest: `87eaaa043f0dfae29585887fbd0bdf2dd8157fe6072c5052339c65c9dd29612c`.
 
-0.4.1 retains the full verified Night/Forest refinement and adds normalized two-player Sprint Rivalry using the shared Grove Circuit route validator. Engineering verification establishes tested mechanics, not owner acceptance of appearance, pacing, fun, or tuning.
+The candidate retains the 0.4.0 Living World systems and 0.4.1 normalized Sprint Rivalry, then adds Ranger Contracts: three server-owned session goals that observe authoritative training, retrieval, hatch, Trial, Night and Sprint events and award existing Coins exactly once after explicit claim.
 
-The source audit also corrected several stale “not implemented” labels. Current source already contains grade-driven treadmill modules, session machine records, Speed milestone events, owner-homecoming behavior, autonomous ranch states, Night clue regions, and Moon Shrine presentation paths.
+Engineering verification establishes mechanics and retained regressions. It does **not** establish contract fun, reward tuning, presentation quality or long-term retention value.
 
-## Current design direction
+## Current product gate
 
-Sprint Rivalry is now engineering-verified. The next mechanics-first target is a **Ranger Contracts / Quest Board** layer that directs players back through systems already present in the game.
+The owner continues mechanics-first development while keeping human feel review separate.
 
-The design goals are:
+Ranger playtesting should focus on whether contracts:
 
-- reinforce training, theft, hatching, Night, Grove Circuit and Sprint;
-- use server-owned progress and exact one-time completion;
-- use Coins as the only progression reward;
-- avoid a new zone, currency, persistence requirement or public-wagering dependency;
-- create short session goals that make the existing vertical slice more replayable.
+- give a young player an obvious next action;
+- rotate play through the core Egg Rivals systems;
+- feel optional and motivating rather than chore-like;
+- pay enough Coins to matter without replacing pet income;
+- make repeated sessions more purposeful.
 
-See [0.4.2 Ranger Contracts](NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md).
-
-## Canonical detailed specifications
-
-- [Design Bible](DESIGN_BIBLE.md)
-- [Core Gameplay](CORE_GAMEPLAY.md)
-- [Base, Incubators, and Respawn](BASE_INCUBATION_RESPAWN.md)
-- [Pet Pen and Ranch](PET_PEN_SYSTEM.md)
-- [Speed Lab and Treadmill](SPEED_LAB_SYSTEM.md)
-- [Night System](NIGHT_SYSTEM.md)
-- [Hub Shops and Social Economy](HUB_SHOPS_AND_SOCIAL_ECONOMY.md)
-- [PvP and Duels](PVP_AND_DUELS.md)
-- [Production Guardrails](PRODUCTION_GUARDRAILS.md)
-- [Decision Ledger](DECISION_LEDGER.md)
-- [Feature Status Matrix](FEATURE_STATUS_MATRIX.md)
-- [rc2 Engineering Verification](STAGE3_040_RC2_VERIFICATION.md)
-- [Owner Playtest](PLAYTEST_0.4.0.md)
-- [0.4.1 Sprint Rivalry](NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md)
-- [0.4.1 Engineering Verification](STAGE3_041_VERIFICATION.md)
-- [0.4.2 Ranger Contracts](NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md)
+Approved design does not imply implementation. `FEATURE_STATUS_MATRIX.md` remains the current implementation-status authority.
 
 ## Design discipline
 

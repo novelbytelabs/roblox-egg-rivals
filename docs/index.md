@@ -2,19 +2,21 @@
 
 Egg Rivals is a Roblox speed-heist, elemental-pet collection, living-ranch, social-economy, and opt-in rivalry game.
 
-Current engineering candidate: `EGG-RIVALS-0.4.1-rc1`.
+Current engineering candidate: `EGG-RIVALS-0.4.2-rc1`.
 
-**90/90** exact-source checks passed in a real two-client Studio regression.
+**99/99** exact-source checks passed in a real two-client Studio regression.
 
-Status: **ENGINEERING CANDIDATE VERIFIED; OWNER SPRINT FEEL REVIEW PENDING**.
+Status: **ENGINEERING CANDIDATE VERIFIED; OWNER CONTRACT UX / RETENTION REVIEW PENDING**.
+
+The previous 0.4.1 90/90, 0.4.0-rc2 86/86, rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 candidates remain preserved as historical evidence.
 
 ## Core loop
 
 `train -> steal -> escape -> choose element -> hatch -> collect -> earn -> upgrade -> compete`
 
-## Current direction
+## Current mechanics
 
-Sprint Rivalry is engineering-verified. Mechanics-first development continues with [0.4.2 Ranger Contracts](NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md).
+Ranger Contracts now provide three session goals that route players through systems already present in Egg Rivals. Progress and Coin rewards are server-authoritative and session-only.
 
 ## Start here
 
@@ -22,12 +24,11 @@ Sprint Rivalry is engineering-verified. Mechanics-first development continues wi
 - [Design Bible](DESIGN_BIBLE.md)
 - [Decision Ledger](DECISION_LEDGER.md)
 - [Feature Status Matrix](FEATURE_STATUS_MATRIX.md)
-- [rc2 Engineering Verification](STAGE3_040_RC2_VERIFICATION.md)
-- [0.4.1 Sprint Verification](STAGE3_041_VERIFICATION.md)
-- [Owner Playtest](PLAYTEST_0.4.0.md)
-- [Night/Forest rc2 Refinement](NIGHT_FOREST_REFINEMENT_0.4.0.md)
-- [0.4.1 Sprint Rivalry](NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md)
 - [0.4.2 Ranger Contracts](NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md)
+- [0.4.2 Engineering Verification](STAGE3_042_VERIFICATION.md)
+- [0.4.1 Sprint Rivalry](NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md)
+- [0.4.1 Engineering Verification](STAGE3_041_VERIFICATION.md)
+- [0.4.0 Owner Playtest](PLAYTEST_0.4.0.md)
 
 ## System specifications
 
@@ -40,5 +41,6 @@ Sprint Rivalry is engineering-verified. Mechanics-first development continues wi
 - [PvP and Duels](PVP_AND_DUELS.md)
 - [Live Operations](LIVE_OPERATIONS.md)
 - [Production Guardrails](PRODUCTION_GUARDRAILS.md)
+- [World and Balance References](WORLD_AND_BALANCE_REFERENCES.md)
 
 Development evidence remains under the Stage 3 verification documents and `tests/`.

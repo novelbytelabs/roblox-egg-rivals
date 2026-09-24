@@ -82,7 +82,7 @@ Status meanings:
 | Trainer Workshop | ENGINEERING VERIFIED / PRESENTATION PENDING | Grade progression and Speed Lab transaction rules passed |
 | Duel Armory | APPROVED / NOT YET IMPLEMENTED | Balanced sidegrades/cosmetics |
 | Pet Outfitter | APPROVED / NOT YET IMPLEMENTED | Cosmetics |
-| Quest Board / Ranger Station | APPROVED / NOT YET IMPLEMENTED | Rotating core-loop objectives |
+| Quest Board / Ranger Station | ENGINEERING VERIFIED / PRESENTATION PENDING | Physical Ranger Station, three server-owned session contracts and exact-once Coin claims passed 0.4.2 regression |
 | Elemental Bazaar | APPROVED / NOT YET IMPLEMENTED | Elemental cosmetics/habitats |
 | Egg Appraiser | EXCLUDED | Explicitly rejected |
 | Public item-transfer staking | DEFERRED / POLICY GATE | Requires current Roblox review |
@@ -106,7 +106,7 @@ Do not update this matrix from aspiration alone.
 
 ## Current engineering candidate status
 
-The current 0.4.1 exact-source engineering candidate passed **90/90** checks. The prior rc2 86/86 and rc1 77/77 results remain preserved historical evidence. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
+The current 0.4.2 exact-source engineering candidate passed **99/99** checks. The prior 0.4.1 90/90, rc2 86/86 and rc1 77/77 results remain preserved historical evidence. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
 
 The original Living World plan intentionally mixed mechanical requirements with experiential aspirations. The green engineering suite does not imply that every presentation goal shipped. Important approved gaps still visible in this matrix include:
 
@@ -117,7 +117,7 @@ The original Living World plan intentionally mixed mechanical requirements with 
 - broader ranch habitats, comforts, showcases, themes and visitor expression;
 - Night Market, Duel Armory, Pet Outfitter, Quest Board and Elemental Bazaar.
 
-The active product gate remains owner playtesting of the exact verified candidate. Sprint feel and presentation should be evaluated alongside the retained 0.4.0 systems.
+The active product gate remains owner playtesting of the exact verified candidate. Contract Board clarity, reward tuning and retention value should be evaluated alongside Sprint feel and the retained 0.4.0 systems.
 
 Do not promote presentation-dependent scope to **VERIFIED BASELINE** from engine evidence alone. Human presentation/gameplay acceptance remains a separate gate.
 

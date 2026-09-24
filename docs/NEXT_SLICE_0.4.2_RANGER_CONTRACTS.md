@@ -1,8 +1,19 @@
 # Egg Rivals 0.4.2 — Ranger Contracts + Session Mastery
 
-Status: **DESIGN PACKET READY — AUTHORIZED MECHANICS-FIRST NEXT SLICE**
+Status: **ENGINEERING VERIFIED — 99/99 EXACT-SOURCE REGRESSION; OWNER CONTRACT UX / RETENTION REVIEW PENDING**
 
 Purpose: make the existing vertical slice more replayable by giving players short, readable goals that deliberately route them through Egg Rivals systems already present.
+
+
+## Implementation / verification status
+
+The bounded 0.4.2 implementation is now present and engineering-verified. The final exact-source candidate passed **99/99** checks with one real Studio server and two real clients.
+
+The implementation includes the physical Ranger Station, three varied server-owned contracts, authoritative production-event progress, explicit completion/claim separation, existing-Coin rewards, Coin-ceiling failure preservation, session cleanup, and a real client claim through the rendered contract UI.
+
+Exact evidence: `STAGE3_042_VERIFICATION.md` and `tests/engine-20260924T221303340660Z.json`.
+
+Owner judgment of Contract Board clarity, reward tuning and retention value remains separate from engineering verification.
 
 This slice does **not** add a zone, currency, persistence requirement, battle pass, daily-login mechanic, or paid power.
 
@@ -112,4 +123,4 @@ Persistent daily/weekly quests, battle pass, login-streak pressure, reroll monet
 
 ## Claim boundary
 
-This packet defines the 0.4.2 implementation target. It does not claim Ranger Contracts are implemented or verified.
+This packet began as the 0.4.2 implementation target. The bounded mechanics are now engineering-verified at 99/99. Contract UX, reward tuning and retention value remain owner-review claims.
