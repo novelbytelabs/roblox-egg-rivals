@@ -91,10 +91,8 @@ function Checks.run(g, check, a, b, results)
 		assert(fireCharge60 > standardCharge60)
 		assert(waterMomentum10 > standardMomentum10)
 		assert(waterCharge60 < standardCharge60)
-		local standardDecay = select(
-			1,
-			R.trainDelta(1, 5, false, C.Tunings.Standard.momentumRamp, C.Tunings.Standard.momentumDecay)
-		)
+		local standardDecay =
+			select(1, R.trainDelta(1, 5, false, C.Tunings.Standard.momentumRamp, C.Tunings.Standard.momentumDecay))
 		local earthDecay =
 			select(1, R.trainDelta(1, 5, false, C.Tunings.Earth.momentumRamp, C.Tunings.Earth.momentumDecay))
 		assert(earthDecay > standardDecay)

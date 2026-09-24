@@ -251,19 +251,9 @@ for _, name in ipairs(C.TuningOrder) do
 	local tuningName = name
 	local pos = tuningButtonPositions[name]
 	local style = C.Elements[name]
-	tuningButtons[name] = U.button(
-		shop,
-		"Tune" .. name,
-		name:upper(),
-		pos[1],
-		pos[2],
-		145,
-		34,
-		function()
-			send("tuning", { name = tuningName })
-		end,
-		style and style.color or C.Colors.Muted
-	)
+	tuningButtons[name] = U.button(shop, "Tune" .. name, name:upper(), pos[1], pos[2], 145, 34, function()
+		send("tuning", { name = tuningName })
+	end, style and style.color or C.Colors.Muted)
 end
 local tuningNote = U.text(
 	shop,
