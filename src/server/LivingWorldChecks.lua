@@ -105,8 +105,7 @@ function Checks.run(g, check, a, b, results)
 		local settled = waitFor(function()
 			local root = g:root(p)
 			local offset = root and root.Position - pos
-			local serverNear =
-				offset and Vector2.new(offset.X, offset.Z).Magnitude <= 3 and math.abs(offset.Y) <= 6
+			local serverNear = offset and Vector2.new(offset.X, offset.Z).Magnitude <= 3 and math.abs(offset.Y) <= 6
 			if serverNear then
 				stableSince = stableSince or g:now()
 			else
