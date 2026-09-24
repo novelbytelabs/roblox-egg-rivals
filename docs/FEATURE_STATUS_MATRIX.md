@@ -52,7 +52,7 @@ Status meanings:
 | Training Trials | ENGINEERING VERIFIED / PRESENTATION PENDING | Ordered gates, anti-teleport checks and real-client completion passed |
 | Personal ghost racer | ENGINEERING VERIFIED / PRESENTATION PENDING | Replayable personal-best path passed |
 | Elemental treadmill tuning | APPROVED / NOT YET IMPLEMENTED | Tactical sidegrades |
-| Pet treadmill spectators | APPROVED / NOT YET IMPLEMENTED | Ranch reaction |
+| Pet treadmill spectators | PARTIAL / PRESENTATION PENDING | Active pet has an existing training reaction path; richer spectator behavior remains desired |
 | Speed milestone celebrations | APPROVED / NOT YET IMPLEMENTED | Major progression moments |
 | Machine Grades | ENGINEERING VERIFIED / PRESENTATION PENDING | All seven grade caps and ownership preservation passed |
 | Heat/cooling presentation | APPROVED / NOT YET IMPLEMENTED | Nonpunitive |
@@ -65,12 +65,12 @@ Status meanings:
 | Night 30x incubation | VERIFIED BASELINE | Existing acceleration |
 | No normal egg taking at Night | ENGINEERING VERIFIED / PRESENTATION PENDING | Night dormancy and cross-sunrise ownership checks passed |
 | One hidden Night egg | ENGINEERING VERIFIED / PRESENTATION PENDING | Hidden-egg lifecycle and sunrise cleanup passed |
-| Environmental Night clues | APPROVED / NOT YET IMPLEMENTED | No exact waypoint |
-| Full neon-blacklight transformation | APPROVED / NOT YET IMPLEMENTED | Major visual pass |
-| Element-specific Night palette | APPROVED / NOT YET IMPLEMENTED | Fire/Water/Wind/Earth |
+| Environmental Night clues | PARTIAL / PRESENTATION REVIEW | Existing client clue-spark field and server ClueRegion path; earlier absence label was inaccurate |
+| Full neon-blacklight transformation | PARTIAL / OWNER REFINEMENT | Lighting and tints already exist; rc2 extends edge coverage and softens bloom |
+| Element-specific Night palette | IMPLEMENTED / PRESENTATION PENDING | Existing per-element Night colors; appearance not independently accepted |
 | Particle motion trails | ENGINEERING VERIFIED / PRESENTATION PENDING | Client pool reuse/budget checks passed; visual quality remains pending |
 | Full-stop collision splatter | ENGINEERING VERIFIED / PRESENTATION PENDING | Contact/full-stop classifier passed; visual quality remains pending |
-| Moon Shrine Night clue role | APPROVED / NOT YET IMPLEMENTED | Exact clue strength tunable |
+| Moon Shrine Night clue role | SOURCE PATH PRESENT / REVIEW PENDING | Server Awake/ClueRegion and client clue presentation exist; tuning remains open |
 | Night Market | APPROVED / NOT YET IMPLEMENTED | Closed by day |
 | Arena neon collision effects | DEFERRED | Revisit with arena polish |
 | System | Status | Notes |
@@ -120,3 +120,16 @@ The original Living World plan intentionally mixed mechanical requirements with 
 The active gate is owner playtesting of the exact verified candidate. Record findings in `PLAYTEST_0.4.0.md`.
 
 Do not promote presentation-dependent scope to **VERIFIED BASELINE** from engine evidence alone. Human presentation/gameplay acceptance remains a separate gate.
+
+## rc2 owner-feedback refinement
+
+| Requirement | Current engineering status | Scope / brief rubric |
+|---|---|---|
+| Broad Night edge traces | IMPLEMENTED / REGRESSION PENDING | Supported object edges and smooth contours remain readable without through-wall highlighting |
+| Softer bloom | IMPLEMENTED / REGRESSION PENDING | Slightly less intense glow; human appearance review remains separate |
+| Longer, denser trails | IMPLEMENTED / REGRESSION PENDING | Longer visual wake while preserving reuse and hard allocation limits |
+| Personal flashlight | IMPLEMENTED / REGRESSION PENDING | Free F-toggle light; no battery, purchase or authority mutation |
+| Forest egg supply | IMPLEMENTED / REGRESSION PENDING | Twelve nests within the existing footprint |
+| Marked Godly opportunity | IMPLEMENTED / REGRESSION PENDING | Real Godly theft target, independent creature roll and longer replacement delay |
+
+Source review corrected several earlier absence claims above. Do not infer missing implementation from an absent test name, and do not infer visual acceptance from existing source. The rc1 77/0 result remains historical for any changed source.

@@ -273,6 +273,7 @@ function Game:spawnEgg(nest, rarity, creature)
 	end
 	creature = creature or nest.creature or C.Creatures[self.rng:NextInteger(1, #C.Creatures)]
 	assert(C.Rarities[rarity] and table.find(C.Creatures, creature), "Invalid egg spawn")
+	assert(not nest.fixedRarity or rarity == nest.fixedRarity, "Dedicated nest rarity mismatch")
 	local model = Art.egg(rarity, self.world.dynamic, creature)
 	model:PivotTo(CFrame.new(nest.position))
 	self.eggSequence = (self.eggSequence or 0) + 1
@@ -412,7 +413,7 @@ function Game:retireEgg(egg)
 	if egg.nest.egg == egg then
 		egg.nest.egg = nil
 	end
-	egg.nest.respawn = self:now() + C.EggRespawnTime
+	egg.nest.respawn = self:now() + (egg.nest.respawnDelay or C.EggRespawnTime)
 	if egg == self.nightEgg then
 		self.nightEgg, self.nightNest = nil, nil
 	end
@@ -1415,7 +1416,9 @@ function Game:step(dt)
 	if not workspace:GetAttribute("Night") then
 		for _, nest in ipairs(self.world.nests) do
 			if not nest.egg and (not nest.respawn or now >= nest.respawn) then
-				self:spawnEgg(nest, R.roll(self.rng, C.DayWeights), nest.creature)
+				self:spawnEgg(nest, nest.fixedRarity or R.roll(self.rng, C.DayWeights), nest.creature)
+			elseif not nest.egg and nest.fixedRarity and nest.label then
+				nest.label.Text = "GODLY GROVE\nReturns in " .. R.clock(nest.respawn - now)
 			end
 		end
 	end
@@ -1475,7 +1478,7 @@ function Game.new()
 	self.phaseEnds = self:now() + R.nextNight(self.rng)
 	workspace:SetAttribute("PhaseEnds", self.phaseEnds)
 	for _, nest in ipairs(self.world.nests) do
-		self:spawnEgg(nest, R.roll(self.rng, C.DayWeights), nest.creature)
+		self:spawnEgg(nest, nest.fixedRarity or R.roll(self.rng, C.DayWeights), nest.creature)
 	end
 	for _, b in ipairs(self.world.bases) do
 		self:prompt(b.treadmill, "Trainer options", "Your Speed Lab", function(p)

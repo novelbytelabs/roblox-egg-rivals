@@ -107,7 +107,12 @@ function Tests.run(g)
 	local a, b = ps[1], ps[2]
 	ContractChecks.run(g, check, a)
 	check("World, four elemental camps, respawns, pens and named models", function()
-		assert(#g.world.bases == 4 and #g.world.nests == 4 and #g.world.hiddenNightSpots >= 4)
+		assert(
+			#g.world.bases == 4
+				and #g.world.nests == #C.ForestNestPositions
+				and #g.world.nests == 12
+				and #g.world.hiddenNightSpots >= 4
+		)
 		assert(g.world.guardian:FindFirstChild("Heart"))
 		assert(g.world.nests[1].egg and g.world.nests[4].egg)
 		assert(g.profiles[a].base ~= g.profiles[b].base)
@@ -630,6 +635,7 @@ function Tests.run(g)
 		assert((pos - target).Magnitude < 2, "Warden failed to route around obstacle")
 	end)
 	require(script.Parent.LivingWorldChecks).run(g, check, a, b, results)
+	require(script.Parent.NightForestChecks).run(g, check, a, b, results)
 	check("Actual client disconnect cancels selection without escrow loss", function()
 		prep()
 		assert(g.duels:request(a, b))

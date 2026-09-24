@@ -1,0 +1,31 @@
+{
+  "candidate": "EGG-RIVALS-0.4.0-rc1",
+  "commit": "e185b078b7fd9f598e62130fb1dcaf008885fdb1",
+  "source_digest": "33d29059abad739b7c3cdfeabf7cf27409328acf510edbb1f3c6b67da318d4e4",
+  "source_parse_and_format": "PASS",
+  "native_build": "PASS",
+  "built_source_byte_comparison": "PASS",
+  "candidate_engine_suite": "PASS",
+  "engine_passed": 77,
+  "engine_failed": 0,
+  "engine_seconds": 147,
+  "engine_result": "tests/engine-20260923T204200Z.json",
+  "engine_result_sha256": "86b1edf0b8a7b15e0c6dcc40b513e2c2104dc285221dec5b3cc847e25309089d",
+  "real_studio_topology": "1 server + 2 clients",
+  "start_cue_exit": 0,
+  "done_cue_exit": 0,
+  "human_presentation_acceptance": "PENDING",
+  "status": "ENGINEERING CANDIDATE VERIFIED; HUMAN PRESENTATION ACCEPTANCE PENDING",
+  "artifacts": {
+    "PLAY": {
+      "path": "build/candidate-20260923T203345809443Z/EggRivals_0.4.0_PLAY.rbxlx",
+      "sha256": "6dd403f065b6cd84ca1d171f01802049e2ce24f0085ab98f6f33044144d6a51b"
+    },
+    "TEST": {
+      "path": "build/candidate-20260923T203345809443Z/EggRivals_0.4.0_TEST.rbxlx",
+      "sha256": "31477102a960cd90dbafb1bbbcdc7a15dc51555116e6a7ed69a5f747033d0680"
+    }
+  },
+  "previous_verified_baseline": "MOONWOOD-0.3.2-r2",
+  "scope": "PC Studio engineering candidate; session-only progression. No public publishing or persistent saving."
+}

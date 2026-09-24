@@ -85,3 +85,13 @@ Those documents remain preserved as design and execution history.
 Persistence, broader zones, mobile/console support, additional shops, additional creatures, public policy-reviewed staking, monetization implementation, broader live operations, and public Roblox release remain later work.
 
 No feature branch merges to `main` until owner review explicitly authorizes it.
+
+## Active update — owner feedback, 2026-09-24
+
+The owner has now authorized mechanics-first continuation with specific Night/Forest changes. This supersedes the earlier instruction to wait for feedback before any further work.
+
+Active bounded work: edge readability, softer bloom, longer/denser trails, a free flashlight, and twelve Forest nests including a marked Godly opportunity. See `NIGHT_FOREST_REFINEMENT_0.4.0.md` and the PT-01 through PT-06 findings in `PLAYTEST_0.4.0.md`.
+
+Important correction: existing source already includes Night lighting, localized clue effects and an active-pet treadmill reaction. Earlier lists of missing features were not a complete source audit. Preserve and refine these implementations instead of restarting them.
+
+After this refinement, the next design work is a requirement-to-source-to-check audit of the still-open 0.4.0 mechanics, followed by a bounded implementation packet. Candidate topics include richer normalized movement rivalry and clearer progression feedback. These topics are not silently promoted into new implementation scope. Persistence, new zones, extra currencies and public release remain outside this update.

@@ -314,3 +314,9 @@ Prices and income values in 0.4.0 are initial tuning, not immutable lore.
 Change them only through explicit balance evidence.
 
 Do not change architectural rules such as independent rarity/creature/element, atomic ownership, or bounded movement merely to fix an economy number.
+
+## 25. Owner feedback — Night readability and Forest availability
+
+The 2026-09-24 owner feedback authorizes broad neon edge tracing, slightly reduced glow, longer/denser trails, a free flashlight and increased Forest egg availability including a marked Godly opportunity. Details and initial implementation tuning are recorded in `NIGHT_FOREST_REFINEMENT_0.4.0.md`.
+
+The dedicated Godly nest is separate from the ordinary roll tables in decision 4. Those roll probabilities remain true for ordinary rolls, not for total supply across the new dedicated encounter. Creature and element independence, server authority, Night dormancy, carry-through transitions and all transfer protections remain binding.

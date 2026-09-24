@@ -1,6 +1,6 @@
 -- Canonical 0.4.0 tuning. No persistence, Robux commerce, or public item staking.
 local C = {
-	Build = "EGG-RIVALS-0.4.0-rc1",
+	Build = "EGG-RIVALS-0.4.0-rc2",
 	SchemaVersion = 4,
 	MaxPlayers = 4,
 	MaxItems = 80,
@@ -79,6 +79,24 @@ local C = {
 	TrialSampleInterval = 0.1,
 	TrialGateRadius = 4.5,
 }
+-- Owner feedback 2026-09-24: more Forest eggs plus an available Godly target.
+-- The marked Godly nest is separate from normal weighted rolls and the hidden Night egg.
+C.GodlyNestIndex = 12
+C.GodlyNestRespawn = 600
+C.ForestNestPositions = {
+	Vector3.new(-28, 2.4, 70),
+	Vector3.new(28, 2.4, 70),
+	Vector3.new(-28, 2.4, 113),
+	Vector3.new(28, 2.4, 150),
+	Vector3.new(-28, 2.4, 150),
+	Vector3.new(28, 2.4, 113),
+	Vector3.new(-28, 2.4, 175),
+	Vector3.new(28, 2.4, 175),
+	Vector3.new(-36, 2.4, 48),
+	Vector3.new(36, 2.4, 48),
+	Vector3.new(-36, 2.4, 133),
+	Vector3.new(0, 2.4, 194),
+}
 C.RarityOrder = { "Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic", "Godly" }
 C.ElementOrder = { "Fire", "Water", "Wind", "Earth" }
 C.Creatures = { "Skunk", "Lizard", "Gorilla", "Dragon" }
@@ -144,16 +162,31 @@ C.Colors = {
 	Blue = Color3.fromRGB(132, 208, 244),
 }
 C.Visual = {
-	LowBudget = 120,
-	HighBudget = 320,
+	NightBloomIntensity = 1.02,
+	NightBloomSize = 28,
+	NightBloomThreshold = 0.8,
+	TrailRatePerSpeed = 2,
+	TrailRateMax = 96,
+	TrailBurstLimit = 12,
+	EdgeWidth = 0.055,
+	EdgeBrightness = 0.9,
+	EdgeDistance = 180,
+	EdgePartBudget = 1600,
+	EdgeUpdateInterval = 0.2,
+	EdgeBuildPerTick = 40,
+	FlashlightRange = 56,
+	FlashlightAngle = 70,
+	FlashlightBrightness = 2.2,
+	LowBudget = 320,
+	HighBudget = 960,
 	TrailThreshold = 18,
 	PetTrailThreshold = 4,
 	StopSpeed = 0.9,
 	ResumeSpeed = 1.4,
 	ImpactWindow = 0.35,
 	ImpactDuration = 0.7,
-	TrailLifetime = 0.6,
+	TrailLifetime = 1.8,
 	FragmentLifetime = 0.8,
-	MaxTrailPerObject = 24,
+	MaxTrailPerObject = 160,
 }
 return C

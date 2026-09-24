@@ -8,6 +8,8 @@ local Art = require(Shared.Art)
 local C = require(Shared.Config)
 local PetMotion = require(Shared.PetMotion)
 local MotionParticles = require(script.Parent.MotionParticles)
+local NightEdges = require(script.Parent.NightEdges)
+local Flashlight = require(script.Parent.Flashlight)
 local UIS = game:GetService("UserInputService")
 local E = {}
 E.__index = E
@@ -47,6 +49,8 @@ function E.new()
 		presentationTick = 0,
 	}, E)
 	self.particles = MotionParticles.new(folder)
+	self.edges = NightEdges.new(folder)
+	self.flashlight = Flashlight.new(folder)
 	local function nightChanged()
 		local night = workspace:GetAttribute("Night") == true
 		TweenService:Create(Lighting, TweenInfo.new(2), {
@@ -66,9 +70,9 @@ function E.new()
 		local bloom = Lighting:FindFirstChildOfClass("BloomEffect")
 		if bloom then
 			TweenService:Create(bloom, TweenInfo.new(2), {
-				Intensity = night and 1.2 or 0.2,
-				Size = night and 32 or 18,
-				Threshold = night and 0.65 or 1.5,
+				Intensity = night and C.Visual.NightBloomIntensity or 0.2,
+				Size = night and C.Visual.NightBloomSize or 18,
+				Threshold = night and C.Visual.NightBloomThreshold or 1.5,
 			}):Play()
 		end
 		local world = workspace:FindFirstChild("Moonwood")
@@ -399,6 +403,8 @@ function E:updatePresentation(dt, t, state)
 end
 
 function E:update(dt, state, records)
+	self.edges:update(dt)
+	self.flashlight:update()
 	local t = workspace:GetServerTimeNow()
 	if self.ghost and self.ghost.Parent and self.ghostFrames and #self.ghostFrames > 1 then
 		local elapsed = workspace:GetServerTimeNow() - self.ghostStarted
@@ -497,6 +503,7 @@ function E:update(dt, state, records)
 			local pet = self.pets[record.Name]
 			if not pet then
 				pet = Art.pet(creature, rarity, element, self.folder)
+				self.edges:track(pet)
 				pet:PivotTo(target)
 				self.pets[record.Name] = pet
 				local label = Art.billboard(

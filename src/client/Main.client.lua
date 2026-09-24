@@ -1401,7 +1401,14 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 			end
 			local cleanup
 			local ok, err = xpcall(function()
-				if data.kind == "Position" then
+				if
+					data.kind == "NightEdges"
+					or data.kind == "Flashlight"
+					or data.kind == "LongTrails"
+					or data.kind == "NightDawn"
+				then
+					require(script.Parent.NightClientChecks).run(effects, virtual, out, data.kind)
+				elseif data.kind == "Position" then
 					-- Observe the normal replicated teleport. Do not move the character,
 					-- change network ownership, or inject input to make the fixture pass.
 					assert(typeof(data.target) == "Vector3")

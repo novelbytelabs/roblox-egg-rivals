@@ -40,7 +40,7 @@ function W.build()
 		true
 	)
 	p("HubWalk", Vector3.new(155, 0.2, 21), Vector3.new(0, 0.14, -17), sand, Enum.Material.Sand, true)
-	p("ForestTrail", Vector3.new(21, 0.2, 166), Vector3.new(0, 0.2, 81), sand, Enum.Material.Ground, true)
+	p("ForestTrail", Vector3.new(21, 0.2, 192), Vector3.new(0, 0.2, 94), sand, Enum.Material.Ground, true)
 	for _, z in ipairs({ 70, 113, 150 }) do
 		p("TrailBranch", Vector3.new(76, 0.2, 12), Vector3.new(0, 0.22, z), sand, Enum.Material.Ground, true)
 	end
@@ -113,11 +113,11 @@ function W.build()
 	end
 	Art.billboard(shop, "TRAIL SUPPLIES\nSnare pod • 15 coins", Config.Colors.Gold, 240, 64, Vector3.new(0, 6, 0))
 	local nests = {}
-	local positions =
-		{ Vector3.new(-28, 2.4, 70), Vector3.new(28, 2.4, 70), Vector3.new(-28, 2.4, 113), Vector3.new(28, 2.4, 150) }
+	local positions = Config.ForestNestPositions
 	for i, pos in ipairs(positions) do
-		local rarity = Config.RarityOrder[i]
-		local creature = Config.Creatures[i]
+		local dedicated = i == Config.GodlyNestIndex
+		local rarity = dedicated and "Godly" or Config.RarityOrder[(i - 1) % #Config.RarityOrder + 1]
+		local creature = Config.Creatures[(i - 1) % #Config.Creatures + 1]
 		local spec = Config.Rarities[rarity]
 		local hints = { 100, 250, 500, 900 }
 		local platform =
@@ -136,7 +136,7 @@ function W.build()
 		end
 		local label = Art.billboard(
 			platform,
-			creature:upper() .. " EGG • " .. rarity:upper() .. "\nSuggested Speed " .. hints[i],
+			creature:upper() .. " EGG • " .. rarity:upper() .. "\nSuggested Speed " .. (hints[i] or 1200),
 			spec.color,
 			200,
 			55,
@@ -150,7 +150,14 @@ function W.build()
 			part = platform,
 			label = label,
 			event = false,
+			fixedRarity = dedicated and "Godly" or nil,
+			respawnDelay = dedicated and Config.GodlyNestRespawn or Config.EggRespawnTime,
 		})
+		if dedicated then
+			nests[#nests].creature = nil -- Independent creature roll on every Godly appearance.
+			platform:SetAttribute("NightEdgeColor", Config.Rarities.Godly.color)
+			platform:SetAttribute("GodlyNest", true)
+		end
 	end
 	local shrinePos = Vector3.new(42, 3, 113)
 	local shrine = p(

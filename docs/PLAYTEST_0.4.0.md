@@ -68,3 +68,20 @@ Do not mark 0.4.0 owner-accepted until the owner explicitly accepts the presenta
 Engineering status remains:
 
 **ENGINEERING CANDIDATE VERIFIED; HUMAN PRESENTATION ACCEPTANCE PENDING**
+
+## Owner feedback — 2026-09-24
+
+The owner reported that the current game is fine for this development stage. Small issues are expected; main mechanics and play remain the priority. This is permission to continue development, not a blanket quality or publication acceptance for future builds.
+
+| ID | Type | Owner observation / request | Action / evidence state |
+|---|---|---|---|
+| PT-01 | KEEP | Overall game is fine for now; prioritize mechanics and play. | Preserve existing core systems and the rc1 77/0 evidence. |
+| PT-02 | PRESENTATION | Objects disappear into darkness; every object edge should have neon tracing. | rc2 adds shape-aware edge lights for supported visible world primitives and pet models; runtime and visual review pending. |
+| PT-03 | TUNING | Glow is a tiny bit too intense. | rc2 reduces bloom intensity from 1.2 to 1.02, narrows its size and raises the threshold. Initial tuning, not owner-accepted appearance. |
+| PT-04 | PRESENTATION | Particle trails are too short and too sparse. | rc2 uses 1.8-second lifetime, higher emission and bounded larger pools. Runtime and feel review pending. |
+| PT-05 | DESIGN | Give players a flashlight for Night visibility. | Free hands-free personal flashlight, F toggle, no battery/price or item mutation. Runtime review pending. |
+| PT-06 | DESIGN | More Forest eggs and Godly eggs available in the map. | Twelve nests including one marked Godly nest; longer dedicated respawn. Runtime and economy tuning review pending. |
+
+Implementation-selected tuning: twelve total nests and a 600-second Godly-nest cooldown after successful removal. The owner asked for availability, not these exact numbers. Ordinary day/night roll tables remain unchanged; the dedicated nest nevertheless increases total Godly supply. That economy consequence is explicit and remains subject to playtest tuning.
+
+Workflow: prefer live feature-branch updates. Pull the workstation with `git pull --ff-only` only when local build/runtime work is needed. Background work uses no chimes. START must succeed before foreground Studio input, and DONE follows the stop command immediately.

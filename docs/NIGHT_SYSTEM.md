@@ -187,3 +187,15 @@ At Night its lights turn on and the location becomes active.
 It may offer lanterns, maps, clue tools, or limited-use aids that help narrow the hidden egg search without revealing the exact location.
 
 Its purpose is to reinforce Night as a world event, not to trivialize the search.
+
+## Owner refinement — 2026-09-24
+
+Neon coverage must trace object edges across the existing world rather than accent only a few objects. The implementation uses client-only, self-lit Beam strips on block/wedge edges and smooth contour/rim strips on spheres and cylinders. Invisible colliders, transient particles and the deferred duel arena are excluded. Arbitrary imported mesh topology needs an explicit adapter; do not label a mesh bounding box as exact edge coverage.
+
+Traces follow object motion, rebuild on size changes, and disappear at dawn. Construction is batched and distance/budget bounded, with coverage diagnostics. The current scene must fit the budget; a budget overflow is not silently accepted as complete coverage.
+
+Bloom is slightly reduced rather than removing glow. Trails last longer, emit more densely and retain bounded client pools and the original genuine-stop collision rule.
+
+Every player receives a free, hands-free personal flashlight controlled by F or its HUD button. It is local presentation, casts shadows, has no battery or purchase requirement, and does not change inventory, economy, hidden-egg identity or competitive authority. Text entry must not toggle it.
+
+The marked Godly Forest nest introduced by the same owner feedback is a Day nest. It does not replace or multiply the hidden Night egg.

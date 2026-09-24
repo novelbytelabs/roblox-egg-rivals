@@ -360,3 +360,15 @@ Canonical implementation decisions are therefore the values and rules in:
 These later documents supersede conflicting earlier Speed, treadmill, rarity, Night-transition, trading, Exchange, and ranch-capacity assumptions.
 
 The next authorized planning target is a major multi-hour 0.4.0 Living World + Progression slice. This authorization does not authorize merging an implementation branch into `main` without owner review.
+
+## 2026-09-24 owner playtest direction — Night and Forest
+
+The owner accepts the existing build as adequate for continued mechanics-first development. Small refinements remain expected. No merge or public publication follows from that statement.
+
+New authorized changes: broad neon object-edge coverage, slightly softer glow, longer/denser trails, a player flashlight, and more Forest eggs including Godly availability.
+
+The rc2 implementation uses twelve Forest nests with one marked Godly target and a 600-second replacement delay after removal. These are implementation-selected initial tuning values. The dedicated nest is not a shop, does not award an item automatically, and uses ordinary server-validated theft, carrying, storage and incubation. Creature selection remains independent; normal rarity-roll tables are unchanged. Overall Godly supply is deliberately higher, so prior aggregate rarity expectations no longer describe this dedicated encounter.
+
+The hidden Night egg remains a separate single-egg event. All ordinary Forest nests, including the marked Godly nest, become dormant at Night. An already-carried egg survives the transition.
+
+Current candidate and evidence status is in `tests/CANDIDATE_STATUS.json`. The 77/0 result proves rc1 only, not a source-changed rc2. Preserve the original execution packet and its remaining requirements; a test-suite pass does not retire unverified design obligations.

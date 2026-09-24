@@ -165,6 +165,16 @@ function R.validate()
 	for _, expansion in ipairs(C.Expansions) do
 		assert(expansion.capacity == expansion.columns * expansion.rows)
 	end
+	assert(#C.ForestNestPositions == 12 and R.integer(C.GodlyNestIndex, 1, #C.ForestNestPositions))
+	assert(C.GodlyNestRespawn > C.EggRespawnTime)
+	for _, position in ipairs(C.ForestNestPositions) do
+		assert(
+			R.vector(position) and math.abs(position.X) < 90 and position.Z > C.SafeBoundaryZ and position.Z <= 200,
+			"Invalid Forest nest"
+		)
+	end
+	assert(C.Visual.LowBudget <= C.Visual.HighBudget and C.Visual.MaxTrailPerObject <= C.Visual.HighBudget)
+	assert(C.Visual.TrailLifetime > 0 and C.Visual.EdgePartBudget > 0 and C.Visual.EdgeWidth > 0)
 	return true
 end
 return R

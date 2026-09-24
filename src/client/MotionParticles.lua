@@ -70,7 +70,7 @@ function P:trail(key, pos, color, now, speed)
 		pos = pos + scatter,
 		color = color,
 		created = now,
-		life = math.clamp(0.25 + speed * 0.007, 0.35, 0.85),
+		life = C.Visual.TrailLifetime,
 		mode = "Trail",
 		velocity = Vector3.new(0, 0.2, 0),
 		size = self.rng:NextNumber(0.12, 0.3),
@@ -124,6 +124,7 @@ function P:observe(key, part, color, position, velocity, grounded, now, dt, thre
 	local far = camera and (camera.CFrame.Position - position).Magnitude > 150
 	local warped = (position - a.position).Magnitude > math.max(20, speed * math.max(dt, 0.016) * 4 + 3)
 	if not night or far or warped then
+		a.carry = 0
 		a.lastFastAt = -math.huge
 		a.position = position
 		a.velocity = velocity
@@ -194,9 +195,9 @@ function P:observe(key, part, color, position, velocity, grounded, now, dt, thre
 		end
 	end
 	if speed >= threshold then
-		a.carry += math.min(dt, 0.1) * math.min(65, speed * 1.15)
-		local count = math.min(6, math.floor(a.carry))
-		a.carry -= count
+		a.carry += math.min(dt, 0.1) * math.min(C.Visual.TrailRateMax, speed * C.Visual.TrailRatePerSpeed)
+		local count = math.min(C.Visual.TrailBurstLimit, math.floor(a.carry))
+		a.carry = math.min(C.Visual.TrailBurstLimit, a.carry - count)
 		for i = 1, count do
 			self:trail(key, a.position:Lerp(position, i / math.max(1, count)), color, now, speed)
 		end
