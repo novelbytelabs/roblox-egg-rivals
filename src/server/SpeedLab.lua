@@ -15,7 +15,19 @@ function SpeedLab:setup(pro)
 		fraction = 0,
 		sync = 0,
 		milestone = 0,
-		records = { trainingSeconds = 0, distance = 0, bestMomentum = 0, overdrivesUsed = 0, overdrivesEarned = 0 },
+		records = {
+			trainingSeconds = 0,
+			distance = 0,
+			bestMomentum = 0,
+			overdrivesUsed = 0,
+			overdrivesEarned = 0,
+			sprintEntered = 0,
+			sprintWins = 0,
+			sprintDNFs = 0,
+			bestSprint = nil,
+			sprintStreak = 0,
+			bestSprintStreak = 0,
+		},
 	}
 end
 function SpeedLab:step(p, dt, now)
