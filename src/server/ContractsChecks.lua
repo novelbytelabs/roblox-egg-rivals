@@ -24,6 +24,7 @@ function Checks.run(g, check, a, b, results)
 
 	check("Ranger Station exposes exactly three varied server-owned session contracts", function()
 		assert(g.world.rangerStation and g.world.rangerStation:IsDescendantOf(g.world.decor))
+		assert(g.world.rangerStation:FindFirstChildOfClass("ProximityPrompt"), "Ranger Station has no physical prompt")
 		local snapshot = g.contracts:snapshot(a)
 		assert(#snapshot == C.ContractCount)
 		local ids, kinds = {}, {}
@@ -69,6 +70,40 @@ function Checks.run(g, check, a, b, results)
 		assert(not session.byId.night_retrieval.completed)
 		assert(g.contracts:observe(a, "night_secure"))
 		assert(session.byId.night_retrieval.completed)
+	end)
+
+	check("Real stored Forest and hidden Night eggs advance only their matching retrieval contracts", function()
+		reset({ "warm_up", "field_retrieval", "night_retrieval" })
+		local oldBoss = workspace:GetAttribute("BossEnabled")
+		local oldEnd = g.phaseEnds
+		workspace:SetAttribute("BossEnabled", false)
+		g:setNight(false)
+		local session = g.contracts.sessions[a]
+		local ordinary
+		for _, nest in ipairs(g.world.nests) do
+			if not nest.fixedRarity and nest.egg and nest.egg.state == "Home" then
+				ordinary = nest.egg
+				break
+			end
+		end
+		assert(ordinary)
+		g:teleport(a, CFrame.new(ordinary.nest.position + Vector3.new(0, 3, 0)))
+		assert(g:take(a, ordinary.id))
+		g:teleport(a, CFrame.new(g.profiles[a].base.center + Vector3.new(0, 3, 0)))
+		assert(g:storeEgg(a))
+		assert(session.byId.field_retrieval.completed and not session.byId.night_retrieval.completed)
+
+		g:setNight(true)
+		local nightEgg = g.nightEgg
+		assert(nightEgg and nightEgg.nightEvent)
+		g:teleport(a, CFrame.new(nightEgg.nest.position + Vector3.new(0, 3, 0)))
+		assert(g:take(a, nightEgg.id))
+		g:teleport(a, CFrame.new(g.profiles[a].base.center + Vector3.new(0, 3, 0)))
+		assert(g:storeEgg(a))
+		assert(session.byId.night_retrieval.completed)
+		g:setNight(false)
+		g.phaseEnds = oldEnd
+		workspace:SetAttribute("BossEnabled", oldBoss)
 	end)
 
 	check("Hatch, solo Trial and Sprint contract kinds complete only on their authoritative events", function()

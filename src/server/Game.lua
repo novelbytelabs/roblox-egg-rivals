@@ -752,6 +752,7 @@ function Game:storeEgg(p)
 	if not item then
 		return false, err
 	end
+	self.contracts:observe(p, egg.nightEvent and "night_secure" or "forest_secure")
 	self:retireEgg(egg)
 	self:notify(p, "Egg stored. Open Collection to choose its element later.", "pickup")
 	self:push(p)
