@@ -12,6 +12,7 @@ local World = require(script.Parent.World)
 local Holds = require(script.Parent.Holds)
 local SpeedLab = require(script.Parent.SpeedLab)
 local Trials = require(script.Parent.Trials)
+local Sprint = require(script.Parent.Sprint)
 local Ranch = require(script.Parent.Ranch)
 local Trade = require(script.Parent.Trade)
 local Incubation = require(script.Parent.Incubation)
@@ -38,6 +39,7 @@ function Game:busy(p, ignorePreview)
 		or pro.trade ~= nil
 		or pro.exchange ~= nil
 		or pro.trial ~= nil
+		or pro.sprint ~= nil
 		or (not ignorePreview and pro.incubatorPreview ~= nil)
 end
 
@@ -80,6 +82,10 @@ function Game:applySpeed(p)
 	end
 	if pro.duel and p:GetAttribute("InDuel") then
 		h.WalkSpeed = pro.duel.phase == "Active" and C.DuelWalkSpeed or 0
+	elseif pro.sprint and pro.sprint.phase == "Countdown" then
+		h.WalkSpeed = 0
+	elseif pro.sprint and (pro.sprint.phase == "Active" or pro.sprint.phase == "Finishing") then
+		h.WalkSpeed = pro.sprint.finished[p] and 0 or C.TrialSpeed
 	elseif p:GetAttribute("InTrial") then
 		h.WalkSpeed = C.TrialSpeed
 	elseif pro.slowUntil > self:now() then
@@ -187,6 +193,7 @@ function Game:setup(p)
 		teleportSerial = 0,
 		trial = nil,
 		bestTrial = nil,
+		sprint = nil,
 	}
 	self.profiles[p] = pro
 	assert(self.inventory:createConsumable(p.UserId, "SnarePod"))
@@ -197,6 +204,7 @@ function Game:setup(p)
 	base.applyExpansion(pro.ranchLevel)
 	p:SetAttribute("InDuel", false)
 	p:SetAttribute("InTrial", false)
+	p:SetAttribute("InSprint", false)
 	p:SetAttribute("Busy", false)
 	p:SetAttribute("BaseIndex", table.find(self.world.bases, base))
 	speed.Changed:Connect(function()
@@ -232,14 +240,36 @@ function Game:setup(p)
 				end
 			end
 		end)
+		local sprintPrompt = Instance.new("ProximityPrompt")
+		sprintPrompt.Name = "SprintPrompt"
+		sprintPrompt.ActionText = "Sprint"
+		sprintPrompt.ObjectText = p.DisplayName
+		sprintPrompt.KeyboardKeyCode = Enum.KeyCode.T
+		sprintPrompt.MaxActivationDistance = C.SprintRange
+		sprintPrompt.RequiresLineOfSight = false
+		sprintPrompt.HoldDuration = 0.2
+		sprintPrompt.Parent = root
+		sprintPrompt:SetAttribute("TargetUserId", p.UserId)
+		sprintPrompt.Triggered:Connect(function(challenger)
+			if self:rate(challenger, "sprintChallenge", 1) then
+				local ok, err = self.sprints:request(challenger, p)
+				if not ok then
+					self:notify(challenger, err)
+				end
+			end
+		end)
 		h.Died:Connect(function()
 			self.incubation:cancel(p)
 			self.trades:leaving(p)
+		self.sprints:leaving(p)
 			if pro.exchange then
 				self:exchangeCancel(p, "Exchange canceled on respawn.")
 			end
 			if pro.trial then
 				self.trials:finish(p, false, "Trial ended on respawn.")
+			end
+			if pro.sprint then
+				self.sprints:died(p)
 			end
 			self.holds:cancel(p)
 			if self.carry[p] then
@@ -985,6 +1015,7 @@ function Game:push(p)
 		incubators = incubators,
 		lab = self.speedLab:snapshot(p),
 		trial = self.trials:snapshot(p),
+		sprint = self.sprints:snapshot(p),
 		ranchLevel = pro.ranchLevel,
 		ranchCapacity = C.Expansions[pro.ranchLevel + 1].capacity,
 		ranch = self.ranch:snapshot(p),
@@ -1077,6 +1108,10 @@ function Game:action(p, name, data)
 		return self.trials:start(p)
 	elseif name == "trialCancel" then
 		return self.trials:finish(p, false, "Trial canceled. No record changed.")
+	elseif name == "sprintReply" then
+		return self.sprints:reply(p, data.accept)
+	elseif name == "sprintCancel" then
+		return self.sprints:cancel(p)
 	elseif name == "ranchExpand" then
 		return self.ranch:buyExpansion(p, data.level)
 	elseif name == "ranchRevere" then
@@ -1302,6 +1337,7 @@ function Game:step(dt)
 	self.duels:step(now)
 	self.ranch:step(now)
 	self.trades:step(now)
+	self.sprints:step(dt, now)
 	for p, pro in pairs(self.profiles) do
 		if
 			pro.exchange
@@ -1445,6 +1481,7 @@ function Game.new()
 	self.incubation = Incubation.new(self)
 	self.speedLab = SpeedLab.new(self)
 	self.trials = Trials.new(self)
+	self.sprints = Sprint.new(self)
 	self.ranch = Ranch.new(self)
 	self.trades = Trade.new(self)
 	self.duels = Duel.new(self)
