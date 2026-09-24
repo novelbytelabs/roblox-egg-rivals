@@ -2,66 +2,61 @@
 
 ## Current engineering candidate
 
-**EGG-RIVALS-0.4.0-rc2** is the current verified engineering candidate.
+**EGG-RIVALS-0.4.1-rc1 — SPRINT RIVALRY** is the current verified engineering candidate.
 
-- Tested source commit: `bc6ecffb62b13a2b50cfc029935e3decd6d597dc`
-- Source digest: `cd3456d8f2dcaef01b967582d599ec426ecb41d6dd51d2044c01912a0ef87a7f`
-- Exact-source multiplayer regression: **86 passed / 0 failed**
+- Tested source commit: `25e300647b0c4ba38916f41452c7268d6bb6df76`
+- Source digest: `84225f0b18b3886fa2d8a0cd0c2f8aa46b5438064b2fa3529a08b63cb6ab6a74`
+- Exact-source multiplayer regression: **90 passed / 0 failed**
 - Real Studio topology: one server + two clients
-- Human presentation/gameplay recheck: **PENDING**
+- Human Sprint feel/presentation review: **PENDING**
 - Roblox publication: **NOT PERFORMED**
 - Merge to `main`: **NOT AUTHORIZED**
 
-The rc1 77/77 candidate and `MOONWOOD-0.3.2-r2` 24/24 baseline remain preserved as historical references.
+The 0.4.0-rc2 86/86 Night/Forest candidate, rc1 77/77 candidate, and `MOONWOOD-0.3.2-r2` 24/24 baseline remain preserved historical references.
 
-## rc2 Night / Forest refinement
+## 0.4.1 achieved mechanically
 
-Engineering verification now covers:
+Engineering verification covers:
 
-- twelve Forest nest sites in the existing world footprint;
-- one marked Godly Day nest with server-owned theft and 600-second replacement;
-- broader shape-aware Night edge tracing;
-- softer bloom tuning;
-- longer/denser bounded particle trails;
-- free personal flashlight on `L`;
-- dawn cleanup and all retained rc1 invariants.
+- explicit nearby Sprint challenge and accept/decline;
+- shared server countdown and normalized WalkSpeed 45;
+- shared Grove Circuit gate and anti-teleport validation;
+- no Overdrive consumption or permanent-Speed advantage;
+- racer collision-group fairness;
+- first-valid-finish winner and DNF cleanup;
+- real two-client physical route completion;
+- session Sprint records;
+- exact inventory preservation;
+- no Sprint-specific Coin mutation while normal passive pet income continues;
+- retained Trial/ghost, Night/Forest, trading, Exchange, ranch, Warden and duel regressions.
 
-Appearance and tuning remain owner-playtest adjustable.
+Exact evidence: `docs/STAGE3_041_VERIFICATION.md`.
 
-## Source-audit corrections
+## Current product gate
 
-Several earlier “missing” labels were stale. Current source already contains:
-
-- grade-driven treadmill module geometry;
-- session machine records;
-- Speed milestone effects and notifications;
-- owner-homecoming behavior;
-- ranch Idle/Wander/Rest/Play/Greet/Revere states;
-- active-pet treadmill reaction;
-- Night clue regions and Moon Shrine presentation.
-
-These should be refined or extended rather than restarted.
+Mechanics-first development may continue, but human review remains separate. The owner should eventually evaluate challenge discoverability, countdown clarity, route readability, winner feedback and whether repeated Sprint races are actually fun.
 
 ## Next mechanics-first design target
 
-**0.4.1 — Sprint Rivalry + Progression Feedback**
+**0.4.2 — Ranger Contracts + Session Mastery**
 
-The first packet is [NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md](NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md).
+The goal is to give players a clear reason to rotate through systems that already exist rather than adding another zone.
 
-Primary target:
+Primary direction:
 
-1. two-player opt-in Sprint Challenge;
-2. normalized movement at WalkSpeed 45;
-3. existing Grove Circuit route and gate validation;
-4. no stakes, Coins, premium rewards or new currency;
-5. no Overdrive/pet/element movement advantage;
-6. server-owned invitation, countdown, route validity, finish and winner;
-7. session records exposed through the existing Speed Lab record surface.
+1. physical Ranger Station / Quest Board in the existing hub;
+2. a small server-owned catalog of session contracts;
+3. contracts reinforce training, Forest egg theft, hatching, Grove Circuit, Night and Sprint;
+4. exact progress comes only from authoritative production events/state;
+5. rewards use existing Coins only;
+6. no new currency, persistence dependency, battle pass, daily-login timer or Robux power;
+7. no contract requires public item wagering;
+8. completion/reward is idempotent and cannot duplicate under repeated input.
 
-This is deliberately narrower than a new zone or broad content expansion.
+Design packet: `docs/NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md`.
 
 ## Later production gates
 
-Persistence, broader zones, mobile/console support, additional creatures, broader shop ecosystems, public policy-reviewed staking, monetization implementation, live operations and public Roblox release remain later work.
+Persistence, broader zones, mobile/console support, additional creatures, deeper ranch customization, broader shop ecosystems, public policy-reviewed staking, monetization implementation, live operations and public Roblox release remain later work.
 
 No feature branch merges to `main` until owner review explicitly authorizes it.
