@@ -126,7 +126,9 @@ function Checks.run(g, check, a, b, results)
 			"Sprint economy fixture hit Coin ceiling"
 		)
 		local expectedPassiveA, expectedPassiveB = 0, 0
+		local maxHeartbeatDt = 0
 		local economyConnection = RunService.Heartbeat:Connect(function(dt)
+			maxHeartbeatDt = math.max(maxHeartbeatDt, dt)
 			expectedPassiveA += incomeA * dt / 60
 			expectedPassiveB += incomeB * dt / 60
 		end)
@@ -189,13 +191,30 @@ function Checks.run(g, check, a, b, results)
 		assert(raceOK, raceErr)
 		local actualPassiveA = proA.money.Value + proA.coinRemainder - wealthA
 		local actualPassiveB = proB.money.Value + proB.coinRemainder - wealthB
+		local boundaryDt = math.max(maxHeartbeatDt, 1 / 60) * 2
+		local toleranceA = incomeA * boundaryDt / 60 + 0.02
+		local toleranceB = incomeB * boundaryDt / 60 + 0.02
 		assert(
-			math.abs(actualPassiveA - expectedPassiveA) < 0.01,
-			"Sprint changed player A Coins beyond passive income"
+			toleranceA < 40 and toleranceB < 40,
+			"Passive-income audit became too coarse to detect the smallest Ranger reward"
 		)
 		assert(
-			math.abs(actualPassiveB - expectedPassiveB) < 0.01,
-			"Sprint changed player B Coins beyond passive income"
+			math.abs(actualPassiveA - expectedPassiveA) <= toleranceA,
+			string.format(
+				"Sprint changed player A Coins beyond passive income: actual %.4f expected %.4f tolerance %.4f",
+				actualPassiveA,
+				expectedPassiveA,
+				toleranceA
+			)
+		)
+		assert(
+			math.abs(actualPassiveB - expectedPassiveB) <= toleranceB,
+			string.format(
+				"Sprint changed player B Coins beyond passive income: actual %.4f expected %.4f tolerance %.4f",
+				actualPassiveB,
+				expectedPassiveB,
+				toleranceB
+			)
 		)
 		assert(g.inventory:income(a.UserId) == incomeA and g.inventory:income(b.UserId) == incomeB)
 		assert(inventorySignature(a) == inventoryA and inventorySignature(b) == inventoryB)

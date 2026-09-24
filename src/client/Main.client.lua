@@ -1514,20 +1514,22 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 			local ok, err = xpcall(function()
 				if data.kind == "ContractClaim" then
 					assert(type(data.contractId) == "string" and type(data.rewardCoins) == "number")
+					local target
 					assert(
 						waitFor(function()
-							return contractPanel.Visible and state and state.contracts
-						end, 3),
-						"Contract panel did not open"
+							if not contractPanel.Visible or not state or not state.contracts then
+								return false
+							end
+							for _, row in ipairs(contractRows) do
+								if row.id == data.contractId and row.claim.Active then
+									target = row
+									return true
+								end
+							end
+							return false
+						end, 4),
+						"Exact completed contract claim button did not become available"
 					)
-					local target
-					for _, row in ipairs(contractRows) do
-						if row.id == data.contractId then
-							target = row
-							break
-						end
-					end
-					assert(target and target.claim.Active, "Exact completed contract claim button is unavailable")
 					local before = state.money
 					mouse(target.claim, 0.08)
 					assert(

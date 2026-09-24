@@ -41,9 +41,28 @@ function Tests.run(g)
 		until os.clock() > deadline
 		return false
 	end
+	local fixtureSerial = 0
 	local function near(p, pos)
 		g:teleport(p, CFrame.new(pos))
-		task.wait(0.15)
+		if not g.clientDiagnostics then
+			task.wait(0.15)
+			return
+		end
+		fixtureSerial += 1
+		local token = "core-fixture-" .. fixtureSerial .. "-" .. tostring(g:now())
+		g:feed(p, "completionInputProbe", { token = token, kind = "Position", target = pos })
+		assert(
+			waitFor(function()
+				local diag = g.clientDiagnostics[p]
+				local root = g:root(p)
+				return diag
+					and diag.token == token
+					and diag.passed
+					and root
+					and Vector2.new(root.Position.X - pos.X, root.Position.Z - pos.Z).Magnitude <= 3
+			end, 5),
+			"Core fixture position did not settle"
+		)
 	end
 	local function equip(p, name)
 		local tool = p.Backpack:FindFirstChild(name) or p.Character:FindFirstChild(name)

@@ -159,6 +159,7 @@ function Checks.run(g, check, a, b, results)
 		g.contracts:observe(a, "forest_secure")
 		local contract = g.contracts.sessions[a].byId.field_retrieval
 		local before = g.profiles[a].money.Value
+		g:push(a)
 		g:feed(a, "openContracts", {})
 		local token = "contract-claim-" .. tostring(g:now())
 		g:feed(a, "completionInputProbe", {
