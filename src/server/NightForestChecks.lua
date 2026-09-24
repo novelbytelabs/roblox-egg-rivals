@@ -107,10 +107,8 @@ function Checks.run(g, check, a, b, results)
 		assert(not egg.prompt.Enabled)
 		local accepted, why = g:take(a, egg.id)
 		assert(not accepted and why == "Daytime nests are dormant during Moonrise.")
-		if home then
-			g:teleport(a, home)
-			probe("Position", home.Position)
-		end
+		-- Home restoration is fixture cleanup, handled after the Night/Forest checks.
+		-- Do not make this gameplay assertion depend on a second long-distance test teleport.
 	end)
 	check("Night contours follow box, sphere, cylinder and wedge geometry instead of box-only proxies", function()
 		local part = Instance.new("Part")
