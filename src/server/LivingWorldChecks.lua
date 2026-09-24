@@ -93,13 +93,14 @@ function Checks.run(g, check, a, b, results)
 		)
 	end
 	local fixtureSerial = 0
-	local function near(p, pos)
+	local function place(p, cf, purpose)
+		local pos = cf.Position
 		fixtureSerial += 1
 		local token = "fixture-position-" .. fixtureSerial .. "-" .. tostring(g:now())
 		local started = g:now()
 		local attempts = 1
 		local nextReassert = started + 0.6
-		g:teleport(p, CFrame.new(pos))
+		g:teleport(p, cf)
 		g:feed(p, "completionInputProbe", { token = token, kind = "Position", target = pos })
 		local stableSince
 		local settled = waitFor(function()
@@ -113,7 +114,7 @@ function Checks.run(g, check, a, b, results)
 				if attempts < 3 and g:now() >= nextReassert then
 					attempts += 1
 					nextReassert = g:now() + 0.6
-					g:teleport(p, CFrame.new(pos))
+					g:teleport(p, cf)
 				end
 			end
 			local diag = g.clientDiagnostics[p]
@@ -138,6 +139,7 @@ function Checks.run(g, check, a, b, results)
 			elapsed = g:now() - started,
 			attempts = attempts,
 			teleportSerial = g.profiles[p].teleportSerial,
+			purpose = purpose or "scenario",
 		})
 		assert(
 			settled and observed and observed.passed and stableSince,
@@ -150,6 +152,9 @@ function Checks.run(g, check, a, b, results)
 				.. " client="
 				.. tostring(observed and observed.error)
 		)
+	end
+	local function near(p, pos)
+		place(p, CFrame.new(pos), "scenario")
 	end
 	local function quiet()
 		for _, p in ipairs({ a, b }) do
@@ -291,7 +296,7 @@ function Checks.run(g, check, a, b, results)
 					pro.base.applyExpansion(s.level)
 					pro.training = false
 					p:SetAttribute("Busy", false)
-					g:teleport(p, s.position)
+					place(p, s.position, "cleanup")
 					g:applySpeed(p)
 				end
 				g.ranch.nextTick = 0
