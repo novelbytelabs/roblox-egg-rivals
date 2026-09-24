@@ -30,9 +30,9 @@ Status meanings:
 | Godly rarity | ENGINEERING VERIFIED / PRESENTATION PENDING | Independent top rarity covered by exact-source rules and transfer checks |
 | Godly reverence behavior | ENGINEERING VERIFIED / PRESENTATION PENDING | Eligible resident selection and same-element bow routing passed; visual feel remains human-review scope |
 | Free new-pet welcome party | ENGINEERING VERIFIED / PRESENTATION PENDING | Batched acquisition behavior passed; presentation feel remains pending |
-| Owner homecoming greetings | APPROVED / NOT YET IMPLEMENTED | Pet reactions at base |
+| Owner homecoming greetings | SOURCE PATH PRESENT / PRESENTATION PENDING | Ranch detects return/respawn and emits homecoming state/effect; owner feel review remains |
 | Walk-through pen gate | PARTIAL / REFINEMENT PENDING | Physical pen exists |
-| Rich autonomous pet social behavior | PARTIAL / REFINEMENT PENDING | Baseline display exists |
+| Rich autonomous pet social behavior | PARTIAL / ENGINEERING PRESENT | Idle/Wander/Rest/Play/Greet/Revere states exist; richer activity upgrades remain future work |
 | Ranch Expansion branch | ENGINEERING VERIFIED / PRESENTATION PENDING | 8/12/16/24-slot geometry and duplicate-purchase rejection passed |
 | Habitat Builder | APPROVED / NOT YET IMPLEMENTED | Elemental habitats |
 | Creature Comforts | APPROVED / NOT YET IMPLEMENTED | Toys/beds/pools/etc. |
@@ -46,20 +46,20 @@ Status meanings:
 | System | Status | Notes |
 |---|---|---|
 | Momentum training | ENGINEERING VERIFIED / PRESENTATION PENDING | Integral, threshold and decay behavior passed |
-| Visible treadmill modules | APPROVED / NOT YET IMPLEMENTED | Motor/Belt/Cooling/etc. |
+| Visible treadmill modules | ENGINEERING PRESENT / PRESENTATION PENDING | Grade-driven LabModules, motor and grade indicators exist; independent component tree remains deferred |
 | Overdrive | ENGINEERING VERIFIED / PRESENTATION PENDING | Bounds, repeat rejection, expiry and duel/trial restrictions passed |
 | Speed Mastery | APPROVED / NOT YET IMPLEMENTED | Control-focused unlocks |
 | Training Trials | ENGINEERING VERIFIED / PRESENTATION PENDING | Ordered gates, anti-teleport checks and real-client completion passed |
 | Personal ghost racer | ENGINEERING VERIFIED / PRESENTATION PENDING | Replayable personal-best path passed |
 | Elemental treadmill tuning | APPROVED / NOT YET IMPLEMENTED | Tactical sidegrades |
 | Pet treadmill spectators | PARTIAL / PRESENTATION PENDING | Active pet has an existing training reaction path; richer spectator behavior remains desired |
-| Speed milestone celebrations | APPROVED / NOT YET IMPLEMENTED | Major progression moments |
+| Speed milestone celebrations | SOURCE PATH PRESENT / PRESENTATION PENDING | Speed thresholds emit effect/notification and ranch reaction; spectacle remains tunable |
 | Machine Grades | ENGINEERING VERIFIED / PRESENTATION PENDING | All seven grade caps and ownership preservation passed |
 | Heat/cooling presentation | APPROVED / NOT YET IMPLEMENTED | Nonpunitive |
 | Social drafting | APPROVED / NOT YET IMPLEMENTED | Group training bonus |
-| Sprint Challenges | APPROVED / NOT YET IMPLEMENTED | Movement rivalry |
+| Sprint Challenges | DESIGN PACKET READY / NOT YET IMPLEMENTED | 0.4.1 normalized two-player Grove Circuit design is specified; no race service exists yet |
 | Motion Energy | ENGINEERING VERIFIED / PRESENTATION PENDING | Energy accounting and camp-power behavior passed; presentation feel remains pending |
-| Machine personal records | APPROVED / NOT YET IMPLEMENTED | Prestige/status |
+| Machine personal records | SOURCE PATH PRESENT / TEST COVERAGE PARTIAL | Session training time, distance, best Momentum and Overdrive earned/used exist; richer display/persistence remain open |
 | System | Status | Notes |
 |---|---|---|
 | Night 30x incubation | VERIFIED BASELINE | Existing acceleration |
@@ -106,7 +106,7 @@ Do not update this matrix from aspiration alone.
 
 ## 0.4.0 engineering candidate status
 
-The 0.4.0 exact-source engineering candidate passed **77/77** checks. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
+The current rc2 exact-source engineering candidate passed **86/86** checks. The prior rc1 77/77 result remains preserved historical evidence. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
 
 The original Living World plan intentionally mixed mechanical requirements with experiential aspirations. The green engineering suite does not imply that every presentation goal shipped. Important approved gaps still visible in this matrix include:
 
@@ -125,11 +125,11 @@ Do not promote presentation-dependent scope to **VERIFIED BASELINE** from engine
 
 | Requirement | Current engineering status | Scope / brief rubric |
 |---|---|---|
-| Broad Night edge traces | IMPLEMENTED / REGRESSION PENDING | Supported object edges and smooth contours remain readable without through-wall highlighting |
-| Softer bloom | IMPLEMENTED / REGRESSION PENDING | Slightly less intense glow; human appearance review remains separate |
-| Longer, denser trails | IMPLEMENTED / REGRESSION PENDING | Longer visual wake while preserving reuse and hard allocation limits |
-| Personal flashlight | IMPLEMENTED / REGRESSION PENDING | Free L-toggle light; no battery, purchase or authority mutation; F remains duel-forfeit only |
-| Forest egg supply | IMPLEMENTED / REGRESSION PENDING | Twelve nests within the existing footprint |
-| Marked Godly opportunity | IMPLEMENTED / REGRESSION PENDING | Real Godly theft target, independent creature roll and longer replacement delay |
+| Broad Night edge traces | ENGINEERING VERIFIED / PRESENTATION RECHECK | Shape-aware bounded edge lifecycle passed rc2 regression; owner visibility tuning remains open |
+| Softer bloom | ENGINEERING VERIFIED / PRESENTATION RECHECK | Runtime uses the rc2 softer bloom values; owner appearance judgment remains separate |
+| Longer, denser trails | ENGINEERING VERIFIED / PRESENTATION RECHECK | Lifetime/density/reuse/bounds passed rc2 checks; owner feel tuning remains open |
+| Personal flashlight | ENGINEERING VERIFIED / PRESENTATION RECHECK | Real L input and nonphysical personal light passed rc2 checks; owner feel remains open |
+| Forest egg supply | ENGINEERING VERIFIED / TUNING OPEN | Twelve distinct nests passed rc2 world and retained gameplay regression |
+| Marked Godly opportunity | ENGINEERING VERIFIED / TUNING OPEN | Real pickup/Night behavior and production respawn schedule passed rc2 regression |
 
-Source review corrected several earlier absence claims above. Do not infer missing implementation from an absent test name, and do not infer visual acceptance from existing source. The rc1 77/0 result remains historical for any changed source.
+Source review corrected several earlier absence claims above. Do not infer missing implementation from an absent test name, and do not infer visual acceptance from existing source. rc2 exact-source verification is recorded in `STAGE3_040_RC2_VERIFICATION.md`; presentation-dependent tuning remains separate from engineering status.
