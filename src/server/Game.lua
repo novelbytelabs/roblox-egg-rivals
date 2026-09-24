@@ -93,7 +93,8 @@ function Game:applySpeed(p)
 		h.WalkSpeed = 6
 	else
 		local overdrive = pro.lab and pro.lab.untilTime > self:now()
-		h.WalkSpeed = R.speed(pro.speed.Value, overdrive)
+		local tuning = self.speedLab and self.speedLab:spec(pro) or C.Tunings.Standard
+		h.WalkSpeed = R.speed(pro.speed.Value, overdrive, tuning.overdriveFactor)
 	end
 end
 function Game:teleport(p, cf)
@@ -1108,6 +1109,8 @@ function Game:action(p, name, data)
 		return self:buyUpgrade(p, data.tier)
 	elseif name == "overdrive" then
 		return self.speedLab:activate(p)
+	elseif name == "tuning" then
+		return self.speedLab:setTuning(p, data.name)
 	elseif name == "trialStart" then
 		return self.trials:start(p)
 	elseif name == "trialCancel" then

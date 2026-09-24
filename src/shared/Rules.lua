@@ -10,7 +10,7 @@ end
 function R.id(s)
 	return type(s) == "string" and #s > 0 and #s <= 80
 end
-function R.speed(points, overdrive)
+function R.speed(points, overdrive, overdriveFactor)
 	if not R.finite(points) then
 		return C.BaseWalkSpeed
 	end
@@ -19,7 +19,8 @@ function R.speed(points, overdrive)
 		C.BaseWalkSpeed,
 		C.WalkSpeedCap
 	)
-	return overdrive and math.min(C.OverdriveCap, speed * C.OverdriveFactor) or speed
+	local factor = R.finite(overdriveFactor) and overdriveFactor > 0 and overdriveFactor or C.OverdriveFactor
+	return overdrive and math.min(C.OverdriveCap, speed * factor) or speed
 end
 function R.vector(v)
 	return typeof(v) == "Vector3" and R.finite(v.X) and R.finite(v.Y) and R.finite(v.Z)
@@ -108,17 +109,23 @@ function R.roll(rng, weights)
 	end
 	error("Invalid rarity distribution")
 end
-function R.trainDelta(momentum, dt, training)
+function R.trainDelta(momentum, dt, training, momentumRamp, momentumDecay)
 	assert(R.finite(dt) and dt >= 0, "Invalid training interval")
+	momentumRamp = momentumRamp or C.MomentumRamp
+	momentumDecay = momentumDecay or C.MomentumDecay
+	assert(
+		R.finite(momentumRamp) and momentumRamp > 0 and R.finite(momentumDecay) and momentumDecay > 0,
+		"Invalid Momentum tuning"
+	)
 	momentum = math.clamp(momentum, 0, 1)
 	if not training then
-		return math.max(0, momentum - dt / C.MomentumDecay), 0, 0
+		return math.max(0, momentum - dt / momentumDecay), 0, 0
 	end
-	local rise = math.min(dt, (1 - momentum) * C.MomentumRamp)
-	local final = math.min(1, momentum + rise / C.MomentumRamp)
+	local rise = math.min(dt, (1 - momentum) * momentumRamp)
+	local final = math.min(1, momentum + rise / momentumRamp)
 	local integral = (momentum + final) * rise * 0.5 + (dt - rise)
-	local start = math.clamp((C.EnergyThreshold - momentum) * C.MomentumRamp, 0, rise)
-	local a = math.clamp((momentum + start / C.MomentumRamp - C.EnergyThreshold) / (1 - C.EnergyThreshold), 0, 1)
+	local start = math.clamp((C.EnergyThreshold - momentum) * momentumRamp, 0, rise)
+	local a = math.clamp((momentum + start / momentumRamp - C.EnergyThreshold) / (1 - C.EnergyThreshold), 0, 1)
 	local b = math.clamp((final - C.EnergyThreshold) / (1 - C.EnergyThreshold), 0, 1)
 	local energy = (a + b) * (rise - start) * 0.5 + (dt - rise)
 	return final, integral, energy
@@ -165,6 +172,45 @@ function R.validate()
 	for _, expansion in ipairs(C.Expansions) do
 		assert(expansion.capacity == expansion.columns * expansion.rows)
 	end
+	assert(#C.TuningOrder == 5 and C.TuningOrder[1] == "Standard")
+	local seenTunings = {}
+	for _, name in ipairs(C.TuningOrder) do
+		local tuning = C.Tunings[name]
+		assert(tuning and not seenTunings[name], "Invalid elemental tuning identity")
+		seenTunings[name] = true
+		assert(
+			R.finite(tuning.momentumRamp)
+				and tuning.momentumRamp > 0
+				and R.finite(tuning.momentumDecay)
+				and tuning.momentumDecay > 0
+				and R.finite(tuning.chargeRate)
+				and tuning.chargeRate > 0
+				and R.finite(tuning.overdriveFactor)
+				and tuning.overdriveFactor >= 1
+				and tuning.overdriveFactor <= 1.25
+				and R.finite(tuning.overdriveDuration)
+				and tuning.overdriveDuration > 0
+				and tuning.overdriveDuration <= C.OverdriveDuration,
+			"Invalid elemental tuning values"
+		)
+	end
+	local standard = C.Tunings.Standard
+	assert(
+		standard.momentumRamp == C.MomentumRamp
+			and standard.momentumDecay == C.MomentumDecay
+			and standard.chargeRate == C.OverdriveChargeRate
+			and standard.overdriveFactor == C.OverdriveFactor
+			and standard.overdriveDuration == C.OverdriveDuration,
+		"Standard tuning must preserve the verified baseline"
+	)
+	assert(C.Tunings.Fire.chargeRate > standard.chargeRate and C.Tunings.Fire.momentumRamp > standard.momentumRamp)
+	assert(C.Tunings.Water.momentumRamp < standard.momentumRamp and C.Tunings.Water.chargeRate < standard.chargeRate)
+	assert(
+		C.Tunings.Wind.overdriveFactor > standard.overdriveFactor
+			and C.Tunings.Wind.overdriveDuration < standard.overdriveDuration
+			and C.Tunings.Wind.chargeRate < standard.chargeRate
+	)
+	assert(C.Tunings.Earth.momentumDecay > standard.momentumDecay and C.Tunings.Earth.chargeRate < standard.chargeRate)
 	assert(#C.ForestNestPositions == 12 and R.integer(C.GodlyNestIndex, 1, #C.ForestNestPositions))
 	assert(C.GodlyNestRespawn > C.EggRespawnTime)
 	for _, position in ipairs(C.ForestNestPositions) do

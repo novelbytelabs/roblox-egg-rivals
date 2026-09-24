@@ -8,6 +8,7 @@ function SpeedLab.new(gameService)
 end
 function SpeedLab:setup(pro)
 	pro.lab = {
+		tuning = "Standard",
 		momentum = 0,
 		charge = 0,
 		energy = 0,
@@ -27,8 +28,14 @@ function SpeedLab:setup(pro)
 			bestSprint = nil,
 			sprintStreak = 0,
 			bestSprintStreak = 0,
+			tuningChanges = 0,
 		},
 	}
+	pro.base.treadmill:SetAttribute("Tuning", "Standard")
+end
+function SpeedLab:spec(pro)
+	local lab = pro and pro.lab
+	return C.Tunings[(lab and lab.tuning) or "Standard"] or C.Tunings.Standard
 end
 function SpeedLab:step(p, dt, now)
 	local g = self.game
@@ -36,7 +43,9 @@ function SpeedLab:step(p, dt, now)
 	local lab = pro.lab
 	local grade = C.Grades[pro.tier]
 	local training = pro.training == true
-	local momentum, integral, energyIntegral = R.trainDelta(lab.momentum, dt, training)
+	local tuning = self:spec(pro)
+	local momentum, integral, energyIntegral =
+		R.trainDelta(lab.momentum, dt, training, tuning.momentumRamp, tuning.momentumDecay)
 	lab.momentum = momentum
 	pro.speed.Value = math.clamp(pro.speed.Value, 0, grade.cap)
 	if training then
@@ -53,7 +62,7 @@ function SpeedLab:step(p, dt, now)
 		end
 		local before = lab.charge
 		if now >= lab.untilTime then
-			lab.charge = math.min(100, lab.charge + C.OverdriveChargeRate * integral)
+			lab.charge = math.min(100, lab.charge + tuning.chargeRate * integral)
 		end
 		if before < 100 and lab.charge >= 100 then
 			lab.records.overdrivesEarned += 1
@@ -101,7 +110,8 @@ function SpeedLab:step(p, dt, now)
 			.. math.floor(lab.momentum * 100)
 			.. "% • POWER "
 			.. math.floor(lab.energy)
-			.. "%"
+			.. "%\nTUNE "
+			.. lab.tuning:upper()
 	end
 end
 function SpeedLab:activate(p)
@@ -113,15 +123,52 @@ function SpeedLab:activate(p)
 	if lab.charge < 100 or lab.untilTime > g:now() then
 		return false, "Train to fully charge Overdrive."
 	end
+	local tuning = self:spec(g.profiles[p])
 	lab.charge = 0
-	lab.untilTime = g:now() + C.OverdriveDuration
+	lab.untilTime = g:now() + tuning.overdriveDuration
 	lab.records.overdrivesUsed += 1
 	g:applySpeed(p)
 	g:effect("overdrive", { position = g:root(p).Position, userId = p.UserId })
-	g:notify(p, "OVERDRIVE • five seconds!", "pickup")
+	g:notify(
+		p,
+		string.format("OVERDRIVE • %.1fs • %s tune", tuning.overdriveDuration, lab.tuning:upper()),
+		"pickup"
+	)
 	g:push(p)
 	return true
 end
+function SpeedLab:setTuning(p, name)
+	local g = self.game
+	local pro = g.profiles[p]
+	local tuning = type(name) == "string" and C.Tunings[name] or nil
+	if not pro or not tuning or not g:alive(p) or g:busy(p) then
+		return false, "That tuning mode is unavailable."
+	end
+	local root = g:root(p)
+	if
+		not root
+		or (
+			(root.Position - pro.base.treadmill.Position).Magnitude > 20
+			and (root.Position - g.world.trainerShop.Position).Magnitude > C.ShopRange
+		)
+	then
+		return false, "Visit Trainer Workshop or your own Speed Lab to change tuning."
+	end
+	local state = pro.lab
+	if state.momentum > 0.001 or state.charge > 0.001 or state.untilTime > g:now() then
+		return false, "Let Momentum and Overdrive return to zero before changing tuning."
+	end
+	if state.tuning == name then
+		return true
+	end
+	state.tuning = name
+	state.records.tuningChanges += 1
+	pro.base.treadmill:SetAttribute("Tuning", name)
+	g:notify(p, name:upper() .. " tuning selected • " .. tuning.description, "tick")
+	g:push(p)
+	return true
+end
+
 function SpeedLab:buy(p, nextTier)
 	local g = self.game
 	local pro = g.profiles[p]
@@ -153,8 +200,18 @@ end
 function SpeedLab:snapshot(p)
 	local pro = self.game.profiles[p]
 	local lab = pro.lab
+	local tuning = self:spec(pro)
 	return {
 		grade = pro.tier,
+		tuning = lab.tuning,
+		tuningDescription = tuning.description,
+		tuningSpec = {
+			momentumRamp = tuning.momentumRamp,
+			momentumDecay = tuning.momentumDecay,
+			chargeRate = tuning.chargeRate,
+			overdriveFactor = tuning.overdriveFactor,
+			overdriveDuration = tuning.overdriveDuration,
+		},
 		gradeName = C.Grades[pro.tier].name,
 		rate = C.Grades[pro.tier].rate,
 		cap = C.Grades[pro.tier].cap,

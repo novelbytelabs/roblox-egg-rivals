@@ -84,7 +84,7 @@ workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(bindCamera)
 bindCamera()
 local brand = U.frame(root, "Brand", 16, 12, 258, 62, C.Colors.Ink)
 U.text(brand, "Title", "EGG RIVALS", 14, 7, 230, 27, 24, C.Colors.Gold)
-U.text(brand, "Subtitle", "SESSION MASTERY • 0.4.2", 14, 36, 232, 17, 11, C.Colors.Muted)
+U.text(brand, "Subtitle", "ELEMENTAL TUNING • 0.4.3", 14, 36, 232, 17, 11, C.Colors.Muted)
 local phasePanel = U.frame(root, "Phase", 395, 12, 290, 62, C.Colors.Ink)
 local phaseTitle = U.text(phasePanel, "Title", "DAYTIME", 12, 6, 266, 25, 19)
 phaseTitle.TextXAlignment = Enum.TextXAlignment.Center
@@ -231,14 +231,52 @@ local penNext = U.button(modal, "PenNext", "PEN PAGE >", 735, 439, 142, 32, func
 		send("penPage", { page = state.penPage + 1 })
 	end
 end, C.Colors.Muted)
-local shop = U.frame(root, "TrainerPanel", 285, 184, 510, 306, C.Colors.Panel)
+local shop = U.frame(root, "TrainerPanel", 285, 125, 510, 500, C.Colors.Panel)
 shop.Visible = false
 U.text(shop, "Title", "SPEED LAB", 20, 15, 445, 35, 23, C.Colors.Gold)
 U.button(shop, "Close", "X", 459, 17, 30, 30, function()
 	menu = nil
 end, C.Colors.Muted)
-local shopDescription = U.text(shop, "Description", "", 20, 65, 466, 138, 18)
-local buyButton = U.button(shop, "BuyUpgrade", "UPGRADE SPEED LAB", 20, 229, 470, 49, function()
+local shopDescription = U.text(shop, "Description", "", 20, 57, 466, 158, 15)
+U.text(shop, "TuningTitle", "ELEMENTAL TUNING • FREE SIDEGRADES", 20, 219, 470, 24, 14, C.Colors.Blue)
+local tuningButtons = {}
+local tuningButtonPositions = {
+	Standard = { 20, 250 },
+	Fire = { 176, 250 },
+	Water = { 332, 250 },
+	Wind = { 98, 292 },
+	Earth = { 254, 292 },
+}
+for _, name in ipairs(C.TuningOrder) do
+	local tuningName = name
+	local pos = tuningButtonPositions[name]
+	local style = C.Elements[name]
+	tuningButtons[name] = U.button(
+		shop,
+		"Tune" .. name,
+		name:upper(),
+		pos[1],
+		pos[2],
+		145,
+		34,
+		function()
+			send("tuning", { name = tuningName })
+		end,
+		style and style.color or C.Colors.Muted
+	)
+end
+local tuningNote = U.text(
+	shop,
+	"TuningNote",
+	"Switch only at 0 Momentum and 0 Overdrive charge. Tuning never comes from your active pet.",
+	20,
+	334,
+	470,
+	42,
+	12,
+	C.Colors.Muted
+)
+local buyButton = U.button(shop, "BuyUpgrade", "UPGRADE SPEED LAB", 20, 394, 470, 49, function()
 	if state and state.lab then
 		send("upgrade", { tier = state.lab.grade + 1 })
 	end
@@ -463,7 +501,7 @@ end, C.Colors.Muted)
 U.text(
 	guide,
 	"Instructions",
-	"1. Train at your Speed Lab. Momentum improves training and charges Overdrive.\n2. Follow the lantern trail into the Forest and steal an egg.\n3. Escape the Warden. Choose Fire, Water, Wind, or Earth deliberately at your camp.\n4. One pet follows; the rest live in your ranch and all still earn Coins.\n5. At Night the daytime nests go dormant and one valuable egg is hidden.\n6. Upgrade your Speed Lab, expand your ranch, trade safely, and master the Grove Circuit.\n7. Visit Ranger Station for three session contracts that reward the systems you already use.\n\nWASD: move • Space: jump • Q: Overdrive • I: collection • U: Speed Lab • H: guide\n1 / 2: equip tools • Click: use equipped tool\n\nProgress is session-only in this engineering slice.",
+	"1. Train at your Speed Lab. Momentum improves training and charges Overdrive.\n2. Follow the lantern trail into the Forest and steal an egg.\n3. Escape the Warden. Choose Fire, Water, Wind, or Earth deliberately at your camp.\n4. One pet follows; the rest live in your ranch and all still earn Coins.\n5. At Night the daytime nests go dormant and one valuable egg is hidden.\n6. Upgrade your Speed Lab, expand your ranch, trade safely, and master the Grove Circuit.\n7. Visit Ranger Station for three session contracts that reward the systems you already use.\n8. At Trainer Workshop, choose a free Standard/Fire/Water/Wind/Earth treadmill tuning sidegrade.\n\nWASD: move • Space: jump • Q: Overdrive • I: collection • U: Speed Lab • H: guide\n1 / 2: equip tools • Click: use equipped tool\n\nProgress is session-only in this engineering slice.",
 	20,
 	59,
 	620,
@@ -900,6 +938,8 @@ render = function()
 	if state.lab then
 		local grade = C.Grades[state.lab.grade]
 		local nextGrade = C.Grades[state.lab.grade + 1]
+		local tuningName = state.lab.tuning or "Standard"
+		local tuning = C.Tunings[tuningName] or C.Tunings.Standard
 		shopDescription.Text = grade.name:upper()
 			.. " SPEED LAB\n\nTraining rate: +"
 			.. tostring(grade.rate)
@@ -909,12 +949,26 @@ render = function()
 			.. tostring(math.floor(state.lab.momentum * 100))
 			.. "% • Overdrive: "
 			.. tostring(math.floor(state.lab.charge))
-			.. "%"
+			.. "%\nTune: "
+			.. tuningName:upper()
+			.. " • "
+			.. tuning.description
 		local records = state.lab.records or {}
 		shopDescription.Text ..= "\n\nSPRINTS: " .. tostring(records.sprintWins or 0) .. " wins • best " .. (records.bestSprint and string.format(
 			"%.2fs",
 			records.bestSprint
 		) or "—")
+		for name, button in pairs(tuningButtons) do
+			local selected = name == tuningName
+			button.Text = selected and ("✓ " .. name:upper()) or name:upper()
+			button.Active = not selected
+			button.AutoButtonColor = not selected
+		end
+		if state.lab.momentum > 0.001 or state.lab.charge > 0.001 or state.lab.untilTime > state.serverTime then
+			tuningNote.Text = "Tune locked until Momentum, Overdrive charge and active burst return to zero."
+		else
+			tuningNote.Text = "Free sidegrade • no pet/stat coupling • switch here or at your own Speed Lab."
+		end
 		if nextGrade then
 			shopDescription.Text ..= "\n\nNEXT: " .. nextGrade.name:upper() .. " • " .. nextGrade.cost .. " Coins"
 			buyButton.Text = "INSTALL " .. nextGrade.name:upper() .. " • " .. nextGrade.cost .. " COINS"
@@ -1512,7 +1566,25 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 			end
 			local cleanup
 			local ok, err = xpcall(function()
-				if data.kind == "ContractClaim" then
+				if data.kind == "Tuning" then
+					assert(type(data.name) == "string" and C.Tunings[data.name])
+					assert(
+						waitFor(function()
+							return shop.Visible and state and state.lab and state.lab.tuning ~= nil
+						end, 3),
+						"Trainer panel did not open for tuning"
+					)
+					local button = tuningButtons[data.name]
+					assert(button and button.Active, "Requested tuning button is unavailable")
+					mouse(button, 0.08)
+					assert(
+						waitFor(function()
+							return state and state.lab and state.lab.tuning == data.name
+						end, 4),
+						"Real tuning selection did not reach authoritative state"
+					)
+					out.tuning = state.lab.tuning
+				elseif data.kind == "ContractClaim" then
 					assert(type(data.contractId) == "string" and type(data.rewardCoins) == "number")
 					local target
 					assert(

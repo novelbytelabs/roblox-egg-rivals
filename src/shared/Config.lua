@@ -1,6 +1,6 @@
 -- Canonical session-only tuning. No persistence, Robux commerce, or public item staking.
 local C = {
-	Build = "EGG-RIVALS-0.4.2-rc1",
+	Build = "EGG-RIVALS-0.4.3-rc1",
 	SchemaVersion = 4,
 	MaxPlayers = 4,
 	MaxItems = 80,
@@ -128,6 +128,51 @@ C.Elements = {
 		color = Color3.fromRGB(99, 168, 91),
 		accent = Color3.fromRGB(178, 135, 84),
 		night = Color3.fromRGB(163, 255, 65),
+	},
+}
+-- Elemental tuning is a free Speed Lab mode. It never derives from the active pet.
+-- Exact numbers are provisional sidegrade tuning, not permanent lore.
+C.TuningOrder = { "Standard", "Fire", "Water", "Wind", "Earth" }
+C.Tunings = {
+	Standard = {
+		description = "Balanced baseline",
+		momentumRamp = C.MomentumRamp,
+		momentumDecay = C.MomentumDecay,
+		chargeRate = C.OverdriveChargeRate,
+		overdriveFactor = C.OverdriveFactor,
+		overdriveDuration = C.OverdriveDuration,
+	},
+	Fire = {
+		description = "Faster Overdrive charge • slower Momentum build",
+		momentumRamp = 36,
+		momentumDecay = 10,
+		chargeRate = 2.5,
+		overdriveFactor = 1.2,
+		overdriveDuration = 5,
+	},
+	Water = {
+		description = "Faster Momentum build • slower Overdrive charge",
+		momentumRamp = 24,
+		momentumDecay = 10,
+		chargeRate = 1.6,
+		overdriveFactor = 1.2,
+		overdriveDuration = 5,
+	},
+	Wind = {
+		description = "Stronger burst • shorter duration",
+		momentumRamp = 30,
+		momentumDecay = 10,
+		chargeRate = 1.8,
+		overdriveFactor = 1.25,
+		overdriveDuration = 4,
+	},
+	Earth = {
+		description = "Momentum lingers longer • slower Overdrive charge",
+		momentumRamp = 30,
+		momentumDecay = 16,
+		chargeRate = 1.7,
+		overdriveFactor = 1.2,
+		overdriveDuration = 5,
 	},
 }
 -- Integer weights avoid accumulated floating-point probability gaps. Total = 10000.
