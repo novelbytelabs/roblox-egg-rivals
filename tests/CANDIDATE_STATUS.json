@@ -1,38 +1,40 @@
 {
-  "candidate": "EGG-RIVALS-0.4.0-rc2",
-  "commit": "bc6ecffb62b13a2b50cfc029935e3decd6d597dc",
-  "source_digest": "cd3456d8f2dcaef01b967582d599ec426ecb41d6dd51d2044c01912a0ef87a7f",
+  "candidate": "EGG-RIVALS-0.4.1-rc1",
+  "tested_source_commit": "25e300647b0c4ba38916f41452c7268d6bb6df76",
+  "evidence_commit": "cd80d0f01c880f6295b08926278e7dbc904b1b1a",
+  "source_digest": "84225f0b18b3886fa2d8a0cd0c2f8aa46b5438064b2fa3529a08b63cb6ab6a74",
   "source_parse_and_format": "PASS",
   "native_build": "PASS",
   "built_source_byte_comparison": "PASS",
-  "gameplay_script_count": 31,
+  "gameplay_script_count": 34,
   "candidate_engine_suite": "PASS",
-  "engine_passed": 86,
+  "engine_passed": 90,
   "engine_failed": 0,
-  "engine_seconds": 169,
-  "engine_result": "tests/engine-20260924T161604676807Z.json",
-  "engine_result_sha256": "f64453606427f99a962907ef5617e9a3c84283d4253524ddff187c166d4c98c9",
+  "engine_seconds": 189,
+  "engine_result": "tests/engine-20260924T172227857145Z.json",
+  "engine_result_sha256": "cd5fcb9b13350ee646c29c9063ac95047eb6abad5787c7e2ae8238b7418bcd25",
   "real_studio_topology": "1 server + 2 clients",
   "foreground_start_cue_exit": 0,
   "foreground_done_cue_exit": 0,
   "background_open_cue_exit": 0,
   "background_close_cue_exit": 0,
-  "human_presentation_acceptance": "PENDING_FOR_RC2",
-  "status": "ENGINEERING CANDIDATE VERIFIED; OWNER PRESENTATION RECHECK PENDING",
+  "human_presentation_acceptance": "PENDING_FOR_0.4.1",
+  "status": "ENGINEERING CANDIDATE VERIFIED; OWNER SPRINT FEEL REVIEW PENDING",
   "artifacts": {
     "PLAY": {
-      "path": "build/candidate-20260924T160933338908Z/EggRivals_0.4.0_PLAY.rbxlx",
-      "sha256": "99d049283b9b4feb049e8fe7709c90e9d71fb6c5c065c1c660f4126892b00d43"
+      "path": "build/candidate-20260924T171327347241Z/EggRivals_0.4.0_PLAY.rbxlx",
+      "sha256": "6eacf53ec18f4b0cbf770d754401dc0ac93254934daaad0f2d66099021067a66"
     },
     "TEST": {
-      "path": "build/candidate-20260924T160933338908Z/EggRivals_0.4.0_TEST.rbxlx",
-      "sha256": "2fa17eb4affc32f6ed0e309a742b0286b2b10b483ab1999ff8c42708bea4252f"
+      "path": "build/candidate-20260924T171327347241Z/EggRivals_0.4.0_TEST.rbxlx",
+      "sha256": "75f7d965ef0a393799d6f5e128f2e499b32d9d9ea0276a7dcd4783fbc9738910"
     }
   },
-  "previous_verified_status": "tests/baselines/egg-rivals-0.4.0-rc1-status.json",
+  "previous_verified_candidate": "EGG-RIVALS-0.4.0-rc2",
   "preserved_failures": [
     "tests/engine-20260924T153932019873Z.json",
-    "tests/engine-20260924T155026855692Z.json"
+    "tests/engine-20260924T155026855692Z.json",
+    "tests/engine-20260924T164642785506Z.json"
   ],
-  "scope": "Owner Night readability, trails, flashlight and Forest egg-availability feedback; session-only PC Studio candidate; no merge or publication."
+  "scope": "Session-only PC Studio candidate with Night/Forest refinement and normalized two-player Sprint Rivalry; no merge or publication."
 }
