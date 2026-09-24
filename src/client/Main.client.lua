@@ -423,8 +423,12 @@ end, C.Colors.Blue)
 local trialHUD = U.frame(root, "TrialHUD", 325, 85, 430, 83, C.Colors.Ink)
 trialHUD.Visible = false
 local trialStatus = U.text(trialHUD, "Status", "", 12, 4, 406, 39, 15, C.Colors.Blue)
-U.button(trialHUD, "CancelTrial", "CANCEL TRIAL", 12, 47, 406, 26, function()
-	send("trialCancel")
+local trialCancelButton = U.button(trialHUD, "CancelTrial", "CANCEL TRIAL", 12, 47, 406, 26, function()
+	if state and state.sprint then
+		send("sprintCancel")
+	else
+		send("trialCancel")
+	end
 end, C.Colors.Muted)
 
 local guide = U.frame(root, "GuidePanel", 210, 140, 660, 377, C.Colors.Panel)
@@ -462,17 +466,29 @@ local invite = U.frame(root, "Invitation", 270, 214, 540, 260, C.Colors.Panel)
 invite.Visible = false
 local inviteTitle = U.text(invite, "Title", "", 20, 15, 500, 42, 24, C.Colors.Gold)
 local inviteText = U.text(invite, "Text", "", 20, 69, 500, 100, 17)
-U.button(invite, "Accept", "ACCEPT", 20, 191, 240, 44, function()
-	send("reply", { accept = true })
+local inviteAccept = U.button(invite, "Accept", "ACCEPT", 20, 191, 240, 44, function()
+	if state and state.sprint then
+		send("sprintReply", { accept = true })
+	else
+		send("reply", { accept = true })
+	end
 end)
-U.button(invite, "Decline", "DECLINE", 280, 191, 240, 44, function()
-	send("reply", { accept = false })
+local inviteDecline = U.button(invite, "Decline", "DECLINE", 280, 191, 240, 44, function()
+	if state and state.sprint then
+		send("sprintReply", { accept = false })
+	else
+		send("reply", { accept = false })
+	end
 end, C.Colors.Muted)
 local pendingPanel = U.frame(root, "PendingInvitation", 321, 109, 438, 82, C.Colors.Panel)
 pendingPanel.Visible = false
 local pendingText = U.text(pendingPanel, "Waiting", "Waiting for opponent…", 12, 3, 414, 32, 16)
-U.button(pendingPanel, "CancelRequest", "CANCEL REQUEST", 110, 42, 218, 30, function()
-	send("cancel")
+local pendingCancel = U.button(pendingPanel, "CancelRequest", "CANCEL REQUEST", 110, 42, 218, 30, function()
+	if state and state.sprint then
+		send("sprintCancel")
+	else
+		send("cancel")
+	end
 end, C.Colors.Muted)
 local scorePanel = U.frame(root, "DuelScore", 300, 86, 480, 85, C.Colors.Ink)
 scorePanel.Visible = false
@@ -719,19 +735,23 @@ render = function()
 		return
 	end
 	local d = state.duel
+	local sprint = state.sprint
 	if incubationPreview then
 		menu = "incubation"
 	end
 	local active = d and d.phase ~= "Requested" and d.phase ~= "Selecting"
+	local sprintActive = sprint
+		and (sprint.phase == "Staging" or sprint.phase == "Countdown" or sprint.phase == "Active" or sprint.phase == "Finishing")
 	local selecting = d and d.phase == "Selecting"
-	if d then
+	if d or sprint then
 		menu = nil
 	elseif state.trade then
 		menu = "trade"
 	end
 	incubatorPanel.Visible = menu == "incubation" and incubationPreview ~= nil
-	labHUD.Visible = not active
-	trialHUD.Visible = state.trial and state.trial.active == true
+	labHUD.Visible = not active and not sprintActive
+	trialHUD.Visible = (state.trial and state.trial.active == true) or sprintActive == true
+	trialCancelButton.Text = sprint and "CANCEL SPRINT" or "CANCEL TRIAL"
 	modal.Visible = menu == "inventory"
 	shop.Visible = menu == "shop"
 	ranchPanel.Visible = menu == "ranch"
@@ -753,19 +773,21 @@ render = function()
 			.. " Coins"
 		ranchBuy.Text = "BUILD " .. pendingRanchUpgrade.name:upper() .. " • " .. pendingRanchUpgrade.cost .. " COINS"
 	end
-	inventoryButton.Visible = not d and not incubationPreview
-	upgradeButton.Visible = not d and not incubationPreview
-	helpButton.Visible = not active
-	objective.Visible = not active
-	debugPanel.Visible = RunService:IsStudio() and not active
+	inventoryButton.Visible = not d and not sprint and not incubationPreview
+	upgradeButton.Visible = not d and not sprint and not incubationPreview
+	helpButton.Visible = not active and not sprintActive
+	objective.Visible = not active and not sprintActive
+	debugPanel.Visible = RunService:IsStudio() and not active and not sprintActive
 	scorePanel.Visible = active == true
 	cross.Visible = active == true
 	health.Visible = active == true
 	forfeitPanel.Visible = active == true
 	forfeitButton.Text = forfeitArmed and "F • CONFIRM FORFEIT" or "F • FORFEIT DUEL"
 	duelPanel.Visible = selecting == true
-	invite.Visible = d ~= nil and d.phase == "Requested" and d.recipient
-	pendingPanel.Visible = d ~= nil and d.phase == "Requested" and not d.recipient
+	invite.Visible = (d ~= nil and d.phase == "Requested" and d.recipient)
+		or (sprint ~= nil and sprint.phase == "Requested" and sprint.recipient)
+	pendingPanel.Visible = (d ~= nil and d.phase == "Requested" and not d.recipient)
+		or (sprint ~= nil and sprint.phase == "Requested" and not sprint.recipient)
 	if state.carrying then
 		carryText.Text = "CARRYING "
 			.. state.carrying:upper()
@@ -787,8 +809,8 @@ render = function()
 		end
 		carryText.Text = activeInc and ("INCUBATING " .. activeInc) or ""
 	end
-	carryText.Visible = not active
-	dropButton.Visible = state.carrying ~= nil and not d
+	carryText.Visible = not active and not sprintActive
+	dropButton.Visible = state.carrying ~= nil and not d and not sprint
 	storeButton.Visible = dropButton.Visible
 	local lab = state.lab
 	local trainText = ""
@@ -843,6 +865,11 @@ render = function()
 			.. "% • Overdrive: "
 			.. tostring(math.floor(state.lab.charge))
 			.. "%"
+		local records = state.lab.records or {}
+		shopDescription.Text ..= "\n\nSPRINTS: "
+			.. tostring(records.sprintWins or 0)
+			.. " wins • best "
+			.. (records.bestSprint and string.format("%.2fs", records.bestSprint) or "—")
 		if nextGrade then
 			shopDescription.Text ..= "\n\nNEXT: " .. nextGrade.name:upper() .. " • " .. nextGrade.cost .. " Coins"
 			buyButton.Text = "INSTALL " .. nextGrade.name:upper() .. " • " .. nextGrade.cost .. " COINS"
@@ -871,7 +898,7 @@ render = function()
 			"05 / UPGRADE YOUR TRAINER",
 			"Pets earn Coins automatically. At 150 Coins, visit your Speed Lab or Trainer Workshop.",
 		},
-		{ "THE GROVE IS YOURS", "Collect all four Forest pets, try a snare, or challenge another player with R." },
+		{ "THE GROVE IS YOURS", "Collect Forest pets, try a snare, duel with R, or challenge a normalized Sprint with T." },
 	}
 	local objectiveData = objectives[math.clamp(state.tutorial, 1, 6)]
 	objectiveTitle.Text = objectiveData[1]
@@ -921,11 +948,23 @@ render = function()
 		scoreText.Text = "YOU  " .. d.score .. "  :  " .. d.otherScore .. "  " .. d.opponent
 		roundText.Text = d.phase == "Countdown" and "GET READY"
 			or (d.phase == "Active" and "FIRST TO 5 • 3 HITS TO ELIMINATE" or d.phase:upper())
+	elseif sprint then
+		duelFingerprint = ""
+		forfeitArmed = false
+		pendingText.Text = "Waiting for " .. sprint.opponent .. "…"
+		inviteTitle.Text = sprint.opponent .. " CHALLENGES YOU TO SPRINT"
+		inviteText.Text = "Normalized Grove Circuit race. Equal movement • no stakes • no Coins."
+		inviteAccept.Text = "ACCEPT SPRINT"
+		inviteDecline.Text = "DECLINE"
+		pendingCancel.Text = "CANCEL SPRINT"
 	else
 		duelFingerprint = ""
 		forfeitArmed = false
+		inviteAccept.Text = "ACCEPT"
+		inviteDecline.Text = "DECLINE"
+		pendingCancel.Text = "CANCEL REQUEST"
 	end
-	result.Visible = state.result ~= nil and state.result.untilTime ~= dismissedResult and not d
+	result.Visible = state.result ~= nil and state.result.untilTime ~= dismissedResult and not d and not sprint
 	if result.Visible then
 		resultTitle.Text = state.result.title
 		resultBody.Text = state.result.score .. "\n" .. state.result.text
@@ -1050,7 +1089,7 @@ local function refreshPrompt(prompt)
 		and player:GetAttribute("Busy") ~= true
 end
 local function trackPrompt(v)
-	if v:IsA("ProximityPrompt") and v.Name == "DuelPrompt" then
+	if v:IsA("ProximityPrompt") and (v.Name == "DuelPrompt" or v.Name == "SprintPrompt") then
 		prompts[v] = true
 		refreshPrompt(v)
 		v:GetAttributeChangedSignal("TargetUserId"):Connect(function()
@@ -1075,7 +1114,7 @@ local function bindTool(tool)
 	end
 	boundTools[tool] = true
 	tool.Activated:Connect(function()
-		if menu or (state and state.duel and (state.duel.phase == "Selecting" or state.duel.phase == "Requested")) then
+		if menu or (state and state.sprint) or (state and state.duel and (state.duel.phase == "Selecting" or state.duel.phase == "Requested")) then
 			return
 		end
 		if tool.Name == "Bat" then
@@ -1203,7 +1242,22 @@ local promptElapsed = 0
 RunService.RenderStepped:Connect(function(dt)
 	local now = workspace:GetServerTimeNow()
 	holder:step()
-	if state and state.trial and state.trial.active then
+	if state and state.sprint then
+		local race = state.sprint
+		if race.phase == "Staging" then
+			trialStatus.Text = "SPRINT • MEET AT GROVE CIRCUIT START\nOpponent: " .. race.opponent
+		elseif race.phase == "Countdown" then
+			trialStatus.Text = "SPRINT • GET READY • " .. math.max(0, math.ceil(race.deadline - now))
+		elseif race.phase == "Active" or race.phase == "Finishing" then
+			trialStatus.Text = string.format(
+				"SPRINT vs %s • %.2fs\nGate %d / %d",
+				race.opponent,
+				now - race.started,
+				race.nextGate or race.total,
+				race.total
+			)
+		end
+	elseif state and state.trial and state.trial.active then
 		trialStatus.Text = string.format(
 			"GROVE CIRCUIT • %.2fs\nGate %d / %d",
 			now - state.trial.started,
@@ -1268,12 +1322,12 @@ RunService.RenderStepped:Connect(function(dt)
 	end
 	effects:update(dt, state, records)
 	if state then
-		incubatorPanel.Visible = menu == "incubation" and incubationPreview ~= nil and not d
-		modal.Visible = menu == "inventory" and not d
-		shop.Visible = menu == "shop" and not d
-		ranchPanel.Visible = menu == "ranch" and not d
-		tradePanel.Visible = menu == "trade" and not d
-		exchangePanel.Visible = menu == "exchange" and not d
+		incubatorPanel.Visible = menu == "incubation" and incubationPreview ~= nil and not d and not state.sprint
+		modal.Visible = menu == "inventory" and not d and not state.sprint
+		shop.Visible = menu == "shop" and not d and not state.sprint
+		ranchPanel.Visible = menu == "ranch" and not d and not state.sprint
+		tradePanel.Visible = menu == "trade" and not d and not state.sprint
+		exchangePanel.Visible = menu == "exchange" and not d and not state.sprint
 		guide.Visible = menu == "help" and not active
 		if modal.Visible then
 			paintInventory()
@@ -1324,7 +1378,9 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 			local ok, err = xpcall(function()
 				local r = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 				local own = r and r:FindFirstChild("DuelPrompt")
+				local ownSprint = r and r:FindFirstChild("SprintPrompt")
 				assert(own and not own.Enabled, "Own challenge prompt was visible")
+				assert(ownSprint and not ownSprint.Enabled, "Own Sprint prompt was visible")
 				assert(root.AbsoluteSize.X > 0 and scale.Scale > 0, "HUD has no dimensions")
 				local right = stats.AbsolutePosition.X + stats.AbsoluteSize.X
 				assert(right <= workspace.CurrentCamera.ViewportSize.X + 2, "HUD exceeds viewport width")
@@ -1695,6 +1751,85 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 						"Valid physical run did not save personal best"
 					)
 					out.best = state.trial.best
+				elseif data.kind == "SprintInvite" then
+					assert(
+						waitFor(function()
+							return invite.Visible and state and state.sprint and state.sprint.recipient
+						end, 3),
+						"Exact Sprint invitation is not visible"
+					)
+					assert(inviteTitle.Text:find("SPRINT", 1, true), "Sprint invitation title missing")
+					mouse(inviteAccept, 0.08)
+					assert(
+						waitFor(function()
+							return state and state.sprint and state.sprint.phase == "Staging"
+						end, 3),
+						"Real Sprint acceptance did not reach staging"
+					)
+					out.accepted = true
+				elseif data.kind == "Sprint" then
+					local PathfindingService = game:GetService("PathfindingService")
+					local char = player.Character
+					local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+					local actor = char and char:FindFirstChild("HumanoidRootPart")
+					assert(actor and humanoid and waitFor(function()
+						return state and state.sprint and (state.sprint.phase == "Active" or state.sprint.phase == "Finishing")
+					end, 4))
+					assert(humanoid.WalkSpeed == C.TrialSpeed, "Sprint movement is not normalized")
+					assert(trialHUD.Visible, "Sprint HUD is not visible")
+					local steering = Vector3.zero
+					local bindName = "EggRivalsSprintRegressionInput"
+					RunService:BindToRenderStep(bindName, Enum.RenderPriority.Last.Value, function()
+						humanoid:Move(steering, false)
+					end)
+					cleanup = function()
+						RunService:UnbindFromRenderStep(bindName)
+						humanoid:Move(Vector3.zero, false)
+					end
+					local deadline = os.clock() + 90
+					for index, target in ipairs(data.gates) do
+						if state.sprint and state.sprint.finished then
+							break
+						end
+						local path = PathfindingService:CreatePath({
+							AgentRadius = 2,
+							AgentHeight = 6,
+							AgentCanJump = true,
+							WaypointSpacing = 5,
+						})
+						path:ComputeAsync(actor.Position, target)
+						local waypoints = path.Status == Enum.PathStatus.Success and path:GetWaypoints()
+							or { { Position = target } }
+						for _, waypoint in ipairs(waypoints) do
+							repeat
+								local delta = waypoint.Position - actor.Position
+								delta = Vector3.new(delta.X, 0, delta.Z)
+								if delta.Magnitude < 2.8 then
+									break
+								end
+								assert(os.clock() < deadline and state.sprint, "Sprint navigation timed out")
+								steering = delta.Unit
+								if waypoint.Action == Enum.PathWaypointAction.Jump then
+									humanoid.Jump = true
+								end
+								task.wait(0.02)
+							until false
+						end
+						steering = Vector3.zero
+						assert(
+							waitFor(function()
+								return not state.sprint or state.sprint.finished or (state.sprint.nextGate or 0) > index
+							end, 2),
+							"Sprint gate " .. index .. " was not registered"
+						)
+					end
+					assert(
+						waitFor(function()
+							return not state.sprint or state.sprint.finished
+						end, 4),
+						"Valid Sprint run did not finish"
+					)
+					out.finished = true
 				elseif data.kind == "Particles" then
 					assert(
 						waitFor(function()
