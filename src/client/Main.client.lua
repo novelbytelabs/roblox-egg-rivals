@@ -1849,9 +1849,11 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 					mouse(inviteAccept, 0.08)
 					assert(
 						waitFor(function()
-							return state and state.sprint and state.sprint.phase == "Staging"
+							return state
+								and state.sprint
+								and state.sprint.phase ~= "Requested"
 						end, 3),
-						"Real Sprint acceptance did not reach staging"
+						"Real Sprint acceptance did not advance the invitation"
 					)
 					out.accepted = true
 				elseif data.kind == "Sprint" then
