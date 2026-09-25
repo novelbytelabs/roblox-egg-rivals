@@ -1,8 +1,19 @@
 # Egg Rivals 0.4.4 — Social Drafting v1
 
-Status: **IMPLEMENTATION CANDIDATE — VERIFICATION PENDING**
+Status: **ENGINEERING VERIFIED — 107/107 EXACT-SOURCE REGRESSION; OWNER SOCIAL FEEL REVIEW PENDING**
 
 Purpose: make simultaneous Speed Lab training mildly social without creating a new currency, zone, party system, or dependency on persistent progression.
+
+
+## Implementation / verification status
+
+The bounded implementation is present and engineering-verified. The final exact-source candidate passed **107/107** checks with one real Studio server and two real clients.
+
+The verified implementation uses server-derived, non-stacking +10% permanent-Speed gain for simultaneously training players whose own treadmill centers are within 50 studs. It does not alter Momentum, Overdrive, Motion Energy, Coins, pet income, Ranger rewards, Trial/Sprint normalization or inventory authority.
+
+Exact evidence: `STAGE3_044_VERIFICATION.md` and `tests/engine-20260925T021744179535Z.json`.
+
+Owner judgment of the +10% value, 50-stud range, presentation and whether Drafting makes training more socially enjoyable remains separate from engineering verification.
 
 ## Existing design authority
 
@@ -56,4 +67,4 @@ Parties, matchmaking, group currencies, persistent social bonuses, stacking tier
 
 ## Claim boundary
 
-This packet defines the 0.4.4 implementation candidate. It does not claim the +10% value, visual feedback or social motivation are owner-accepted until playtesting occurs.
+This packet began as the 0.4.4 implementation target. The bounded mechanics are now engineering-verified at 107/107. The +10% value, 50-stud range, visual feedback and social motivation remain owner-review claims.

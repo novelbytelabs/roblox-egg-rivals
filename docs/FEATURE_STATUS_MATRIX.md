@@ -56,7 +56,7 @@ Status meanings:
 | Speed milestone celebrations | SOURCE PATH PRESENT / PRESENTATION PENDING | Speed thresholds emit effect/notification and ranch reaction; spectacle remains tunable |
 | Machine Grades | ENGINEERING VERIFIED / PRESENTATION PENDING | All seven grade caps and ownership preservation passed |
 | Heat/cooling presentation | APPROVED / NOT YET IMPLEMENTED | Nonpunitive |
-| Social drafting | APPROVED / NOT YET IMPLEMENTED | Group training bonus |
+| Social drafting | ENGINEERING VERIFIED / PRESENTATION PENDING | Server-derived +10% non-stacking Speed gain for nearby simultaneous trainers; 107/107 regression passed |
 | Sprint Challenges | ENGINEERING VERIFIED / PRESENTATION PENDING | Normalized two-player Grove Circuit race, real-client completion, DNF cleanup and session records passed 0.4.1 regression |
 | Motion Energy | ENGINEERING VERIFIED / PRESENTATION PENDING | Energy accounting and camp-power behavior passed; presentation feel remains pending |
 | Machine personal records | SOURCE PATH PRESENT / TEST COVERAGE PARTIAL | Session training time, distance, best Momentum and Overdrive earned/used exist; richer display/persistence remain open |
@@ -106,18 +106,18 @@ Do not update this matrix from aspiration alone.
 
 ## Current engineering candidate status
 
-The current 0.4.3 exact-source engineering candidate passed **104/104** checks. The prior 0.4.2 99/99, 0.4.1 90/90, rc2 86/86 and rc1 77/77 results remain preserved historical evidence. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
+The current 0.4.4 exact-source engineering candidate passed **107/107** checks. The prior 0.4.3 104/104, 0.4.2 99/99, 0.4.1 90/90, rc2 86/86 and rc1 77/77 results remain preserved historical evidence. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
 
 The original Living World plan intentionally mixed mechanical requirements with experiential aspirations. The green engineering suite does not imply that every presentation goal shipped. Important approved gaps still visible in this matrix include:
 
 - owner homecoming reactions and richer autonomous pet life;
 - visible treadmill modules, records, milestones and pet training reactions;
-- social drafting and still-undefined Speed Mastery;
+- still-undefined Speed Mastery;
 - environmental Night clues, Moon Shrine activation and full blacklight transformation;
 - broader ranch habitats, comforts, showcases, themes and visitor expression;
 - Night Market, Duel Armory, Pet Outfitter, Quest Board and Elemental Bazaar.
 
-The active product gate remains owner playtesting of the exact verified candidate. Elemental tuning identity/balance should be evaluated alongside Contract Board retention, Sprint feel and the retained 0.4.0 systems.
+The active product gate remains owner playtesting of the exact verified candidate. Social Drafting motivation/tuning and Elemental Tuning identity/balance should be evaluated alongside Contract Board retention, Sprint feel and the retained 0.4.0 systems.
 
 Do not promote presentation-dependent scope to **VERIFIED BASELINE** from engine evidence alone. Human presentation/gameplay acceptance remains a separate gate.
 

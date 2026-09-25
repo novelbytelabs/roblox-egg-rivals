@@ -106,6 +106,8 @@ nav:
       - Production Guardrails: PRODUCTION_GUARDRAILS.md
       - World & Balance References: WORLD_AND_BALANCE_REFERENCES.md
   - Development:
+      - 0.4.4 Social Drafting: NEXT_SLICE_0.4.4_SOCIAL_DRAFTING.md
+      - 0.4.4 Verification: STAGE3_044_VERIFICATION.md
       - 0.4.3 Elemental Tuning: NEXT_SLICE_0.4.3_ELEMENTAL_TUNING.md
       - 0.4.3 Verification: STAGE3_043_VERIFICATION.md
       - 0.4.2 Ranger Contracts: NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md

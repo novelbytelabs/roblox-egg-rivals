@@ -16,11 +16,11 @@ Precedence rule: a later explicit owner decision overrides an earlier conflictin
 - Starter systems should feel complete; upgrades add richness rather than fix intentionally bad starter experiences.
 
 **CURRENT ENGINEERING CANDIDATE**
-- `EGG-RIVALS-0.4.3-rc1`.
-- Exact tested source bytes are committed at `f4be2411712ffec3f3dfd8c23f69dea7307a45d1`.
-- Source digest: `0875af46f723f9a964062a3d255d126450934438dc91699d1f76a066eef648be`.
-- 104/104 exact-source two-client Studio checks passed.
-- 0.4.2 99/99, 0.4.1 90/90, 0.4.0-rc2 86/86, rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 remain preserved historical references.
+- `EGG-RIVALS-0.4.4-rc1`.
+- Exact tested source bytes are committed at `301448dd7cf9a8fda748d4c14b585615f170d30d`.
+- Source digest: `be7aaa66d706a1fa86dfe0a2ad7a277ee69a80934688719bb7a1a430a7ce70d8`.
+- 107/107 exact-source two-client Studio checks passed.
+- 0.4.3 104/104, 0.4.2 99/99, 0.4.1 90/90, 0.4.0-rc2 86/86, rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 remain preserved historical references.
 - Human presentation / gameplay-feel acceptance remains a distinct gate.
 
 ## Rarity
@@ -411,3 +411,17 @@ Current candidate and evidence status is in `tests/CANDIDATE_STATUS.json`. The r
 - one real client selected an exact tuning through the rendered Trainer UI.
 
 Evidence: `STAGE3_043_VERIFICATION.md`. Tuning feel and balance remain owner-review claims rather than engineering claims.
+
+## Social Drafting — 0.4.4 verified
+
+**IMPLEMENTED / ENGINEERING VERIFIED**
+- drafting is derived by the server from simultaneous training on each player's own treadmill;
+- adjacent treadmill centers within 50 studs qualify;
+- the bonus is +10% permanent-Speed gain;
+- the bonus is boolean and non-stacking;
+- solo training remains fully viable;
+- drafting does not modify Momentum, Overdrive charge/rules, Motion Energy, Coins, pet income, Ranger rewards, inventory authority, Trial normalization or Sprint normalization;
+- Elemental Tuning composes independently with Drafting;
+- treadmill attributes, Speed Lab snapshot and presentation expose Drafting state.
+
+Evidence: `STAGE3_044_VERIFICATION.md`. The +10% value, 50-stud range, visual feedback and social motivation remain owner-review/tuning claims.

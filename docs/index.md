@@ -2,13 +2,13 @@
 
 Egg Rivals is a Roblox speed-heist, elemental-pet collection, living-ranch, social-economy, and opt-in rivalry game.
 
-Current engineering candidate: `EGG-RIVALS-0.4.3-rc1`.
+Current engineering candidate: `EGG-RIVALS-0.4.4-rc1`.
 
-**104/104** exact-source checks passed in a real two-client Studio regression.
+**107/107** exact-source checks passed in a real two-client Studio regression.
 
-Status: **ENGINEERING CANDIDATE VERIFIED; OWNER ELEMENTAL TUNING FEEL REVIEW PENDING**.
+Status: **ENGINEERING CANDIDATE VERIFIED; OWNER SOCIAL DRAFTING FEEL REVIEW PENDING**.
 
-The previous 0.4.2 99/99, 0.4.1 90/90, 0.4.0-rc2 86/86, rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 candidates remain preserved as historical evidence.
+The previous 0.4.3 104/104, 0.4.2 99/99, 0.4.1 90/90, 0.4.0-rc2 86/86, rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 candidates remain preserved as historical evidence.
 
 ## Core loop
 
@@ -16,7 +16,7 @@ The previous 0.4.2 99/99, 0.4.1 90/90, 0.4.0-rc2 86/86, rc1 77/77 and `MOONWOOD-
 
 ## Current mechanics
 
-Elemental Tuning v1 now adds Standard, Fire, Water, Wind and Earth Speed Lab modes as free server-owned sidegrades. Ranger Contracts, Sprint Rivalry and the Living World systems remain intact.
+Social Drafting v1 adds server-owned, non-stacking cooperative Speed training while Elemental Tuning, Ranger Contracts, Sprint Rivalry and the Living World systems remain intact.
 
 ## Start here
 
@@ -24,6 +24,8 @@ Elemental Tuning v1 now adds Standard, Fire, Water, Wind and Earth Speed Lab mod
 - [Design Bible](DESIGN_BIBLE.md)
 - [Decision Ledger](DECISION_LEDGER.md)
 - [Feature Status Matrix](FEATURE_STATUS_MATRIX.md)
+- [0.4.4 Social Drafting](NEXT_SLICE_0.4.4_SOCIAL_DRAFTING.md)
+- [0.4.4 Engineering Verification](STAGE3_044_VERIFICATION.md)
 - [0.4.3 Elemental Tuning](NEXT_SLICE_0.4.3_ELEMENTAL_TUNING.md)
 - [0.4.3 Engineering Verification](STAGE3_043_VERIFICATION.md)
 - [0.4.2 Ranger Contracts](NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md)

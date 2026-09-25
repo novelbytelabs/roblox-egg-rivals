@@ -30,20 +30,21 @@ The egg determines creature identity. The incubator determines elemental form. R
 
 ## Current engineering state
 
-`EGG-RIVALS-0.4.3-rc1` is the current verified engineering candidate.
+`EGG-RIVALS-0.4.4-rc1` is the current verified engineering candidate.
 
-It passed **104/104** exact-source checks in a real two-client Roblox Studio regression. Exact tested source bytes are committed at `f4be2411712ffec3f3dfd8c23f69dea7307a45d1`. Source digest: `0875af46f723f9a964062a3d255d126450934438dc91699d1f76a066eef648be`.
+It passed **107/107** exact-source checks in a real two-client Roblox Studio regression. Exact tested source bytes are committed at `301448dd7cf9a8fda748d4c14b585615f170d30d`. Source digest: `be7aaa66d706a1fa86dfe0a2ad7a277ee69a80934688719bb7a1a430a7ce70d8`.
 
-The candidate retains the Living World systems, normalized Sprint Rivalry and Ranger Contracts, then adds Elemental Tuning v1: Standard plus four free server-owned Speed Lab sidegrades with bounded training/Open-World-Overdrive tradeoffs.
+The candidate retains the Living World systems, normalized Sprint Rivalry, Ranger Contracts and Elemental Tuning, then adds Social Drafting v1: a server-derived, non-stacking +10% permanent-Speed training bonus for nearby simultaneous trainers.
 
-Engineering verification establishes mechanics and retained regressions. It does **not** establish tuning fun, balance, presentation quality or long-term retention value.
+Engineering verification establishes mechanics and retained regressions. It does **not** establish Social Drafting motivation/tuning, elemental-tuning fun, presentation quality or long-term retention value.
 
 ## Current product gate
 
 The owner continues mechanics-first development while keeping human feel review separate.
 
-Current playtesting should evaluate both retained Ranger/Sprint systems and Elemental Tuning:
+Current playtesting should evaluate the retained Ranger/Sprint systems, Elemental Tuning and Social Drafting:
 
+- whether Social Drafting is noticeable without making solo training feel inferior;
 - whether each tuning identity is immediately understandable;
 - whether its benefit/tradeoff feels meaningful but not mandatory;
 - whether switching restrictions are clear;
