@@ -1,6 +1,6 @@
 -- Canonical session-only tuning. No persistence, Robux commerce, or public item staking.
 local C = {
-	Build = "EGG-RIVALS-0.4.3-rc1",
+	Build = "EGG-RIVALS-0.4.4-rc1",
 	SchemaVersion = 4,
 	MaxPlayers = 4,
 	MaxItems = 80,
@@ -52,6 +52,8 @@ local C = {
 	EnergyThreshold = 0.75,
 	EnergyRate = 1.5,
 	EnergyDrain = 0.5,
+	DraftRange = 50,
+	DraftBonus = 0.10,
 	IncubatorHold = 0.75,
 	IncubatorHalfExtent = 4,
 	IncubatorHeight = 10,
