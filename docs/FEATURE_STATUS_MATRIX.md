@@ -51,7 +51,7 @@ Status meanings:
 | Speed Mastery | APPROVED / NOT YET IMPLEMENTED | Control-focused unlocks |
 | Training Trials | ENGINEERING VERIFIED / PRESENTATION PENDING | Ordered gates, anti-teleport checks and real-client completion passed |
 | Personal ghost racer | ENGINEERING VERIFIED / PRESENTATION PENDING | Replayable personal-best path passed |
-| Elemental treadmill tuning | APPROVED / NOT YET IMPLEMENTED | Tactical sidegrades |
+| Elemental treadmill tuning | ENGINEERING VERIFIED / PRESENTATION PENDING | Standard/Fire/Water/Wind/Earth free server-owned sidegrades; normalized Trial/Sprint movement ignores tuning |
 | Pet treadmill spectators | PARTIAL / PRESENTATION PENDING | Active pet has an existing training reaction path; richer spectator behavior remains desired |
 | Speed milestone celebrations | SOURCE PATH PRESENT / PRESENTATION PENDING | Speed thresholds emit effect/notification and ranch reaction; spectacle remains tunable |
 | Machine Grades | ENGINEERING VERIFIED / PRESENTATION PENDING | All seven grade caps and ownership preservation passed |
@@ -106,18 +106,18 @@ Do not update this matrix from aspiration alone.
 
 ## Current engineering candidate status
 
-The current 0.4.2 exact-source engineering candidate passed **99/99** checks. The prior 0.4.1 90/90, rc2 86/86 and rc1 77/77 results remain preserved historical evidence. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
+The current 0.4.3 exact-source engineering candidate passed **104/104** checks. The prior 0.4.2 99/99, 0.4.1 90/90, rc2 86/86 and rc1 77/77 results remain preserved historical evidence. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
 
 The original Living World plan intentionally mixed mechanical requirements with experiential aspirations. The green engineering suite does not imply that every presentation goal shipped. Important approved gaps still visible in this matrix include:
 
 - owner homecoming reactions and richer autonomous pet life;
 - visible treadmill modules, records, milestones and pet training reactions;
-- elemental treadmill tuning and social drafting;
+- social drafting and still-undefined Speed Mastery;
 - environmental Night clues, Moon Shrine activation and full blacklight transformation;
 - broader ranch habitats, comforts, showcases, themes and visitor expression;
 - Night Market, Duel Armory, Pet Outfitter, Quest Board and Elemental Bazaar.
 
-The active product gate remains owner playtesting of the exact verified candidate. Contract Board clarity, reward tuning and retention value should be evaluated alongside Sprint feel and the retained 0.4.0 systems.
+The active product gate remains owner playtesting of the exact verified candidate. Elemental tuning identity/balance should be evaluated alongside Contract Board retention, Sprint feel and the retained 0.4.0 systems.
 
 Do not promote presentation-dependent scope to **VERIFIED BASELINE** from engine evidence alone. Human presentation/gameplay acceptance remains a separate gate.
 
