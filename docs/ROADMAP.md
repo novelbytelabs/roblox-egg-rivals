@@ -2,52 +2,32 @@
 
 ## Current engineering candidate
 
-**EGG-RIVALS-0.4.4-rc1 — SOCIAL DRAFTING v1** is the current verified engineering candidate.
+**EGG-RIVALS-0.4.5-rc1 — VISITOR RANCH INTERACTIONS v1** is the current verified engineering candidate.
 
-- Exact tested source bytes committed at: `301448dd7cf9a8fda748d4c14b585615f170d30d`
-- Source digest: `be7aaa66d706a1fa86dfe0a2ad7a277ee69a80934688719bb7a1a430a7ce70d8`
-- Exact-source multiplayer regression: **107 passed / 0 failed**
+- Exact tested source bytes committed at: `03e660ab64b192dafffcd216a79c4f28c20ea952`
+- Source digest: `540ca1c77c675d178412a1beae38eb48dcfc515fd5be46a96f833fb6638db369`
+- Exact-source multiplayer regression: **110 passed / 0 failed**
 - Real Studio topology: one server + two clients
-- PLAY/TEST gameplay scripts: **38 byte-identical**
-- Human Social Drafting feel/tuning review: **PENDING**
+- PLAY/TEST gameplay scripts: **39 byte-identical**
+- Human Visitor Ranch feel/presentation review: **PENDING**
 - Roblox publication: **NOT PERFORMED**
 - Merge to `main`: **NOT AUTHORIZED**
 
-The 0.4.3 104/104 Elemental Tuning, 0.4.2 99/99 Ranger, 0.4.1 90/90 Sprint, 0.4.0-rc2 86/86 Night/Forest, rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 results remain preserved historical references.
+The 0.4.4 107/107 Social Drafting, 0.4.3 104/104 Elemental Tuning, 0.4.2 99/99 Ranger, 0.4.1 90/90 Sprint, 0.4.0-rc2 86/86 Night/Forest and earlier baselines remain preserved historical references.
 
-## 0.4.4 achieved mechanically
+## 0.4.5 achieved mechanically
 
-Engineering verification covers:
+Engineering verification covers server-validated foreign-pet inspection, owner/self/range/unavailable-pet rejection, harmless rate-limited Admire, exact pet-state preservation, passive-income-only Coin movement, retained visitor Godly reverence, and the Trading Post transfer boundary. All prior regression families remain green.
 
-- server-derived Social Drafting from real simultaneous treadmill training;
-- adjacent-camp geometry within a 50-stud Drafting radius;
-- +10% permanent-Speed gain while Drafting;
-- boolean, non-stacking semantics;
-- symmetric activation and deterministic deactivation when a partner stops;
-- no mutation of Momentum, Overdrive charge/rules, Motion Energy, Coins, pet income, Ranger rewards, inventory or competitive movement normalization;
-- Drafting state exposed through Speed Lab snapshot, treadmill attributes and presentation;
-- clean composition with Elemental Tuning;
-- all retained Ranger, Sprint, Night/Forest, trading, Exchange, ranch, Warden, incubation, duel and Trial regressions.
-
-Exact evidence: `docs/STAGE3_044_VERIFICATION.md`.
+Exact evidence: `docs/STAGE3_045_VERIFICATION.md`.
 
 ## Current product gate
 
-Mechanics-first development may continue, while owner feel review remains separate. Eventually evaluate:
-
-1. whether +10% is noticeable without making solo training feel inferior;
-2. whether 50 studs communicates the intended adjacent-camp social behavior;
-3. whether DRAFT +10% is understandable at a glance;
-4. whether players naturally choose to train together;
-5. whether Elemental Tuning and Drafting together remain legible.
+Mechanics-first development may continue while owner feel review remains separate. Eventually evaluate foreign-pet discoverability, panel readability, Admire frequency, reverence coexistence and Trading Post boundary clarity.
 
 ## Next mechanics-first design target
 
-The next bounded candidate is **0.4.5 Visitor Ranch Interactions v1**. Its design packet is `docs/NEXT_SLICE_0.4.5_VISITOR_RANCH.md` and its implementation is verification-pending.
-
-The slice extends existing foreign-pet inspection and visitor reverence with server-validated read-only inspection plus a harmless rate-limited Admire reaction. Trading remains at the Trading Post; visitors gain no ownership/economy authority.
-
-Speed Mastery remains approved but too underspecified to implement without first defining its control-focused unlocks.
+**Speed Mastery v1** is the strongest remaining mechanics gap, but its control-focused unlocks must be defined concretely before implementation. The next design pass must preserve bounded movement, normalized Sprint fairness, server authority and non-pay-to-win progression.
 
 ## Later production gates
 

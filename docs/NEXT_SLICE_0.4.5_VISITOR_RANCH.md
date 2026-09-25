@@ -1,8 +1,14 @@
 # Egg Rivals 0.4.5 — Visitor Ranch Interactions v1
 
-Status: **IMPLEMENTATION CANDIDATE — VERIFICATION PENDING**
+Status: **ENGINEERING VERIFIED — 110/110 EXACT-SOURCE REGRESSION; OWNER FEEL REVIEW PENDING**
 
 Purpose: deepen the approved ranch/social loop by turning visible pets in another player's ranch into safe social objects without giving visitors any ownership, economy or progression authority.
+
+## Implementation / verification status
+
+The bounded v1 implementation is present and engineering-verified. Exact evidence is recorded in `STAGE3_045_VERIFICATION.md` and `tests/engine-20260925T030114542554Z.json`.
+
+The implementation uses the existing Ranch authority surface, validates exact foreign displayed pets and proximity on the server, preserves Trading Post transfer boundaries, and adds no ownership/economy authority to the visitor. Owner social feel and panel presentation remain separate playtest claims.
 
 ## Existing foundations
 

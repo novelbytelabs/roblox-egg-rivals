@@ -1,38 +1,37 @@
 {
-  "candidate": "EGG-RIVALS-0.4.4-rc1",
-  "tested_source_commit": "301448dd7cf9a8fda748d4c14b585615f170d30d",
-  "source_digest": "be7aaa66d706a1fa86dfe0a2ad7a277ee69a80934688719bb7a1a430a7ce70d8",
+  "candidate": "EGG-RIVALS-0.4.5-rc1",
+  "tested_source_commit": "03e660ab64b192dafffcd216a79c4f28c20ea952",
+  "source_digest": "540ca1c77c675d178412a1beae38eb48dcfc515fd5be46a96f833fb6638db369",
   "source_parse_and_format": "PASS",
   "native_build": "PASS",
   "built_source_byte_comparison": "PASS",
-  "gameplay_script_count": 38,
+  "gameplay_script_count": 39,
   "candidate_engine_suite": "PASS",
-  "engine_passed": 107,
+  "engine_passed": 110,
   "engine_failed": 0,
-  "engine_seconds": 201,
-  "engine_result": "tests/engine-20260925T021744179535Z.json",
-  "engine_result_sha256": "67bd9d98831564bee4319ac0ff86176fcfb2622fbded344b34c34374427c7eab",
+  "engine_seconds": 200,
+  "engine_result": "tests/engine-20260925T030114542554Z.json",
+  "engine_result_sha256": "2a12d2983de07bdaf3c45714142524ead5e69b2f50da417b1ee20805f63c2d77",
   "real_studio_topology": "1 server + 2 clients",
   "foreground_start_cue_exit": 0,
   "foreground_done_cue_exit": 0,
   "background_open_cue_exit": 0,
   "background_close_cue_exit": 0,
-  "human_presentation_acceptance": "PENDING_FOR_0.4.4",
-  "status": "ENGINEERING CANDIDATE VERIFIED; OWNER SOCIAL DRAFTING FEEL REVIEW PENDING",
+  "human_presentation_acceptance": "PENDING_FOR_0.4.5",
+  "status": "ENGINEERING CANDIDATE VERIFIED; OWNER VISITOR RANCH FEEL REVIEW PENDING",
   "artifacts": {
     "PLAY": {
-      "path": "build/candidate-20260925T021239619722Z/EggRivals_0.4.0_PLAY.rbxlx",
-      "sha256": "5785268205abb55858984667bc09544409bbd7957836b4a16d202d885e5637fb"
+      "path": "build/candidate-20260925T025519014429Z/EggRivals_0.4.0_PLAY.rbxlx",
+      "sha256": "602d1bc7d2204843acb2afb6b90d6b0486553405a6f042f7a92527111b84cf4d"
     },
     "TEST": {
-      "path": "build/candidate-20260925T021239619722Z/EggRivals_0.4.0_TEST.rbxlx",
-      "sha256": "03ff0ac085c2345313bf6024ed89691a16df3b7ca688cf888ea581f060cb9070"
+      "path": "build/candidate-20260925T025519014429Z/EggRivals_0.4.0_TEST.rbxlx",
+      "sha256": "7a0bcace22903f22e945b021a5c0b66a658a31ad3fb150471229fc7df4beef6a"
     }
   },
-  "previous_verified_candidate": "EGG-RIVALS-0.4.3-rc1",
+  "previous_verified_candidate": "EGG-RIVALS-0.4.4-rc1",
   "preserved_prior_runs": [
-    "tests/engine-20260925T014225856424Z.json",
-    "tests/engine-20260925T020859883596Z.json"
+    "tests/engine-20260925T023827877859Z.json"
   ],
-  "scope": "Session-only PC Studio candidate retaining Night/Forest refinement, Sprint Rivalry, Ranger Contracts and Elemental Tuning, plus bounded server-owned Social Drafting v1; no merge or publication."
+  "scope": "Session-only PC Studio candidate retaining prior mechanics plus safe Visitor Ranch inspection and Admire interactions; no merge or publication."
 }

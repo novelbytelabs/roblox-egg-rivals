@@ -38,7 +38,7 @@ Status meanings:
 | Creature Comforts | APPROVED / NOT YET IMPLEMENTED | Toys/beds/pools/etc. |
 | Showcase Upgrades | APPROVED / NOT YET IMPLEMENTED | Featured pets/podiums |
 | Pen Manager | APPROVED / NOT YET IMPLEMENTED | Sorting/groups/automation |
-| Visitor Features | APPROVED / NOT YET IMPLEMENTED | Inspect/reactions/trade entry |
+| Visitor Features | ENGINEERING VERIFIED / PRESENTATION PENDING | Exact foreign-pet inspection, rate-limited Admire, and existing reverence path verified; trading remains at Trading Post |
 | Celebration Upgrades | APPROVED / NOT YET IMPLEMENTED | Enhanced welcome events |
 | Pen Themes | APPROVED / NOT YET IMPLEMENTED | Ranch aesthetics |
 | Large Creature Facilities | APPROVED / NOT YET IMPLEMENTED | Giant stalls/caves/paddocks |
@@ -106,7 +106,7 @@ Do not update this matrix from aspiration alone.
 
 ## Current engineering candidate status
 
-The current 0.4.4 exact-source engineering candidate passed **107/107** checks. The prior 0.4.3 104/104, 0.4.2 99/99, 0.4.1 90/90, rc2 86/86 and rc1 77/77 results remain preserved historical evidence. Systems with direct mechanical coverage are labeled **ENGINEERING VERIFIED / PRESENTATION PENDING** above.
+The current 0.4.5 exact-source engineering candidate passed **110/110** checks. Prior verified candidates remain preserved historical evidence.
 
 The original Living World plan intentionally mixed mechanical requirements with experiential aspirations. The green engineering suite does not imply that every presentation goal shipped. Important approved gaps still visible in this matrix include:
 
