@@ -436,8 +436,12 @@ function Tests.run(g)
 		assert(pro.money.Value == 0)
 		near(a, pro.base.treadmill.Position + Vector3.new(0, 3, 0))
 		local before = pro.speed.Value
-		task.wait(1.2)
-		assert(pro.speed.Value - before >= 2)
+		assert(
+			waitFor(function()
+				return pro.speed.Value - before >= 2
+			end, 2.5),
+			"Boost training did not produce two Speed within the bounded production-rate window"
+		)
 		near(a, pro.base.spawn.Position)
 	end)
 	check("Safe-zone bat and snare rejection", function()

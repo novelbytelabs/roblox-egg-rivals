@@ -78,6 +78,9 @@ function Checks.run(g, check, a, b, results)
 		assert(wind.overdriveFactor > s.overdriveFactor and wind.overdriveDuration < s.overdriveDuration)
 		assert(wind.chargeRate < s.chargeRate)
 		assert(earth.momentumDecay > s.momentumDecay and earth.chargeRate < s.chargeRate)
+		local m1, i1, e1 = R.trainDelta(0.25, 1.3, true)
+		local m2, i2, e2 = R.trainDelta(0.25, 1.3, true, s.momentumRamp, s.momentumDecay)
+		assert(math.abs(m1 - m2) < 1e-9 and math.abs(i1 - i2) < 1e-9 and math.abs(e1 - e2) < 1e-9)
 	end)
 
 	check("Fire, Water and Earth tuning produce the intended training sidegrades", function()
@@ -101,14 +104,29 @@ function Checks.run(g, check, a, b, results)
 	check("Tuning selection is free, server-owned and locked against charge or Momentum cherry-picking", function()
 		local pro = g.profiles[a]
 		resetLab(a)
-		local coins = pro.money.Value
 		local income = g.inventory:income(a.UserId)
 		place(a, Vector3.new(0, 4, 90))
 		assert(not g.speedLab:setTuning(a, "Fire"))
 		place(a, g.world.trainerShop.Position + Vector3.new(0, 3, 3))
 		assert(not g.speedLab:setTuning(a, "Void"))
+		local wealthBefore = pro.money.Value + pro.coinRemainder
+		local started = g:now()
 		assert(g.speedLab:setTuning(a, "Fire"))
-		assert(pro.lab.tuning == "Fire" and pro.money.Value == coins and g.inventory:income(a.UserId) == income)
+		local elapsed = math.max(0, g:now() - started)
+		local passiveExpected = income * elapsed / 60
+		local passiveActual = pro.money.Value + pro.coinRemainder - wealthBefore
+		local passiveTolerance = income * 0.2 / 60 + 0.02
+		assert(passiveTolerance < 40, "Free-tuning audit is too coarse to detect the smallest Ranger reward")
+		assert(
+			math.abs(passiveActual - passiveExpected) <= passiveTolerance,
+			string.format(
+				"Tuning changed Coins beyond passive income: actual %.4f expected %.4f tolerance %.4f",
+				passiveActual,
+				passiveExpected,
+				passiveTolerance
+			)
+		)
+		assert(pro.lab.tuning == "Fire" and g.inventory:income(a.UserId) == income)
 		local changes = pro.lab.records.tuningChanges
 		assert(g.speedLab:setTuning(a, "Fire") and pro.lab.records.tuningChanges == changes)
 		pro.lab.momentum = 0.1
@@ -134,7 +152,7 @@ function Checks.run(g, check, a, b, results)
 		local now = g:now()
 		assert(g.speedLab:activate(a))
 		assert(math.abs(pro.lab.untilTime - now - C.Tunings.Wind.overdriveDuration) < 0.2)
-		assert(g:humanoid(a).WalkSpeed == wind)
+		assert(math.abs(g:humanoid(a).WalkSpeed - wind) < 0.001, "Wind Overdrive engine speed mismatch")
 		pro.lab.untilTime = g:now() + 5
 		a:SetAttribute("InTrial", true)
 		g:applySpeed(a)
@@ -153,8 +171,9 @@ function Checks.run(g, check, a, b, results)
 		local pro = g.profiles[a]
 		resetLab(a)
 		place(a, g.world.trainerShop.Position + Vector3.new(0, 3, 3))
-		local beforeCoins = pro.money.Value
 		local beforeIncome = g.inventory:income(a.UserId)
+		local wealthBefore = pro.money.Value + pro.coinRemainder
+		local started = g:now()
 		g:push(a)
 		g:feed(a, "openShop", { shop = "trainer" })
 		local token = "tuning-input-" .. tostring(g:now())
@@ -170,7 +189,21 @@ function Checks.run(g, check, a, b, results)
 		results.tuningClientDiagnostics = diag
 		assert(diag.passed, diag.error)
 		assert(diag.tuning == "Water" and pro.lab.tuning == "Water")
-		assert(pro.money.Value == beforeCoins and g.inventory:income(a.UserId) == beforeIncome)
+		local elapsed = math.max(0, g:now() - started)
+		local passiveExpected = beforeIncome * elapsed / 60
+		local passiveActual = pro.money.Value + pro.coinRemainder - wealthBefore
+		local passiveTolerance = beforeIncome * 0.2 / 60 + 0.02
+		assert(passiveTolerance < 40, "Real tuning audit is too coarse to detect the smallest Ranger reward")
+		assert(
+			math.abs(passiveActual - passiveExpected) <= passiveTolerance,
+			string.format(
+				"Real tuning input changed Coins beyond passive income: actual %.4f expected %.4f tolerance %.4f",
+				passiveActual,
+				passiveExpected,
+				passiveTolerance
+			)
+		)
+		assert(g.inventory:income(a.UserId) == beforeIncome)
 		resetLab(a)
 		g:push(a)
 	end)
