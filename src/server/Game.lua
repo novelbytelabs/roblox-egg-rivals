@@ -44,6 +44,37 @@ function Game:busy(p, ignorePreview)
 		or (not ignorePreview and pro.incubatorPreview ~= nil)
 end
 
+function Game:updateTrainingState()
+	local trainers = {}
+	for p, pro in pairs(self.profiles) do
+		local root = self:root(p)
+		pro.training = self:alive(p)
+			and not self:busy(p)
+			and root ~= nil
+			and R.within(root.Position, pro.base.treadmill.Position, 5, 2.9, 5)
+		pro.drafting = false
+		if pro.training then
+			table.insert(trainers, p)
+		end
+	end
+	for i = 1, #trainers - 1 do
+		local a = trainers[i]
+		local aPro = self.profiles[a]
+		for j = i + 1, #trainers do
+			local b = trainers[j]
+			local bPro = self.profiles[b]
+			if
+				aPro
+				and bPro
+				and (aPro.base.treadmill.Position - bPro.base.treadmill.Position).Magnitude <= C.DraftRange
+			then
+				aPro.drafting = true
+				bPro.drafting = true
+			end
+		end
+	end
+	return trainers
+end
 function Game:equipped(p, name)
 	local t = p.Character and p.Character:FindFirstChild(name)
 	return t and t:IsA("Tool") and t:GetAttribute("Stage3Tool") == true
@@ -188,6 +219,7 @@ function Game:setup(p)
 		exchange = nil,
 		rates = {},
 		training = false,
+		drafting = false,
 		tutorial = 1,
 		coinRemainder = 0,
 		ranchLevel = 0,
@@ -1006,6 +1038,7 @@ function Game:push(p)
 		charges = pro.charges,
 		base = p:GetAttribute("BaseIndex"),
 		training = pro.training,
+		drafting = pro.drafting == true,
 		autoHatch = false,
 		activePetId = pro.activePetId,
 		penPage = pro.penPage,
@@ -1362,10 +1395,8 @@ function Game:step(dt)
 	if now >= self.phaseEnds then
 		self:setNight(not workspace:GetAttribute("Night"))
 	end
+	self:updateTrainingState()
 	for p, pro in pairs(self.profiles) do
-		local root = self:root(p)
-		local alive = self:alive(p)
-		pro.training = alive and not self:busy(p) and R.within(root.Position, pro.base.treadmill.Position, 5, 2.9, 5)
 		self.speedLab:step(p, dt, now)
 		local newMoney, remainder = R.credit(pro.money.Value, pro.coinRemainder, self.inventory:income(p.UserId), dt)
 		pro.money.Value = newMoney
