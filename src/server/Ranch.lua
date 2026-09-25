@@ -187,16 +187,17 @@ function Ranch:inspect(visitor, petId)
 		return false, err
 	end
 	local item, owner = target.item, target.owner
-	return true, {
-		id = item.id,
-		ownerUserId = owner.UserId,
-		ownerName = owner.DisplayName,
-		creature = item.creature,
-		species = item.species,
-		element = item.element,
-		rarity = item.rarity,
-		income = C.Rarities[item.rarity].income,
-	}
+	return true,
+		{
+			id = item.id,
+			ownerUserId = owner.UserId,
+			ownerName = owner.DisplayName,
+			creature = item.creature,
+			species = item.species,
+			element = item.element,
+			rarity = item.rarity,
+			income = C.Rarities[item.rarity].income,
+		}
 end
 
 function Ranch:react(visitor, petId, reaction)
