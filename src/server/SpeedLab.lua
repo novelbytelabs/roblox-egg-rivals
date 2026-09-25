@@ -9,6 +9,7 @@ end
 function SpeedLab:setup(pro)
 	pro.lab = {
 		tuning = "Standard",
+		precision = false,
 		momentum = 0,
 		charge = 0,
 		energy = 0,
@@ -30,11 +31,14 @@ function SpeedLab:setup(pro)
 			bestSprintStreak = 0,
 			tuningChanges = 0,
 			draftingSeconds = 0,
+			precisionToggles = 0,
+			overdriveCuts = 0,
 		},
 	}
 	pro.base.treadmill:SetAttribute("Tuning", "Standard")
 	pro.base.treadmill:SetAttribute("Drafting", false)
 	pro.base.treadmill:SetAttribute("DraftBonus", C.DraftBonus)
+	pro.base.treadmill:SetAttribute("Precision", false)
 end
 function SpeedLab:spec(pro)
 	local lab = pro and pro.lab
@@ -42,6 +46,12 @@ function SpeedLab:spec(pro)
 end
 function SpeedLab:trainingMultiplier(pro)
 	return pro and pro.drafting == true and (1 + C.DraftBonus) or 1
+end
+function SpeedLab:mastery(pro)
+	return {
+		precisionUnlocked = pro ~= nil and pro.tier >= C.PrecisionUnlockTier,
+		overdriveCutUnlocked = pro ~= nil and pro.tier >= C.OverdriveCutUnlockTier,
+	}
 end
 function SpeedLab:step(p, dt, now)
 	local g = self.game
@@ -126,6 +136,7 @@ function SpeedLab:step(p, dt, now)
 			.. "%\nTUNE "
 			.. lab.tuning:upper()
 			.. (drafting and ("\nDRAFT +" .. math.floor(C.DraftBonus * 100) .. "%") or "")
+			.. (lab.precision and ("\nPRECISION " .. math.floor(C.PrecisionFactor * 100) .. "%") or "")
 	end
 end
 function SpeedLab:activate(p)
@@ -133,13 +144,26 @@ function SpeedLab:activate(p)
 	if not g:alive(p) or g:busy(p) then
 		return false, "Overdrive is for open-world movement only."
 	end
-	local lab = g.profiles[p].lab
-	if lab.charge < 100 or lab.untilTime > g:now() then
+	local pro = g.profiles[p]
+	local lab = pro.lab
+	local now = g:now()
+	if lab.untilTime > now then
+		if pro.tier < C.OverdriveCutUnlockTier then
+			return false, "Hyper Speed Mastery is required to cut Overdrive early."
+		end
+		lab.untilTime = 0
+		lab.records.overdriveCuts += 1
+		g:applySpeed(p)
+		g:notify(p, "OVERDRIVE CUT • no charge refunded", "tick")
+		g:push(p)
+		return true
+	end
+	if lab.charge < 100 then
 		return false, "Train to fully charge Overdrive."
 	end
-	local tuning = self:spec(g.profiles[p])
+	local tuning = self:spec(pro)
 	lab.charge = 0
-	lab.untilTime = g:now() + tuning.overdriveDuration
+	lab.untilTime = now + tuning.overdriveDuration
 	lab.records.overdrivesUsed += 1
 	g:applySpeed(p)
 	g:effect("overdrive", { position = g:root(p).Position, userId = p.UserId })
@@ -148,6 +172,27 @@ function SpeedLab:activate(p)
 		string.format("OVERDRIVE • %.1fs • %s tune", tuning.overdriveDuration, lab.tuning:upper()),
 		"pickup"
 	)
+	g:push(p)
+	return true
+end
+function SpeedLab:setPrecision(p, active)
+	local g = self.game
+	local pro = g.profiles[p]
+	if type(active) ~= "boolean" or not pro or not g:alive(p) or g:busy(p) then
+		return false, "Precision Mode is unavailable right now."
+	end
+	if pro.tier < C.PrecisionUnlockTier then
+		return false, "Install Turbo to unlock Precision Mode."
+	end
+	local lab = pro.lab
+	if lab.precision == active then
+		return true
+	end
+	lab.precision = active
+	lab.records.precisionToggles += 1
+	pro.base.treadmill:SetAttribute("Precision", active)
+	g:applySpeed(p)
+	g:notify(p, active and "PRECISION MODE • controlled open-world pace" or "PRECISION MODE OFF", "tick")
 	g:push(p)
 	return true
 end
@@ -215,8 +260,13 @@ function SpeedLab:snapshot(p)
 	local pro = self.game.profiles[p]
 	local lab = pro.lab
 	local tuning = self:spec(pro)
+	local mastery = self:mastery(pro)
 	return {
 		grade = pro.tier,
+		precision = lab.precision == true,
+		precisionUnlocked = mastery.precisionUnlocked,
+		precisionFactor = C.PrecisionFactor,
+		overdriveCutUnlocked = mastery.overdriveCutUnlocked,
 		tuning = lab.tuning,
 		tuningDescription = tuning.description,
 		drafting = pro.drafting == true,
