@@ -949,7 +949,8 @@ render = function()
 				or ("Q • OVERDRIVE " .. math.floor(lab.charge) .. "%")
 		end
 		if lab.precisionUnlocked then
-			precisionHUD.Text = lab.precision and ("C • PRECISION ON • " .. math.floor((lab.precisionFactor or C.PrecisionFactor) * 100) .. "%")
+			precisionHUD.Text = lab.precision
+					and ("C • PRECISION ON • " .. math.floor((lab.precisionFactor or C.PrecisionFactor) * 100) .. "%")
 				or "C • PRECISION OFF"
 			precisionHUD.Active = true
 			precisionHUD.AutoButtonColor = true
@@ -1012,10 +1013,7 @@ render = function()
 		if state.lab.drafting then
 			shopDescription.Text ..= "\nDRAFTING • +" .. tostring(math.floor((state.lab.draftBonus or 0) * 100)) .. "% SPEED GAIN"
 		end
-		shopDescription.Text ..= "\nMASTERY • "
-			.. (state.lab.precisionUnlocked and "PRECISION C" or "Precision at Turbo")
-			.. " • "
-			.. (state.lab.overdriveCutUnlocked and "Q CUT" or "Cut at Hyper")
+		shopDescription.Text ..= "\nMASTERY • " .. (state.lab.precisionUnlocked and "PRECISION C" or "Precision at Turbo") .. " • " .. (state.lab.overdriveCutUnlocked and "Q CUT" or "Cut at Hyper")
 		local records = state.lab.records or {}
 		shopDescription.Text ..= "\n\nSPRINTS: " .. tostring(records.sprintWins or 0) .. " wins • best " .. (records.bestSprint and string.format(
 			"%.2fs",
