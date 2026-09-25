@@ -29,13 +29,19 @@ function SpeedLab:setup(pro)
 			sprintStreak = 0,
 			bestSprintStreak = 0,
 			tuningChanges = 0,
+			draftingSeconds = 0,
 		},
 	}
 	pro.base.treadmill:SetAttribute("Tuning", "Standard")
+	pro.base.treadmill:SetAttribute("Drafting", false)
+	pro.base.treadmill:SetAttribute("DraftBonus", C.DraftBonus)
 end
 function SpeedLab:spec(pro)
 	local lab = pro and pro.lab
 	return C.Tunings[(lab and lab.tuning) or "Standard"] or C.Tunings.Standard
+end
+function SpeedLab:trainingMultiplier(pro)
+	return pro and pro.drafting == true and (1 + C.DraftBonus) or 1
 end
 function SpeedLab:step(p, dt, now)
 	local g = self.game
@@ -43,6 +49,8 @@ function SpeedLab:step(p, dt, now)
 	local lab = pro.lab
 	local grade = C.Grades[pro.tier]
 	local training = pro.training == true
+	local drafting = training and pro.drafting == true
+	local draftMultiplier = self:trainingMultiplier(pro)
 	local tuning = self:spec(pro)
 	local momentum, integral, energyIntegral =
 		R.trainDelta(lab.momentum, dt, training, tuning.momentumRamp, tuning.momentumDecay)
@@ -50,7 +58,7 @@ function SpeedLab:step(p, dt, now)
 	pro.speed.Value = math.clamp(pro.speed.Value, 0, grade.cap)
 	if training then
 		local speedBefore = pro.speed.Value
-		lab.fraction += grade.rate * (dt + C.MomentumBonus * integral)
+		lab.fraction += grade.rate * draftMultiplier * (dt + C.MomentumBonus * integral)
 		local whole = math.floor(lab.fraction + 1e-9)
 		pro.speed.Value = math.min(grade.cap, pro.speed.Value + whole)
 		lab.fraction = math.max(0, lab.fraction - whole)
@@ -70,6 +78,9 @@ function SpeedLab:step(p, dt, now)
 		end
 		lab.energy = math.min(100, lab.energy + C.EnergyRate * energyIntegral)
 		lab.records.trainingSeconds += dt
+		if drafting then
+			lab.records.draftingSeconds += dt
+		end
 		lab.records.distance += R.speed(pro.speed.Value) * dt
 		lab.records.bestMomentum = math.max(lab.records.bestMomentum, momentum)
 		if pro.speed.Value >= 60 then
@@ -99,6 +110,8 @@ function SpeedLab:step(p, dt, now)
 		pro.base.treadmill:SetAttribute("Momentum", math.floor(lab.momentum * 100) / 100)
 		pro.base.treadmill:SetAttribute("Energy", math.floor(lab.energy))
 		pro.base.treadmill:SetAttribute("Training", training)
+		pro.base.treadmill:SetAttribute("Drafting", drafting)
+		pro.base.treadmill:SetAttribute("DraftBonus", C.DraftBonus)
 		pro.base.recordLabel.Text = grade.name:upper()
 			.. " LAB • "
 			.. grade.rate
@@ -112,6 +125,7 @@ function SpeedLab:step(p, dt, now)
 			.. math.floor(lab.energy)
 			.. "%\nTUNE "
 			.. lab.tuning:upper()
+			.. (drafting and ("\nDRAFT +" .. math.floor(C.DraftBonus * 100) .. "%") or "")
 	end
 end
 function SpeedLab:activate(p)
@@ -205,6 +219,8 @@ function SpeedLab:snapshot(p)
 		grade = pro.tier,
 		tuning = lab.tuning,
 		tuningDescription = tuning.description,
+		drafting = pro.drafting == true,
+		draftBonus = C.DraftBonus,
 		tuningSpec = {
 			momentumRamp = tuning.momentumRamp,
 			momentumDecay = tuning.momentumDecay,
