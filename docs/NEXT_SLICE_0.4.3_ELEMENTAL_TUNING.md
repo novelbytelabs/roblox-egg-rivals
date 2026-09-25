@@ -1,8 +1,18 @@
 # Egg Rivals 0.4.3 — Elemental Tuning v1
 
-Status: **IMPLEMENTATION CANDIDATE — VERIFICATION PENDING**
+Status: **ENGINEERING VERIFIED — 104/104 EXACT-SOURCE REGRESSION; OWNER TUNING FEEL REVIEW PENDING**
 
 Purpose: deepen the signature Speed Lab without adding a new currency, zone, persistence requirement or pet-stat power system.
+
+## Implementation / verification status
+
+The bounded 0.4.3 implementation is now present and engineering-verified. The final exact-source candidate passed **104/104** checks with one real Studio server and two real clients.
+
+The implementation includes Standard plus four free server-owned elemental sidegrades, switching restrictions that prevent cherry-picking stored Momentum/Overdrive, normalized Trial/Sprint isolation, the existing 68 studs/s cap, and real client selection from the rendered Trainer UI.
+
+Exact evidence: `STAGE3_043_VERIFICATION.md` and `tests/engine-20260925T012102080077Z.json`.
+
+Owner judgment of tuning identity, balance and usefulness remains separate from engineering verification.
 
 ## Scope decision
 
@@ -75,4 +85,4 @@ Speed Mastery unlock trees, elemental pets granting movement bonuses, tuning pur
 
 ## Claim boundary
 
-This packet defines the 0.4.3 implementation candidate. It does not claim Elemental Tuning is verified or fun until fresh engine and owner evidence exists.
+This packet began as the 0.4.3 implementation target. The bounded mechanics are now engineering-verified at 104/104. Tuning identity, balance and fun remain owner-review claims.
