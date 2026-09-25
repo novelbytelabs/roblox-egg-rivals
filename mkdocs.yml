@@ -106,8 +106,14 @@ nav:
       - Production Guardrails: PRODUCTION_GUARDRAILS.md
       - World & Balance References: WORLD_AND_BALANCE_REFERENCES.md
   - Development:
-      - 0.4.0 Living World Plan: NEXT_SLICE_0.4.0_LIVING_WORLD.md
       - 0.4.3 Elemental Tuning: NEXT_SLICE_0.4.3_ELEMENTAL_TUNING.md
+      - 0.4.3 Verification: STAGE3_043_VERIFICATION.md
+      - 0.4.2 Ranger Contracts: NEXT_SLICE_0.4.2_RANGER_CONTRACTS.md
+      - 0.4.2 Verification: STAGE3_042_VERIFICATION.md
+      - 0.4.1 Sprint Rivalry: NEXT_SLICE_0.4.1_SPRINT_RIVALRY.md
+      - 0.4.1 Verification: STAGE3_041_VERIFICATION.md
+      - 0.4.0 Night/Forest Verification: STAGE3_040_RC2_VERIFICATION.md
+      - 0.4.0 Living World Plan: NEXT_SLICE_0.4.0_LIVING_WORLD.md
       - Astra 0.4.0 Execution Packet: ASTRA_0.4.0_EXECUTION_PACKET.md
       - Roadmap: ROADMAP.md
       - Stage 3 Elemental Refinement: STAGE3_ELEMENTAL_REFINEMENT_0.3.2.md
