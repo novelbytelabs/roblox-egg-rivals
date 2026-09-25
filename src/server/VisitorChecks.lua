@@ -1,3 +1,4 @@
+local RunService = game:GetService("RunService")
 local C = require(game:GetService("ReplicatedStorage").Stage3Shared.Config)
 local V = {}
 
@@ -40,15 +41,51 @@ function V.run(g, check, a, b)
 	check("Visitor Admire is proximity and cooldown bounded without economy or ownership authority", function()
 		local pet, record = visiblePet(g, b)
 		local pos = assert(record:GetAttribute("PenPosition"))
-		local beforeA = g.profiles[a].money.Value
-		local beforeB = g.profiles[b].money.Value
+		local proA, proB = g.profiles[a], g.profiles[b]
+		local incomeA, incomeB = g.inventory:income(a.UserId), g.inventory:income(b.UserId)
+		local wealthA = proA.money.Value + proA.coinRemainder
+		local wealthB = proB.money.Value + proB.coinRemainder
+		local expectedPassiveA, expectedPassiveB = 0, 0
+		local maxHeartbeatDt = 0
+		local economyConnection = RunService.Heartbeat:Connect(function(dt)
+			maxHeartbeatDt = math.max(maxHeartbeatDt, dt)
+			expectedPassiveA += incomeA * dt / 60
+			expectedPassiveB += incomeB * dt / 60
+		end)
 		local beforeRevision = pet.revision
-		near(g, a, pos + Vector3.new(0, 2, 4))
-		assert(not g.ranch:react(a, pet.id, "RewardMe"))
-		assert(g:action(a, "ranchReact", { id = pet.id, reaction = "Admire" }))
-		assert(not g:action(a, "ranchReact", { id = pet.id, reaction = "Admire" }))
+		local interactionOK, interactionErr = xpcall(function()
+			near(g, a, pos + Vector3.new(0, 2, 4))
+			assert(not g.ranch:react(a, pet.id, "RewardMe"))
+			assert(g:action(a, "ranchReact", { id = pet.id, reaction = "Admire" }))
+			assert(not g:action(a, "ranchReact", { id = pet.id, reaction = "Admire" }))
+		end, debug.traceback)
+		economyConnection:Disconnect()
+		assert(interactionOK, interactionErr)
 		assert(pet.ownerId == b.UserId and pet.state == "Inventory" and pet.revision == beforeRevision)
-		assert(g.profiles[a].money.Value == beforeA and g.profiles[b].money.Value == beforeB)
+		local actualPassiveA = proA.money.Value + proA.coinRemainder - wealthA
+		local actualPassiveB = proB.money.Value + proB.coinRemainder - wealthB
+		local boundaryDt = math.max(maxHeartbeatDt, 1 / 60) * 2
+		local toleranceA = incomeA * boundaryDt / 60 + 0.02
+		local toleranceB = incomeB * boundaryDt / 60 + 0.02
+		assert(
+			math.abs(actualPassiveA - expectedPassiveA) <= toleranceA,
+			string.format(
+				"Admire changed visitor Coins beyond passive income: actual %.4f expected %.4f tolerance %.4f",
+				actualPassiveA,
+				expectedPassiveA,
+				toleranceA
+			)
+		)
+		assert(
+			math.abs(actualPassiveB - expectedPassiveB) <= toleranceB,
+			string.format(
+				"Admire changed owner Coins beyond passive income: actual %.4f expected %.4f tolerance %.4f",
+				actualPassiveB,
+				expectedPassiveB,
+				toleranceB
+			)
+		)
+		assert(g.inventory:income(a.UserId) == incomeA and g.inventory:income(b.UserId) == incomeB)
 	end)
 
 	check("Owners and unavailable pets cannot use the visitor interaction path", function()
