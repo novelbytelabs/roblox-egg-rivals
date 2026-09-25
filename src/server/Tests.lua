@@ -609,7 +609,14 @@ function Tests.run(g)
 		assert(egg)
 		near(a, egg.model:GetPivot().Position + Vector3.new(0, 2, -5))
 		assert(g:take(a, egg.id))
-		g.world.guardian:PivotTo(CFrame.new(g:root(a).Position + Vector3.new(0, 0, -10)))
+		-- Isolate catch/unpause semantics from the separate obstacle-routing regression below.
+		-- The central Forest trail is intentionally clear and both endpoints are observed fixtures.
+		near(a, g.world.guardianHome + Vector3.new(0, 0, -8))
+		g.world.guardian:PivotTo(CFrame.new(g.world.guardianHome))
+		assert(
+			g.navigation:clear(g.world.guardian:GetPivot().Position, g:root(a).Position),
+			"Warden catch fixture corridor is blocked"
+		)
 		workspace:SetAttribute("BossEnabled", true)
 		assert(
 			waitFor(function()
