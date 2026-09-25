@@ -70,7 +70,10 @@ function V.run(g, check, a, b)
 		local boundaryDt = math.max(maxHeartbeatDt, 1 / 60) * 3
 		local toleranceA = incomeA * boundaryDt / 60 + 0.02
 		local toleranceB = incomeB * boundaryDt / 60 + 0.02
-		assert(toleranceA < 1 and toleranceB < 1, "Visitor economy fixture income is too high for exact reward detection")
+		assert(
+			toleranceA < 1 and toleranceB < 1,
+			"Visitor economy fixture income is too high for exact reward detection"
+		)
 		assert(
 			math.abs(actualPassiveA - expectedPassiveA) <= toleranceA,
 			string.format(
