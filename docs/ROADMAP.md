@@ -43,9 +43,9 @@ Mechanics-first development may continue, while owner feel review remains separa
 
 ## Next mechanics-first design target
 
-The most coherent approved gap is **richer ranch interaction and visitor mechanics**.
+The next bounded candidate is **0.4.5 Visitor Ranch Interactions v1**. Its design packet is `docs/NEXT_SLICE_0.4.5_VISITOR_RANCH.md` and its implementation is verification-pending.
 
-A bounded 0.4.5 design should deepen the existing social loop—visit a ranch, inspect pets, react harmlessly, and enter existing trade interactions—without adding ownership authority, currency, persistence, feeding chores or a new zone.
+The slice extends existing foreign-pet inspection and visitor reverence with server-validated read-only inspection plus a harmless rate-limited Admire reaction. Trading remains at the Trading Post; visitors gain no ownership/economy authority.
 
 Speed Mastery remains approved but too underspecified to implement without first defining its control-focused unlocks.
 
