@@ -20,7 +20,7 @@ Canonical source is under `src/`. Rojo projects are `default.project.json` and `
 
 The owner wants continued emphasis on **main mechanics and play** rather than polish closure.
 
-Social Drafting v1 is engineering-verified. It adds a mild cooperative training incentive while preserving solo viability, Elemental Tuning, normalized Trial/Sprint movement and existing economy/inventory authority.
+Social Drafting v1 is engineering-verified. The next bounded implementation candidate is 0.4.5 Visitor Ranch Interactions v1: read-only foreign-pet inspection, a harmless server-validated Admire reaction, and direct access to the existing visitor reverence request without new ownership or economy authority.
 
 No merge to `main` or Roblox publication is authorized by engineering verification alone.
 
@@ -36,6 +36,7 @@ Start with:
 - `docs/STAGE3_041_VERIFICATION.md` — Sprint Rivalry evidence.
 - `docs/STAGE3_044_VERIFICATION.md` — Social Drafting evidence.
 - `docs/NEXT_SLICE_0.4.4_SOCIAL_DRAFTING.md` — implemented Social Drafting design packet.
+- `docs/NEXT_SLICE_0.4.5_VISITOR_RANCH.md` — Visitor Ranch Interactions implementation candidate.
 - `docs/STAGE3_043_VERIFICATION.md` — Elemental Tuning evidence.
 - `docs/NEXT_SLICE_0.4.3_ELEMENTAL_TUNING.md` — implemented Elemental Tuning design packet.
 - `docs/STAGE3_042_VERIFICATION.md` — Ranger Contracts evidence.
