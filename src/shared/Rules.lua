@@ -211,6 +211,8 @@ function R.validate()
 			and C.Tunings.Wind.chargeRate < standard.chargeRate
 	)
 	assert(C.Tunings.Earth.momentumDecay > standard.momentumDecay and C.Tunings.Earth.chargeRate < standard.chargeRate)
+	assert(R.finite(C.DraftRange) and C.DraftRange > 0 and C.DraftRange < 84)
+	assert(R.finite(C.DraftBonus) and C.DraftBonus > 0 and C.DraftBonus <= 0.15)
 	assert(#C.ForestNestPositions == 12 and R.integer(C.GodlyNestIndex, 1, #C.ForestNestPositions))
 	assert(C.GodlyNestRespawn > C.EggRespawnTime)
 	for _, position in ipairs(C.ForestNestPositions) do
