@@ -496,12 +496,17 @@ ContextActionService:BindActionAtPriority("EggRivalsIncubationHold", function()
 	end
 	return Enum.ContextActionResult.Sink
 end, false, Enum.ContextActionPriority.High.Value + 10, Enum.KeyCode.E)
-local labHUD = U.frame(root, "LabMeters", 16, 86, 270, 112, C.Colors.Ink)
+local labHUD = U.frame(root, "LabMeters", 16, 86, 270, 150, C.Colors.Ink)
 local momentumHUD = U.text(labHUD, "Momentum", "", 12, 5, 246, 25, 13, C.Colors.Mint)
 local energyHUD = U.text(labHUD, "CampPower", "", 12, 32, 246, 23, 13, C.Colors.Gold)
 local overdriveHUD = U.button(labHUD, "Overdrive", "Q • CHARGE OVERDRIVE", 10, 65, 250, 35, function()
 	send("overdrive")
 end, C.Colors.Blue)
+local precisionHUD = U.button(labHUD, "Precision", "C • PRECISION LOCKED", 10, 103, 250, 35, function()
+	if state and state.lab and state.lab.precisionUnlocked then
+		send("precision", { active = not state.lab.precision })
+	end
+end, C.Colors.Mint)
 local trialHUD = U.frame(root, "TrialHUD", 325, 85, 430, 83, C.Colors.Ink)
 trialHUD.Visible = false
 local trialStatus = U.text(trialHUD, "Status", "", 12, 4, 406, 39, 15, C.Colors.Blue)
@@ -522,7 +527,7 @@ end, C.Colors.Muted)
 U.text(
 	guide,
 	"Instructions",
-	"1. Train at your Speed Lab. Momentum improves training and charges Overdrive.\n2. Follow the lantern trail into the Forest and steal an egg.\n3. Escape the Warden. Choose Fire, Water, Wind, or Earth deliberately at your camp.\n4. One pet follows; the rest live in your ranch and all still earn Coins.\n5. At Night the daytime nests go dormant and one valuable egg is hidden.\n6. Upgrade your Speed Lab, expand your ranch, trade safely, and master the Grove Circuit.\n7. Visit Ranger Station for three session contracts that reward the systems you already use.\n8. At Trainer Workshop, choose a free Standard/Fire/Water/Wind/Earth treadmill tuning sidegrade.\n\nWASD: move • Space: jump • Q: Overdrive • I: collection • U: Speed Lab • H: guide\n1 / 2: equip tools • Click: use equipped tool\n\nProgress is session-only in this engineering slice.",
+	"1. Train at your Speed Lab. Momentum improves training and charges Overdrive.\n2. Follow the lantern trail into the Forest and steal an egg.\n3. Escape the Warden. Choose Fire, Water, Wind, or Earth deliberately at your camp.\n4. One pet follows; the rest live in your ranch and all still earn Coins.\n5. At Night the daytime nests go dormant and one valuable egg is hidden.\n6. Upgrade your Speed Lab, expand your ranch, trade safely, and master the Grove Circuit.\n7. Visit Ranger Station for three session contracts that reward the systems you already use.\n8. At Trainer Workshop, choose a free Standard/Fire/Water/Wind/Earth treadmill tuning sidegrade.\n\nWASD: move • Space: jump • Q: Overdrive / Cut • C: Precision • I: collection • U: Speed Lab • H: guide\n1 / 2: equip tools • Click: use equipped tool\n\nProgress is session-only in this engineering slice.",
 	20,
 	59,
 	620,
@@ -934,8 +939,25 @@ render = function()
 	if lab then
 		momentumHUD.Text = "MOMENTUM  " .. math.floor(lab.momentum * 100) .. "%  • " .. lab.gradeName
 		energyHUD.Text = "CAMP POWER  " .. math.floor(lab.energy) .. "%"
-		overdriveHUD.Text = lab.charge >= 100 and "Q • OVERDRIVE READY"
-			or ("Q • OVERDRIVE " .. math.floor(lab.charge) .. "%")
+		local overdriveActive = lab.untilTime and lab.untilTime > (state.serverTime or 0)
+		if overdriveActive and lab.overdriveCutUnlocked then
+			overdriveHUD.Text = "Q • CUT OVERDRIVE"
+		elseif overdriveActive then
+			overdriveHUD.Text = "OVERDRIVE ACTIVE"
+		else
+			overdriveHUD.Text = lab.charge >= 100 and "Q • OVERDRIVE READY"
+				or ("Q • OVERDRIVE " .. math.floor(lab.charge) .. "%")
+		end
+		if lab.precisionUnlocked then
+			precisionHUD.Text = lab.precision and ("C • PRECISION ON • " .. math.floor((lab.precisionFactor or C.PrecisionFactor) * 100) .. "%")
+				or "C • PRECISION OFF"
+			precisionHUD.Active = true
+			precisionHUD.AutoButtonColor = true
+		else
+			precisionHUD.Text = "C • PRECISION LOCKED • TURBO"
+			precisionHUD.Active = false
+			precisionHUD.AutoButtonColor = false
+		end
 		trainText = state.training
 				and ("   +" .. tostring(lab.rate) .. "/s • " .. math.floor(lab.momentum * 100) .. "% MOMENTUM")
 			or ("   " .. lab.gradeName)
@@ -990,6 +1012,10 @@ render = function()
 		if state.lab.drafting then
 			shopDescription.Text ..= "\nDRAFTING • +" .. tostring(math.floor((state.lab.draftBonus or 0) * 100)) .. "% SPEED GAIN"
 		end
+		shopDescription.Text ..= "\nMASTERY • "
+			.. (state.lab.precisionUnlocked and "PRECISION C" or "Precision at Turbo")
+			.. " • "
+			.. (state.lab.overdriveCutUnlocked and "Q CUT" or "Cut at Hyper")
 		local records = state.lab.records or {}
 		shopDescription.Text ..= "\n\nSPRINTS: " .. tostring(records.sprintWins or 0) .. " wins • best " .. (records.bestSprint and string.format(
 			"%.2fs",
@@ -1326,6 +1352,12 @@ local function handleShortcut(keyCode)
 	elseif keyCode == Enum.KeyCode.Q and not (state and state.duel) then
 		send("overdrive")
 		return
+	elseif
+		keyCode == C.PrecisionKey
+		and not (state and (state.duel or state.sprint or (state.trial and state.trial.active)))
+	then
+		send("precision", { active = not (state and state.lab and state.lab.precision == true) })
+		return
 	end
 	if state and state.duel then
 		if keyCode == Enum.KeyCode.F and state.duel.phase ~= "Selecting" and state.duel.phase ~= "Requested" then
@@ -1381,6 +1413,7 @@ ContextActionService:BindActionAtPriority(
 	Enum.KeyCode.H,
 	Enum.KeyCode.M,
 	Enum.KeyCode.Q,
+	C.PrecisionKey,
 	Enum.KeyCode.F
 )
 local wasActive = false
@@ -1653,6 +1686,23 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 						"Rendered contract claim did not reach authoritative state"
 					)
 					assert(out.moneyDelta >= data.rewardCoins, "Claim did not credit the advertised reward")
+				elseif data.kind == "Mastery" then
+					assert(
+						waitFor(function()
+							return state and state.lab and state.lab.precisionUnlocked and not state.lab.precision
+						end, 4),
+						"Precision mastery state was not ready for real input"
+					)
+					virtual:SendKey(true, C.PrecisionKey, false)
+					task.wait(0.08)
+					virtual:SendKey(false, C.PrecisionKey, false)
+					assert(
+						waitFor(function()
+							return state and state.lab and state.lab.precision == true
+						end, 4),
+						"Real C input did not enable authoritative Precision Mode"
+					)
+					out.precision = state.lab.precision
 				elseif
 					data.kind == "NightEdges"
 					or data.kind == "Flashlight"
