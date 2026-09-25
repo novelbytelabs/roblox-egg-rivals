@@ -38,6 +38,7 @@ local exchangeSelectedId = nil
 local exchangeFingerprint = ""
 local incubationPreview = nil
 local incubationViews = {}
+local visitorPet = nil
 local holder
 local incubationSpec
 local render
@@ -84,7 +85,7 @@ workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(bindCamera)
 bindCamera()
 local brand = U.frame(root, "Brand", 16, 12, 258, 62, C.Colors.Ink)
 U.text(brand, "Title", "EGG RIVALS", 14, 7, 230, 27, 24, C.Colors.Gold)
-U.text(brand, "Subtitle", "ELEMENTAL TUNING • 0.4.3", 14, 36, 232, 17, 11, C.Colors.Muted)
+U.text(brand, "Subtitle", "VISITOR RANCH • 0.4.5", 14, 36, 232, 17, 11, C.Colors.Muted)
 local phasePanel = U.frame(root, "Phase", 395, 12, 290, 62, C.Colors.Ink)
 local phaseTitle = U.text(phasePanel, "Title", "DAYTIME", 12, 6, 266, 25, 19)
 phaseTitle.TextXAlignment = Enum.TextXAlignment.Center
@@ -283,6 +284,36 @@ local ranchBuy = U.button(ranchPanel, "BuildExpansion", "BUILD EXPANSION", 20, 1
 		send("ranchExpand", { level = pendingRanchUpgrade.level })
 	end
 end, C.Colors.Mint)
+local visitorPanel = U.frame(root, "VisitorPetPanel", 320, 190, 440, 286, C.Colors.Panel)
+visitorPanel.Visible = false
+local visitorTitle = U.text(visitorPanel, "Title", "VISITING RANCH PET", 18, 13, 355, 32, 22, C.Colors.Mint)
+local visitorInfo = U.text(visitorPanel, "Info", "", 18, 56, 404, 92, 16, C.Colors.Text)
+U.button(visitorPanel, "Admire", "ADMIRE PET", 18, 164, 194, 40, function()
+	if visitorPet then
+		send("ranchReact", { id = visitorPet.id, reaction = "Admire" })
+	end
+end, C.Colors.Gold)
+U.button(visitorPanel, "Revere", "REQUEST REVERENCE", 228, 164, 194, 40, function()
+	if visitorPet then
+		send("ranchRevere", { userId = visitorPet.ownerUserId })
+	end
+end, C.Colors.Blue)
+U.text(
+	visitorPanel,
+	"TradeHint",
+	"Trading stays at the Trading Post so both players review exact offers together.",
+	18,
+	216,
+	350,
+	48,
+	12,
+	C.Colors.Muted
+)
+U.button(visitorPanel, "Close", "X", 390, 13, 30, 30, function()
+	visitorPet = nil
+	menu = nil
+end, C.Colors.Muted)
+
 local tradePanel = U.frame(root, "TradePanel", 90, 86, 900, 500, C.Colors.Panel)
 tradePanel.Visible = false
 local tradeTitle = U.text(tradePanel, "Title", "TRADING POST", 18, 12, 650, 34, 24, C.Colors.Gold)
@@ -811,7 +842,20 @@ render = function()
 	modal.Visible = menu == "inventory"
 	shop.Visible = menu == "shop"
 	ranchPanel.Visible = menu == "ranch"
+	visitorPanel.Visible = menu == "visitor" and visitorPet ~= nil
 	tradePanel.Visible = menu == "trade"
+	if visitorPanel.Visible then
+		visitorTitle.Text = visitorPet.ownerName:upper() .. "'S " .. visitorPet.species:upper()
+		visitorInfo.Text = visitorPet.element:upper()
+			.. " "
+			.. visitorPet.species:upper()
+			.. "\n"
+			.. visitorPet.rarity:upper()
+			.. " • +"
+			.. tostring(visitorPet.income)
+			.. " COINS/MIN\nRead-only visit • ownership stays with "
+			.. visitorPet.ownerName
+	end
 	exchangePanel.Visible = menu == "exchange"
 	contractPanel.Visible = menu == "contracts"
 	guide.Visible = menu == "help"
@@ -1084,6 +1128,10 @@ feed.OnClientEvent:Connect(function(kind, data)
 	elseif kind == "ranchUpgrade" then
 		pendingRanchUpgrade = data
 		menu = "ranch"
+		render()
+	elseif kind == "visitorPet" then
+		visitorPet = data
+		menu = "visitor"
 		render()
 	elseif kind == "openTrade" then
 		holder:cancel()
@@ -1428,6 +1476,7 @@ RunService.RenderStepped:Connect(function(dt)
 		modal.Visible = menu == "inventory" and not d and not state.sprint
 		shop.Visible = menu == "shop" and not d and not state.sprint
 		ranchPanel.Visible = menu == "ranch" and not d and not state.sprint
+		visitorPanel.Visible = menu == "visitor" and visitorPet ~= nil and not d and not state.sprint
 		tradePanel.Visible = menu == "trade" and not d and not state.sprint
 		exchangePanel.Visible = menu == "exchange" and not d and not state.sprint
 		guide.Visible = menu == "help" and not active
@@ -1451,14 +1500,7 @@ effects.onPetSelected = function(id, ownerId)
 		invFingerprint = ""
 		render()
 	else
-		notify(
-			tostring(record:GetAttribute("Species"))
-				.. " • "
-				.. tostring(record:GetAttribute("Rarity"))
-				.. " • "
-				.. tostring(record:GetAttribute("Income"))
-				.. " Coins/min"
-		)
+		send("ranchInspect", { id = id })
 	end
 end
 send("sync")
