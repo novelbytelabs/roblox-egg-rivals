@@ -326,18 +326,20 @@ function Checks.run(g, check, a, b, results)
 		end
 		assert(#g.inventory:list(a.UserId) == count)
 	end)
-	scenario("Overdrive works with a carried egg, rejects repeat activation, and expires", function(_, egg)
+	scenario("Overdrive works with a carried egg, pre-Hyper rejects repeat activation, and expires", function(_, egg)
 		local carried = egg(a)
 		local pro = g.profiles[a]
-		pro.tier = 7
-		pro.speed.Value = C.SpeedCap
+		pro.tier = C.OverdriveCutUnlockTier - 1
+		pro.speed.Value = C.Grades[pro.tier].cap
 		pro.lab.charge = 100
+		local normal = R.speed(pro.speed.Value, false, g.speedLab:spec(pro).overdriveFactor)
+		local burst = R.speed(pro.speed.Value, true, g.speedLab:spec(pro).overdriveFactor)
 		assert(g:action(a, "overdrive", {}))
-		assert(g.carry[a] == carried and pro.lab.charge == 0 and g:humanoid(a).WalkSpeed == C.OverdriveCap)
+		assert(g.carry[a] == carried and pro.lab.charge == 0 and math.abs(g:humanoid(a).WalkSpeed - burst) < 0.001)
 		assert(not g.speedLab:activate(a))
 		pro.lab.untilTime = g:now() - 0.01
 		g.speedLab:step(a, 0, g:now())
-		assert(g:humanoid(a).WalkSpeed == C.WalkSpeedCap and pro.lab.untilTime == 0)
+		assert(math.abs(g:humanoid(a).WalkSpeed - normal) < 0.001 and pro.lab.untilTime == 0)
 	end)
 	scenario("Overdrive refuses real duel selection and trial activity without consuming charge", function()
 		near(a, Vector3.new(-2, 4, 0))
