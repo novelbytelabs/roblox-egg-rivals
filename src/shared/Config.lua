@@ -1,6 +1,6 @@
 -- Canonical session-only tuning. No persistence, Robux commerce, or public item staking.
 local C = {
-	Build = "EGG-RIVALS-0.4.5-rc1",
+	Build = "EGG-RIVALS-0.4.6-rc1",
 	SchemaVersion = 4,
 	MaxPlayers = 4,
 	MaxItems = 80,
@@ -42,6 +42,7 @@ local C = {
 	InventoryKey = Enum.KeyCode.I,
 	OverdriveKey = Enum.KeyCode.Q,
 	FlashlightKey = Enum.KeyCode.L,
+	PrecisionKey = Enum.KeyCode.C,
 	MomentumRamp = 30,
 	MomentumDecay = 10,
 	MomentumBonus = 0.75,
@@ -54,6 +55,9 @@ local C = {
 	EnergyDrain = 0.5,
 	DraftRange = 50,
 	DraftBonus = 0.10,
+	PrecisionUnlockTier = 3,
+	PrecisionFactor = 0.70,
+	OverdriveCutUnlockTier = 4,
 	IncubatorHold = 0.75,
 	IncubatorHalfExtent = 4,
 	IncubatorHeight = 10,
