@@ -328,12 +328,17 @@ function Checks.run(g, check, a, b, results)
 	end)
 	scenario("Overdrive works with a carried egg, pre-Hyper rejects repeat activation, and expires", function(_, egg)
 		local carried = egg(a)
-		local pro = g.profiles[a]
+		local pro = assert(g.profiles[a], "Overdrive fixture profile missing")
+		assert(pro.speed and pro.lab, "Overdrive fixture profile is incomplete")
 		pro.tier = C.OverdriveCutUnlockTier - 1
+		pro.lab.tuning = "Standard"
+		pro.lab.precision = false
+		pro.lab.untilTime = 0
+		pro.slowUntil = 0
 		pro.speed.Value = C.Grades[pro.tier].cap
 		pro.lab.charge = 100
-		local normal = R.speed(pro.speed.Value, false, g.speedLab:spec(pro).overdriveFactor)
-		local burst = R.speed(pro.speed.Value, true, g.speedLab:spec(pro).overdriveFactor)
+		local normal = R.speed(pro.speed.Value, false, C.Tunings.Standard.overdriveFactor)
+		local burst = R.speed(pro.speed.Value, true, C.Tunings.Standard.overdriveFactor)
 		assert(g:action(a, "overdrive", {}))
 		assert(g.carry[a] == carried and pro.lab.charge == 0 and math.abs(g:humanoid(a).WalkSpeed - burst) < 0.001)
 		assert(not g.speedLab:activate(a))
