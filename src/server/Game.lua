@@ -125,7 +125,11 @@ function Game:applySpeed(p)
 	else
 		local overdrive = pro.lab and pro.lab.untilTime > self:now()
 		local tuning = self.speedLab and self.speedLab:spec(pro) or C.Tunings.Standard
-		h.WalkSpeed = R.speed(pro.speed.Value, overdrive, tuning.overdriveFactor)
+		local speed = R.speed(pro.speed.Value, overdrive, tuning.overdriveFactor)
+		if pro.lab and pro.lab.precision and pro.tier >= C.PrecisionUnlockTier then
+			speed = math.max(C.BaseWalkSpeed, speed * C.PrecisionFactor)
+		end
+		h.WalkSpeed = speed
 	end
 end
 function Game:teleport(p, cf)
@@ -1142,6 +1146,8 @@ function Game:action(p, name, data)
 		return self:buyUpgrade(p, data.tier)
 	elseif name == "overdrive" then
 		return self.speedLab:activate(p)
+	elseif name == "precision" then
+		return self.speedLab:setPrecision(p, data.active)
 	elseif name == "tuning" then
 		return self.speedLab:setTuning(p, data.name)
 	elseif name == "trialStart" then
