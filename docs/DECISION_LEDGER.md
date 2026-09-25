@@ -16,10 +16,11 @@ Precedence rule: a later explicit owner decision overrides an earlier conflictin
 - Starter systems should feel complete; upgrades add richness rather than fix intentionally bad starter experiences.
 
 **CURRENT ENGINEERING CANDIDATE**
-- `EGG-RIVALS-0.4.1-rc1`.
-- Tested source: `25e300647b0c4ba38916f41452c7268d6bb6df76`.
-- 90/90 exact-source two-client Studio checks passed.
-- 0.4.0-rc2 86/86, rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 remain preserved historical references.
+- `EGG-RIVALS-0.4.3-rc1`.
+- Exact tested source bytes are committed at `f4be2411712ffec3f3dfd8c23f69dea7307a45d1`.
+- Source digest: `0875af46f723f9a964062a3d255d126450934438dc91699d1f76a066eef648be`.
+- 104/104 exact-source two-client Studio checks passed.
+- 0.4.2 99/99, 0.4.1 90/90, 0.4.0-rc2 86/86, rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 remain preserved historical references.
 - Human presentation / gameplay-feel acceptance remains a distinct gate.
 
 ## Rarity
@@ -391,3 +392,22 @@ The rc2 implementation uses twelve Forest nests with one marked Godly target and
 The hidden Night egg remains a separate single-egg event. All ordinary Forest nests, including the marked Godly nest, become dormant at Night. An already-carried egg survives the transition.
 
 Current candidate and evidence status is in `tests/CANDIDATE_STATUS.json`. The rc2 86/86 result remains historical and was not substituted by the later 0.4.1 90/90 Sprint candidate. Owner presentation review and later design obligations remain distinct from engineering verification.
+
+
+## Elemental tuning — 0.4.3 verified
+
+**IMPLEMENTED / ENGINEERING VERIFIED**
+- tuning is a free server-owned Speed Lab mode;
+- Standard preserves the prior verified baseline;
+- Fire charges Overdrive faster but builds Momentum more slowly;
+- Water builds Momentum faster but charges Overdrive more slowly;
+- Wind gives a stronger open-world burst but with shorter duration and slower charge;
+- Earth retains Momentum longer after interruption but charges Overdrive more slowly;
+- switching is allowed only at the owner's Speed Lab or Trainer Workshop;
+- stored Momentum, stored charge or an active burst prevents switching;
+- tuning is not derived from pets and does not change pet income, egg rarity, grade prices, inventory ownership or duel damage;
+- Training Trial and Sprint remain normalized at WalkSpeed 45;
+- the absolute Overdrive cap remains 68 studs/s;
+- one real client selected an exact tuning through the rendered Trainer UI.
+
+Evidence: `STAGE3_043_VERIFICATION.md`. Tuning feel and balance remain owner-review claims rather than engineering claims.
