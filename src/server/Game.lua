@@ -1156,6 +1156,15 @@ function Game:action(p, name, data)
 		return self.contracts:claim(p, data.id)
 	elseif name == "ranchExpand" then
 		return self.ranch:buyExpansion(p, data.level)
+	elseif name == "ranchInspect" then
+		local ok, result = self.ranch:inspect(p, data.id)
+		if ok then
+			self:feed(p, "visitorPet", result)
+			return true
+		end
+		return false, result
+	elseif name == "ranchReact" then
+		return self.ranch:react(p, data.id, data.reaction)
 	elseif name == "ranchRevere" then
 		local owner = R.integer(data.userId, -100000000000, 100000000000) and Players:GetPlayerByUserId(data.userId)
 			or nil
