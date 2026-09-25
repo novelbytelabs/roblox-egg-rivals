@@ -943,6 +943,9 @@ render = function()
 			.. tuningName:upper()
 			.. " • "
 			.. tuning.description
+		if state.lab.drafting then
+			shopDescription.Text ..= "\nDRAFTING • +" .. tostring(math.floor((state.lab.draftBonus or 0) * 100)) .. "% SPEED GAIN"
+		end
 		local records = state.lab.records or {}
 		shopDescription.Text ..= "\n\nSPRINTS: " .. tostring(records.sprintWins or 0) .. " wins • best " .. (records.bestSprint and string.format(
 			"%.2fs",
