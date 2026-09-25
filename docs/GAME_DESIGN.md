@@ -30,25 +30,25 @@ The egg determines creature identity. The incubator determines elemental form. R
 
 ## Current engineering state
 
-`EGG-RIVALS-0.4.2-rc1` is the current verified engineering candidate.
+`EGG-RIVALS-0.4.3-rc1` is the current verified engineering candidate.
 
-It passed **99/99** exact-source checks in a real two-client Roblox Studio regression. Tested source commit: `d0c14e6742b7cc14ddb4680a1fd9cd2dca5f7a1e`. Source digest: `87eaaa043f0dfae29585887fbd0bdf2dd8157fe6072c5052339c65c9dd29612c`.
+It passed **104/104** exact-source checks in a real two-client Roblox Studio regression. Exact tested source bytes are committed at `f4be2411712ffec3f3dfd8c23f69dea7307a45d1`. Source digest: `0875af46f723f9a964062a3d255d126450934438dc91699d1f76a066eef648be`.
 
-The candidate retains the 0.4.0 Living World systems and 0.4.1 normalized Sprint Rivalry, then adds Ranger Contracts: three server-owned session goals that observe authoritative training, retrieval, hatch, Trial, Night and Sprint events and award existing Coins exactly once after explicit claim.
+The candidate retains the Living World systems, normalized Sprint Rivalry and Ranger Contracts, then adds Elemental Tuning v1: Standard plus four free server-owned Speed Lab sidegrades with bounded training/Open-World-Overdrive tradeoffs.
 
-Engineering verification establishes mechanics and retained regressions. It does **not** establish contract fun, reward tuning, presentation quality or long-term retention value.
+Engineering verification establishes mechanics and retained regressions. It does **not** establish tuning fun, balance, presentation quality or long-term retention value.
 
 ## Current product gate
 
 The owner continues mechanics-first development while keeping human feel review separate.
 
-Ranger playtesting should focus on whether contracts:
+Current playtesting should evaluate both retained Ranger/Sprint systems and Elemental Tuning:
 
-- give a young player an obvious next action;
-- rotate play through the core Egg Rivals systems;
-- feel optional and motivating rather than chore-like;
-- pay enough Coins to matter without replacing pet income;
-- make repeated sessions more purposeful.
+- whether each tuning identity is immediately understandable;
+- whether its benefit/tradeoff feels meaningful but not mandatory;
+- whether switching restrictions are clear;
+- whether open-world escape choices become more interesting;
+- whether contracts still provide useful direction across the core systems.
 
 Approved design does not imply implementation. `FEATURE_STATUS_MATRIX.md` remains the current implementation-status authority.
 
