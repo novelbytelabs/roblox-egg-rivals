@@ -600,8 +600,13 @@ function E:update(dt, state, records)
 			local base = line.Parent
 			local lab = base:FindFirstChild("Treadmill")
 			local momentum = lab and lab:GetAttribute("Momentum") or 0
-			line.Position =
-				Vector3.new(center.X - 4.5 + ((phase + t * (0.12 + momentum * 0.5)) % 1) * 9, center.Y + 0.49, center.Z)
+			local drafting = lab and lab:GetAttribute("Drafting") == true
+			local draftVisual = drafting and 0.18 or 0
+			line.Position = Vector3.new(
+				center.X - 4.5 + ((phase + t * (0.12 + momentum * 0.5 + draftVisual)) % 1) * 9,
+				center.Y + 0.49,
+				center.Z
+			)
 		end
 	end
 	local world = workspace:FindFirstChild("Moonwood")
