@@ -151,6 +151,79 @@ function Ranch:requestReverence(visitor, owner)
 	return ok, err
 end
 
+function Ranch:visitorPet(visitor, petId)
+	local g = self.game
+	if not g:alive(visitor) or g:busy(visitor) or not R.id(petId) then
+		return nil, "Finish your current activity and visit another player's displayed pet."
+	end
+	local item = g.inventory.items[petId]
+	local record = g.petRecords:FindFirstChild(petId)
+	if
+		not item
+		or item.kind ~= "Pet"
+		or item.state ~= "Inventory"
+		or not record
+		or record:GetAttribute("Displayed") ~= true
+		or record:GetAttribute("DisplayMode") ~= "Pen"
+		or record:GetAttribute("OwnerUserId") ~= item.ownerId
+	then
+		return nil, "That ranch pet is not available to visitors."
+	end
+	local owner = Players:GetPlayerByUserId(item.ownerId)
+	if not owner or owner == visitor or not g.profiles[owner] then
+		return nil, "Visit another player's ranch pet."
+	end
+	local position = record:GetAttribute("PenPosition")
+	local root = g:root(visitor)
+	if not R.vector(position) or not root or (root.Position - position).Magnitude > C.VisitorInspectRange then
+		return nil, "Move closer to that ranch pet."
+	end
+	return { owner = owner, item = item, record = record, position = position }
+end
+
+function Ranch:inspect(visitor, petId)
+	local target, err = self:visitorPet(visitor, petId)
+	if not target then
+		return false, err
+	end
+	local item, owner = target.item, target.owner
+	return true, {
+		id = item.id,
+		ownerUserId = owner.UserId,
+		ownerName = owner.DisplayName,
+		creature = item.creature,
+		species = item.species,
+		element = item.element,
+		rarity = item.rarity,
+		income = C.Rarities[item.rarity].income,
+	}
+end
+
+function Ranch:react(visitor, petId, reaction)
+	if reaction ~= "Admire" then
+		return false, "Choose an available ranch reaction."
+	end
+	local target, err = self:visitorPet(visitor, petId)
+	if not target then
+		return false, err
+	end
+	local g = self.game
+	if not g:rate(visitor, "ranchReaction", C.VisitorReactionCooldown) then
+		return false, "Give the ranch a moment before reacting again."
+	end
+	local item, owner = target.item, target.owner
+	g:effect("visitorReaction", {
+		visitorUserId = visitor.UserId,
+		ownerUserId = owner.UserId,
+		petId = item.id,
+		rarity = item.rarity,
+		position = target.position,
+	})
+	g:notify(visitor, "You admired " .. owner.DisplayName .. "'s " .. item.species .. ".", "tick")
+	g:notify(owner, visitor.DisplayName .. " admired your " .. item.species .. ".", "tick")
+	return true
+end
+
 function Ranch:buyExpansion(p, level)
 	local g = self.game
 	local pro = g.profiles[p]
