@@ -64,9 +64,13 @@ function V.run(g, check, a, b)
 		assert(pet.ownerId == b.UserId and pet.state == "Inventory" and pet.revision == beforeRevision)
 		local actualPassiveA = proA.money.Value + proA.coinRemainder - wealthA
 		local actualPassiveB = proB.money.Value + proB.coinRemainder - wealthB
-		local boundaryDt = math.max(maxHeartbeatDt, 1 / 60) * 2
+		-- Game income and this audit listener can straddle the yielding test thread by
+		-- one scheduler boundary on each side plus the resume frame. Keep the allowance
+		-- below one integer Coin so any Visitor Ranch reward/mutation is still detected.
+		local boundaryDt = math.max(maxHeartbeatDt, 1 / 60) * 3
 		local toleranceA = incomeA * boundaryDt / 60 + 0.02
 		local toleranceB = incomeB * boundaryDt / 60 + 0.02
+		assert(toleranceA < 1 and toleranceB < 1, "Visitor economy fixture income is too high for exact reward detection")
 		assert(
 			math.abs(actualPassiveA - expectedPassiveA) <= toleranceA,
 			string.format(
