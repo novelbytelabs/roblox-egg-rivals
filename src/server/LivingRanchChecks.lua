@@ -190,7 +190,8 @@ function Checks.run(g, check, a, b, results)
 			assert(openLeaves == 2 and ledgerEdges == 4)
 			assert(#pro.base.penSlots == C.Expansions[level + 1].capacity)
 			for _, slot in ipairs(pro.base.penSlots) do
-				assert(math.abs(slot.X - pro.base.penCenter.X) >= 5)
+				assert(math.abs(slot.X - pro.base.penCenter.X) >= 6.2)
+				assert(math.abs(slot.Z - pro.base.penCenter.Z) <= pro.base.penBounds.Y)
 			end
 			local model = area:FindFirstChild("RanchHabitats")
 			assert(model and model:GetAttribute("PartCount") <= A.MaxHabitatParts)
