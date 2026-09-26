@@ -20,6 +20,18 @@ local Incubation = require(script.Parent.Incubation)
 local HttpService = game:GetService("HttpService")
 local Game = {}
 Game.__index = Game
+
+local STUDIO_RANCH_PETS = {
+	{ "Common", "Skunk", "Fire" },
+	{ "Uncommon", "Lizard", "Water" },
+	{ "Rare", "Gorilla", "Earth" },
+	{ "Epic", "Dragon", "Wind" },
+	{ "Legendary", "Lizard", "Fire" },
+	{ "Mythic", "Dragon", "Water" },
+	{ "Godly", "Gorilla", "Earth" },
+	{ "Rare", "Skunk", "Wind" },
+}
+
 function Game:now()
 	return workspace:GetServerTimeNow()
 end
@@ -1289,18 +1301,17 @@ function Game:action(p, name, data)
 		if not self:rate(p, "debugRanch", 1) then
 			return false, "Cooldown"
 		end
-		local specs = {
-			{ "Common", "Skunk", "Fire" },
-			{ "Uncommon", "Lizard", "Water" },
-			{ "Rare", "Gorilla", "Earth" },
-			{ "Epic", "Dragon", "Wind" },
-			{ "Legendary", "Lizard", "Fire" },
-			{ "Mythic", "Dragon", "Water" },
-			{ "Godly", "Gorilla", "Earth" },
-			{ "Rare", "Skunk", "Wind" },
-		}
+		local pro = self.profiles[p]
+		local target = C.Expansions[pro.ranchLevel + 1].capacity
+		local current = 0
+		for _, item in ipairs(self.inventory:list(p.UserId)) do
+			if item.kind == "Pet" then
+				current += 1
+			end
+		end
 		local added = 0
-		for _, spec in ipairs(specs) do
+		for index = current + 1, target do
+			local spec = STUDIO_RANCH_PETS[((index - 1) % #STUDIO_RANCH_PETS) + 1]
 			local pet = self.inventory:create(p.UserId, "Pet", spec[1], spec[2], spec[3])
 			if pet then
 				self.ranch:acquired(p, pet)
@@ -1308,9 +1319,45 @@ function Game:action(p, name, data)
 			end
 		end
 		self:reconcilePets()
-		self:notify(p, "Studio ranch pack added: " .. tostring(added) .. " pets.", "win")
+		self:notify(p, "Studio ranch filled: " .. tostring(current + added) .. " / " .. tostring(target) .. " pets.", "win")
 		self:push(p)
-		return added > 0
+		return true
+	elseif name == "debugMaxRanch" and RunService:IsStudio() then
+		if self:busy(p) then
+			return false, "Finish your current activity first."
+		end
+		if not self:rate(p, "debugMaxRanch", 1) then
+			return false, "Cooldown"
+		end
+		local pro = self.profiles[p]
+		pro.money.Value = math.max(pro.money.Value, 250000)
+		pro.ranchLevel = #C.Expansions - 1
+		pro.penPage = 1
+		pro.activePetId = nil
+		for _, item in ipairs(self.inventory:list(p.UserId)) do
+			if item.kind == "Pet" and item.state == "Inventory" then
+				item.petMode = "Pen"
+			end
+		end
+		pro.base.applyExpansion(pro.ranchLevel)
+		local target = C.Expansions[pro.ranchLevel + 1].capacity
+		local current = 0
+		for _, item in ipairs(self.inventory:list(p.UserId)) do
+			if item.kind == "Pet" then
+				current += 1
+			end
+		end
+		for index = current + 1, target do
+			local spec = STUDIO_RANCH_PETS[((index - 1) % #STUDIO_RANCH_PETS) + 1]
+			local pet = self.inventory:create(p.UserId, "Pet", spec[1], spec[2], spec[3])
+			if pet then
+				self.ranch:acquired(p, pet)
+			end
+		end
+		self:reconcilePets()
+		self:notify(p, "Grand Ranch test loaded: full display + 250,000 Coins.", "win")
+		self:push(p)
+		return true
 	end
 	return false, "Unknown action."
 end
