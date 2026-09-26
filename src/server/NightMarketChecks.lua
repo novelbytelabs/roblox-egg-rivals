@@ -5,6 +5,32 @@ local function nearMarket(g, p)
 	g:teleport(p, CFrame.new(g.world.nightMarket.counter.Position + Vector3.new(0, 2, -6)))
 end
 
+local function waitFor(fn, seconds)
+	local deadline = os.clock() + seconds
+	repeat
+		if fn() then
+			return true
+		end
+		task.wait(0.05)
+	until os.clock() > deadline
+	return false
+end
+
+local function clientPurchase(g, p)
+	local token = "night-market-" .. tostring(g:now())
+	g:feed(p, "openNightMarket", {})
+	g:feed(p, "completionInputProbe", { token = token, kind = "NightMarket" })
+	assert(
+		waitFor(function()
+			return g.clientDiagnostics[p] and g.clientDiagnostics[p].token == token
+		end, 8),
+		"Real client Night Market probe timed out"
+	)
+	local data = g.clientDiagnostics[p]
+	assert(data.passed, data.error)
+	return data
+end
+
 local function assertMarketState(g, open)
 	local market = g.world.nightMarket
 	assert(market.counter:GetAttribute("Open") == open)
@@ -97,7 +123,8 @@ function Checks.run(g, check, a, _b, results)
 		nearMarket(g, a)
 		assert(g.nightEpoch == firstEpoch + 1)
 		local before = pro.money.Value
-		assert(g:buyNightAid(a, "MoonCompass"))
+		local diagnostic = clientPurchase(g, a)
+		assert(diagnostic.moneyDelta == C.NightMarketAids.MoonCompass.cost)
 		assert(pro.money.Value == before - C.NightMarketAids.MoonCompass.cost)
 		assert(#g.inventory:list(a.UserId) == beforeCount)
 		assert(g.inventory:income(a.UserId) == beforeIncome)
@@ -111,6 +138,7 @@ function Checks.run(g, check, a, _b, results)
 
 	results.nightMarketDiagnostics = {
 		aids = { "MoonCompass", "GlowMap" },
+		realClientPurchase = true,
 		compassCost = C.NightMarketAids.MoonCompass.cost,
 		mapCost = C.NightMarketAids.GlowMap.cost,
 		coordinateFree = true,

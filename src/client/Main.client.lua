@@ -338,7 +338,7 @@ U.text(
 local compassSpec = C.NightMarketAids.MoonCompass
 local mapSpec = C.NightMarketAids.GlowMap
 U.text(nightMarketPanel, "CompassInfo", compassSpec.description, 20, 126, 440, 34, 12, C.Colors.Muted)
-U.button(
+local nightCompassButton = U.button(
 	nightMarketPanel,
 	"MoonCompass",
 	compassSpec.name:upper() .. " • " .. compassSpec.cost .. " COINS",
@@ -352,7 +352,7 @@ U.button(
 	C.Colors.Blue
 )
 U.text(nightMarketPanel, "MapInfo", mapSpec.description, 20, 210, 440, 34, 12, C.Colors.Muted)
-U.button(
+local nightMapButton = U.button(
 	nightMarketPanel,
 	"GlowMap",
 	mapSpec.name:upper() .. " • " .. mapSpec.cost .. " COINS",
@@ -1784,6 +1784,27 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 						"Rendered contract claim did not reach authoritative state"
 					)
 					assert(out.moneyDelta >= data.rewardCoins, "Claim did not credit the advertised reward")
+				elseif data.kind == "NightMarket" then
+					assert(
+						waitFor(function()
+							return nightMarketPanel.Visible and workspace:GetAttribute("Night") == true
+						end, 3),
+						"Night Market panel did not open during Moonrise"
+					)
+					assert(nightCompassButton.Active and nightMapButton.Active, "Night Market aid buttons are unavailable")
+					local before = state and state.money
+					assert(type(before) == "number")
+					mouse(nightCompassButton, 0.08)
+					assert(
+						waitFor(function()
+							return state and state.money == before - C.NightMarketAids.MoonCompass.cost
+						end, 4),
+						"Real Night Market purchase did not reach authoritative Coins"
+					)
+					assert(toast.Visible and toastText.Text:find("Moon Compass", 1, true), "Moon Compass clue was not rendered")
+					assert(not toastText.Text:find("%d"), "Rendered Night Market clue leaked numeric location detail")
+					out.moneyDelta = before - state.money
+					out.clue = toastText.Text
 				elseif data.kind == "Mastery" then
 					assert(
 						waitFor(function()
