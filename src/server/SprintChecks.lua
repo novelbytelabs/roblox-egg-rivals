@@ -191,7 +191,9 @@ function Checks.run(g, check, a, b, results)
 		assert(raceOK, raceErr)
 		local actualPassiveA = proA.money.Value + proA.coinRemainder - wealthA
 		local actualPassiveB = proB.money.Value + proB.coinRemainder - wealthB
-		local boundaryDt = math.max(maxHeartbeatDt, 1 / 60) * 2
+		-- The yielding real-client probe can straddle one income scheduler boundary on
+		-- each side plus the resume frame, matching the Visitor Ranch audit allowance.
+		local boundaryDt = math.max(maxHeartbeatDt, 1 / 60) * 3
 		local toleranceA = incomeA * boundaryDt / 60 + 0.02
 		local toleranceB = incomeB * boundaryDt / 60 + 0.02
 		assert(
