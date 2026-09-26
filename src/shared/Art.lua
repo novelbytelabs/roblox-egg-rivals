@@ -238,8 +238,11 @@ function Art.petCosmetic(pet, variant, element)
 		return
 	end
 	local style = Config.Elements[element]
-	local function cosmeticPart(name, size, cf, color, material)
-		local cosmetic = part(pet, name, size, cf, color, nil, material)
+	local petScale = pet:GetScale()
+	local petPivot = pet:GetPivot()
+	local function cosmeticPart(name, size, localCF, color, material)
+		local scaledCF = CFrame.new(localCF.Position * petScale) * localCF.Rotation
+		local cosmetic = part(pet, name, size * petScale, petPivot * scaledCF, color, nil, material)
 		cosmetic:SetAttribute("PetCosmetic", true)
 		return cosmetic
 	end
