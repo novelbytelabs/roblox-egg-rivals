@@ -1791,7 +1791,10 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 						end, 3),
 						"Night Market panel did not open during Moonrise"
 					)
-					assert(nightCompassButton.Active and nightMapButton.Active, "Night Market aid buttons are unavailable")
+					assert(
+						nightCompassButton.Active and nightMapButton.Active,
+						"Night Market aid buttons are unavailable"
+					)
 					local before = state and state.money
 					assert(type(before) == "number")
 					mouse(nightCompassButton, 0.08)
@@ -1801,7 +1804,10 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 						end, 4),
 						"Real Night Market purchase did not reach authoritative Coins"
 					)
-					assert(toast.Visible and toastText.Text:find("Moon Compass", 1, true), "Moon Compass clue was not rendered")
+					assert(
+						toast.Visible and toastText.Text:find("Moon Compass", 1, true),
+						"Moon Compass clue was not rendered"
+					)
 					assert(not toastText.Text:find("%d"), "Rendered Night Market clue leaked numeric location detail")
 					out.moneyDelta = before - state.money
 					out.clue = toastText.Text

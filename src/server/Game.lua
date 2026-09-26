@@ -1855,17 +1855,22 @@ function Game.new()
 			self:notify(p, err)
 		end
 	end)
-	self.nightMarketPrompt = self:prompt(self.world.nightMarket.counter, "Browse search aids", "Night Market", function(p)
-		if workspace:GetAttribute("Night") ~= true then
-			self:notify(p, "The Night Market opens only at Moonrise.")
-			return
+	self.nightMarketPrompt = self:prompt(
+		self.world.nightMarket.counter,
+		"Browse search aids",
+		"Night Market",
+		function(p)
+			if workspace:GetAttribute("Night") ~= true then
+				self:notify(p, "The Night Market opens only at Moonrise.")
+				return
+			end
+			if self:busy(p) then
+				self:notify(p, "Finish your current activity first.")
+				return
+			end
+			self:feed(p, "openNightMarket", {})
 		end
-		if self:busy(p) then
-			self:notify(p, "Finish your current activity first.")
-			return
-		end
-		self:feed(p, "openNightMarket", {})
-	end)
+	)
 	self:updateNightMarket(false)
 	self.net.Request.OnServerEvent:Connect(function(p, name, data)
 		local ok, err = self:action(p, name, data)
