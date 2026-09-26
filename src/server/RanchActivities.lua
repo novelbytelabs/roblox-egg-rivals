@@ -288,7 +288,7 @@ function Activities:solo(pro, entry, now, godlies)
 	local home = entry.record:GetAttribute("PenPosition")
 	local site = self:site(pro, item.element)
 	local kind, target, focus = "Idle", home, home + Vector3.new(0, 0, 1)
-	if site and choice <= 1 then
+	if site and choice == 0 then
 		kind = "HabitatRest"
 		local angle = (item.order % 8) * math.pi / 4
 		target = site.anchor.Position + Vector3.new(math.cos(angle) * 1.2, 0, math.sin(angle) * 1.2)
