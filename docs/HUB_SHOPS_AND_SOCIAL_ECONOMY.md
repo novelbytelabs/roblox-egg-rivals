@@ -98,20 +98,21 @@ It can provide:
 The machine itself should visibly reflect purchased / earned upgrades.
 ## Duel Armory
 
-The Duel Armory supports the opt-in competitive arena.
+Implementation candidate: **0.4.9 v1 — verification pending**.
 
-Approved directions include:
+The Duel Armory is the physical loadout home for the opt-in competitive arena. The initial sidegrades are free session choices rather than purchases:
 
-- balanced weapon sidegrades;
-- weapon skins;
-- sights;
-- projectile / tracer effects;
-- animations;
-- other competitive presentation.
+- **Blaster:** balanced baseline cadence and range;
+- **Rail:** slower, harder precision shot with longer reach;
+- **Scatter:** short-range five-pellet spread.
+
+Server-owned weapon specs control damage, cooldown, range, pellet count and spread. The maximum theoretical damage cadence is kept in a narrow envelope so each choice changes style rather than selling raw superiority.
+
+Players must be alive, free of another activity and physically at the Armory to change loadout. A challenge or active duel locks the selection. The selected loadout determines the exact duel tool each round.
+
+Future Armory depth may add skins, sights, tracer effects and animations. Those remain presentation systems rather than paid combat power.
 
 Do not sell direct competitive superiority for Robux.
-
-Production weapons should create different play styles while preserving a fair skill-forward baseline.
 
 ## Pet Outfitter
 

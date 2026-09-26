@@ -80,7 +80,7 @@ Status meanings:
 | Trading Post | ENGINEERING VERIFIED / PRESENTATION PENDING | Real timed holds, concurrency, mutation, timeout and disconnect paths passed |
 | Exchange | ENGINEERING VERIFIED / PRESENTATION PENDING | Pets, eggs, consumables, Godly holds and stale/departure paths passed |
 | Trainer Workshop | ENGINEERING VERIFIED / PRESENTATION PENDING | Grade progression and Speed Lab transaction rules passed |
-| Duel Armory | APPROVED / NOT YET IMPLEMENTED | Balanced sidegrades/cosmetics |
+| Duel Armory | IMPLEMENTED / VERIFICATION PENDING | Free Blaster/Rail/Scatter server-owned sidegrades; no paid competitive power |
 | Pet Outfitter | APPROVED / NOT YET IMPLEMENTED | Cosmetics |
 | Quest Board / Ranger Station | ENGINEERING VERIFIED / PRESENTATION PENDING | Physical Ranger Station, three server-owned session contracts and exact-once Coin claims passed 0.4.2 regression |
 | Elemental Bazaar | APPROVED / NOT YET IMPLEMENTED | Elemental cosmetics/habitats |

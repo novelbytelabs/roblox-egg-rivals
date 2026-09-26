@@ -37,13 +37,24 @@ The Night Market is physically closed by Day and opens at Moonrise. Two bounded,
 
 Server authority owns eligibility, cost, per-Night usage and clue generation. A real-client purchase probe is included in the regression family.
 
+### 0.4.9 — Duel Armory v1
+
+**IMPLEMENTED / VERIFICATION PENDING**
+
+The physical Duel Armory offers three free session loadouts:
+
+- **Blaster** — balanced baseline cadence and range.
+- **Rail** — slower, harder precision shot with longer reach.
+- **Scatter** — short-range five-pellet spread.
+
+Theoretical maximum damage cadence is deliberately bounded within roughly ten percent across the three loadouts. Selection is server-owned, costs no Coins or Robux, cannot change during a duel, and determines the exact duel tool and server shot rules.
+
 ## Next approved gameplay sequence
 
-After the verification queue and Night Market:
+After the verification queue, Night Market and Duel Armory:
 
-1. **Duel Armory** — balanced weapon sidegrades and competitive presentation.
-2. **Pet Outfitter** — cosmetic pet identity without obscuring creature/element/rarity readability.
-3. **Elemental Bazaar** — elemental ranch/incubator/pet presentation without pay-to-win bonuses.
-4. **Persistence / MVP production** — save progression, then broaden creatures, zones and platform support.
+1. **Pet Outfitter** — cosmetic pet identity without obscuring creature/element/rarity readability.
+2. **Elemental Bazaar** — elemental ranch/incubator/pet presentation without pay-to-win bonuses.
+3. **Persistence / MVP production** — save progression, then broaden creatures, zones and platform support.
 
 The project should remain centered on the established loop rather than drifting into unrelated side systems.

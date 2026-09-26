@@ -15,6 +15,7 @@ BRANCHES = (
     "fix/0.4.6-speed-mastery-verification",
     "feature/0.4.7-living-ranch",
     "feature/0.4.8-night-market",
+    "feature/0.4.9-duel-armory",
 )
 TEMPLATES = ("default.project.json", "test.project.json")
 

@@ -11,6 +11,7 @@ Current implementation queue:
 - **0.4.6 Speed Mastery v1** — implemented on its repair branch; fresh exact-source Studio verification pending.
 - **0.4.7 Living Ranch + Pet Activity** — implemented on its feature branch; fresh exact-source Studio verification pending. The owner is satisfied with current pen progress, so further pen-layout polish is not the active roadmap target.
 - **0.4.8 Night Market v1** — implemented on `feature/0.4.8-night-market`; verification pending. It adds a physically closed-by-day Moonrise shop with bounded coarse search aids and no exact hidden-egg waypoint.
+- **0.4.9 Duel Armory v1** — implemented on `feature/0.4.9-duel-armory`; verification pending. It adds free Blaster/Rail/Scatter arena sidegrades with server-owned combat stats and no paid power.
 
 Core loop:
 
@@ -22,7 +23,7 @@ Canonical source is under `src/`. Rojo projects are `default.project.json` and `
 
 The owner wants continued emphasis on **main mechanics and play** rather than additional pen-layout polish.
 
-The active verification queue is 0.4.6 Speed Mastery followed by 0.4.7 Living Ranch. GitHub-first feature development has resumed with 0.4.8 Night Market. After Night Market, the approved shop roadmap continues with Duel Armory, Pet Outfitter and Elemental Bazaar before later persistence, broader-world and production work.
+The active verification queue is 0.4.6 Speed Mastery followed by 0.4.7 Living Ranch. GitHub-first feature development has continued through 0.4.8 Night Market and 0.4.9 Duel Armory. The approved shop roadmap continues with Pet Outfitter and Elemental Bazaar before later persistence, broader-world and production work.
 
 No merge to `main` or Roblox publication is authorized by engineering verification alone.
 

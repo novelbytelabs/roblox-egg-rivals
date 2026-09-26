@@ -107,18 +107,21 @@ Current baseline:
 The duel system is intended to evoke the skill-forward RIVALS-style competitive fantasy while remaining its own Egg Rivals implementation.
 ## Competitive progression
 
-Production weapon candidates can include:
+Implementation candidate: **0.4.9 Duel Armory v1 — verification pending**.
 
-- balanced Blaster;
-- Burst weapon;
-- precision Rail weapon;
-- short-range Scatter weapon.
+The first competitive loadout set is:
 
-Different weapons should be sidegrades / styles rather than direct purchased superiority.
+- **Blaster:** balanced baseline;
+- **Rail:** slower precision fire with longer reach;
+- **Scatter:** short-range five-pellet spread.
 
-The Duel Armory is primarily a home for unlock presentation, balanced weapon choice, skins, sights, effects, and animations.
+These are free session sidegrades. Server-owned damage/cadence/range values are deliberately tuned to a narrow theoretical-output envelope, while range and firing pattern create the actual tradeoffs.
 
-Paid monetization must not determine duel outcomes through raw power.
+Loadout selection happens at the physical Duel Armory and is locked once a duel challenge is active. The server equips and validates the exact selected weapon during arena rounds.
+
+Burst remains a compatible future weapon direction, not a requirement for this slice.
+
+The Duel Armory can later support skins, sights, tracer effects and animations. Paid monetization must not determine duel outcomes through raw power.
 
 ## Sprint rivalry
 
