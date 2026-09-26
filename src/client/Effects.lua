@@ -491,18 +491,14 @@ function E:update(dt, state, records)
 				self.pets[record.Name] = pet
 				local label = Art.billboard(
 					pet.PrimaryPart,
-					(species or element .. " " .. creature)
-						.. " • "
-						.. rarity
-						.. "\n+"
-						.. tostring(record:GetAttribute("Income") or 0)
-						.. " Coins/min",
+					(species or element .. " " .. creature) .. " • " .. rarity,
 					C.Elements[element].color,
-					200,
-					42,
-					Vector3.new(0, 3, 0)
+					175,
+					28,
+					Vector3.new(0, 2.8, 0)
 				)
-				label.Parent.MaxDistance = 24
+				label.TextSize = 13
+				label.Parent.MaxDistance = rarity == "Godly" and 20 or 14
 				local hitbox =
 					Art.part(pet, "PetInteraction", Vector3.new(3.5, 3.8, 3.5), target, C.Elements[element].color)
 				hitbox.Transparency = 1
