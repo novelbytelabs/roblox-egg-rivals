@@ -172,7 +172,19 @@ function Checks.run(g, check, a, b, results)
 			pro.ranchLevel = level
 			pro.base.applyExpansion(level)
 			g:reconcilePets()
-			local model = assert(pro.base.model:FindFirstChild("PenArea")):FindFirstChild("RanchHabitats")
+			local area = assert(pro.base.model:FindFirstChild("PenArea"))
+			assert(area:GetAttribute("PresentationVersion") == 2)
+			assert(area:FindFirstChild("RanchPath") and area:FindFirstChild("RanchPlaza"))
+			local arch = assert(area:FindFirstChild("RanchEntryArch"))
+			local openLeaves = 0
+			for _, part in ipairs(arch:GetDescendants()) do
+				if part:IsA("BasePart") and part.Name == "OpenGateLeaf" then
+					openLeaves += 1
+					assert(not part.CanCollide and not part.CanTouch and not part.CanQuery)
+				end
+			end
+			assert(openLeaves == 2)
+			local model = area:FindFirstChild("RanchHabitats")
 			assert(model and model:GetAttribute("PartCount") <= A.MaxHabitatParts)
 			for _, element in ipairs(C.ElementOrder) do
 				local site = assert(g.ranch.activities:site(pro, element))
@@ -185,6 +197,32 @@ function Checks.run(g, check, a, b, results)
 			end
 		end
 		assert(signature(g, a) == before and g.inventory:income(a.UserId) == income)
+	end)
+
+	scenario("Studio ranch tools grant test funds and a bounded multi-element ranch pack", function()
+		local pro = g.profiles[a]
+		local beforeMoney = pro.money.Value
+		local beforeIds = {}
+		for _, item in ipairs(g.inventory:list(a.UserId)) do
+			beforeIds[item.id] = true
+		end
+		assert(g:action(a, "debugCoins", {}))
+		assert(pro.money.Value == math.min(C.MaxCoins, beforeMoney + 250000))
+		assert(g:action(a, "debugRanch", {}))
+		local added, elements = 0, {}
+		for _, item in ipairs(g.inventory:list(a.UserId)) do
+			if not beforeIds[item.id] then
+				added += 1
+				elements[item.element] = true
+				assert(item.kind == "Pet" and item.ownerId == a.UserId and item.petMode == "Pen")
+				g.inventory.items[item.id] = nil
+			end
+		end
+		assert(added == 8)
+		for _, element in ipairs(C.ElementOrder) do
+			assert(elements[element] == true)
+		end
+		g:reconcilePets()
 	end)
 
 	scenario(
