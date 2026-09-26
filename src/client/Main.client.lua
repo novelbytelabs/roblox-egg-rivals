@@ -40,6 +40,8 @@ local exchangeFingerprint = ""
 local incubationPreview = nil
 local incubationViews = {}
 local visitorPet = nil
+local outfitterSelectedId = nil
+local outfitterFingerprint = ""
 local holder
 local incubationSpec
 local render
@@ -86,7 +88,7 @@ workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(bindCamera)
 bindCamera()
 local brand = U.frame(root, "Brand", 16, 12, 258, 62, C.Colors.Ink)
 U.text(brand, "Title", "EGG RIVALS", 14, 7, 230, 27, 24, C.Colors.Gold)
-U.text(brand, "Subtitle", "DUEL ARMORY • 0.4.9", 14, 36, 232, 17, 11, C.Colors.Muted)
+U.text(brand, "Subtitle", "PET OUTFITTER • 0.4.10", 14, 36, 232, 17, 11, C.Colors.Muted)
 local phasePanel = U.frame(root, "Phase", 395, 12, 290, 62, C.Colors.Ink)
 local phaseTitle = U.text(phasePanel, "Title", "DAYTIME", 12, 6, 266, 25, 19)
 phaseTitle.TextXAlignment = Enum.TextXAlignment.Center
@@ -413,6 +415,60 @@ for index, name in ipairs(C.DuelWeaponOrder) do
 		spec.color
 	)
 end
+
+local outfitterPanel = U.frame(root, "PetOutfitterPanel", 110, 80, 860, 550, C.Colors.Panel)
+outfitterPanel.Visible = false
+U.text(outfitterPanel, "Title", "PET OUTFITTER", 18, 12, 650, 34, 24, C.Colors.Mint)
+U.button(outfitterPanel, "Close", "X", 806, 14, 36, 31, function()
+	outfitterSelectedId = nil
+	outfitterFingerprint = ""
+	menu = nil
+end, C.Colors.Muted)
+local outfitterInfo = U.text(
+	outfitterPanel,
+	"Info",
+	"Choose one of your pets, then fit a cosmetic style. Styles are free and never change stats.",
+	18,
+	52,
+	820,
+	42,
+	14,
+	C.Colors.Muted
+)
+local outfitterGrid = U.grid(outfitterPanel, "Pets", 16, 100, 828, 284)
+local outfitterButtons = {}
+for index, variant in ipairs(C.PetVariantOrder) do
+	local variantName = variant
+	local spec = C.PetVariants[variantName]
+	outfitterButtons[variantName] = U.button(
+		outfitterPanel,
+		"Style" .. variantName,
+		variantName:upper(),
+		18 + (index - 1) * 274,
+		455,
+		256,
+		42,
+		function()
+			if outfitterSelectedId then
+				send("petVariant", { id = outfitterSelectedId, variant = variantName })
+			else
+				notify("Choose one of your pets first.")
+			end
+		end,
+		spec.color
+	)
+end
+U.text(
+	outfitterPanel,
+	"Safety",
+	"Creature • element • rarity • income stay unchanged. Godly rarity effects remain separate.",
+	18,
+	508,
+	820,
+	24,
+	12,
+	C.Colors.Muted
+)
 
 local ranchPanel = U.frame(root, "RanchPanel", 300, 195, 480, 250, C.Colors.Panel)
 ranchPanel.Visible = false
@@ -798,6 +854,53 @@ local function paintInventory()
 		U.text(grid, "Empty", "No items yet. Bring an egg back from the Forest.", 5, 8, 800, 50, 20, C.Colors.Muted)
 	end
 end
+local function paintOutfitter()
+	if not state or menu ~= "outfitter" then
+		return
+	end
+	local parts = { outfitterSelectedId or "" }
+	for _, item in ipairs(state.items) do
+		if item.kind == "Pet" then
+			table.insert(parts, item.id .. item.state .. tostring(item.variant) .. tostring(item.revision))
+		end
+	end
+	local fp = table.concat(parts, "|")
+	if fp == outfitterFingerprint then
+		return
+	end
+	outfitterFingerprint = fp
+	U.clearGrid(outfitterGrid)
+	local selected
+	local count = 0
+	for _, item in ipairs(state.items) do
+		if item.kind == "Pet" and item.state == "Inventory" then
+			count += 1
+			if item.id == outfitterSelectedId then
+				selected = item
+			end
+			U.card(outfitterGrid, item, function(clicked)
+				outfitterSelectedId = clicked.id
+				outfitterFingerprint = ""
+				paintOutfitter()
+				render()
+			end, item.id == outfitterSelectedId)
+		end
+	end
+	if count == 0 then
+		U.text(outfitterGrid, "Empty", "Hatch a pet before visiting the Outfitter.", 5, 8, 760, 50, 20, C.Colors.Muted)
+	end
+	local variant = selected and (selected.variant or "Standard") or nil
+	outfitterInfo.Text = selected
+		and (selected.species .. " • " .. selected.rarity .. " • CURRENT STYLE: " .. variant:upper())
+		or "Choose one of your pets, then fit a cosmetic style. Styles are free and never change stats."
+	for _, name in ipairs(C.PetVariantOrder) do
+		local button = outfitterButtons[name]
+		button.Text = variant == name and ("CURRENT • " .. name:upper()) or name:upper()
+		button.Active = selected ~= nil and variant ~= name
+		button.AutoButtonColor = button.Active
+	end
+end
+
 local function itemLabel(item)
 	if item.kind == "Pet" then
 		return item.rarity .. " " .. (item.species or ((item.element or "") .. " " .. (item.creature or "Pet")))
@@ -1001,6 +1104,10 @@ render = function()
 			button.AutoButtonColor = not selected
 		end
 	end
+	outfitterPanel.Visible = menu == "outfitter"
+	if outfitterPanel.Visible then
+		paintOutfitter()
+	end
 	ranchPanel.Visible = menu == "ranch"
 	visitorPanel.Visible = menu == "visitor" and visitorPet ~= nil
 	tradePanel.Visible = menu == "trade"
@@ -1011,7 +1118,9 @@ render = function()
 			.. visitorPet.species:upper()
 			.. "\n"
 			.. visitorPet.rarity:upper()
-			.. " • +"
+			.. " • "
+			.. tostring(visitorPet.variant or "Standard"):upper()
+			.. " STYLE • +"
 			.. tostring(visitorPet.income)
 			.. " COINS/MIN\nRead-only visit • ownership stays with "
 			.. visitorPet.ownerName
@@ -1320,6 +1429,11 @@ feed.OnClientEvent:Connect(function(kind, data)
 		render()
 	elseif kind == "openDuelArmory" then
 		menu = "armory"
+		render()
+	elseif kind == "openPetOutfitter" then
+		outfitterSelectedId = nil
+		outfitterFingerprint = ""
+		menu = "outfitter"
 		render()
 	elseif kind == "ranchUpgrade" then
 		pendingRanchUpgrade = data
@@ -1857,6 +1971,39 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 						"Rendered contract claim did not reach authoritative state"
 					)
 					assert(out.moneyDelta >= data.rewardCoins, "Claim did not credit the advertised reward")
+				elseif data.kind == "PetOutfitter" then
+					assert(type(data.id) == "string" and C.PetVariants[data.variant], "Invalid Outfitter probe")
+					assert(
+						waitFor(function()
+							return outfitterPanel.Visible and state ~= nil
+						end, 3),
+						"Pet Outfitter panel did not open"
+					)
+					outfitterSelectedId = data.id
+					outfitterFingerprint = ""
+					paintOutfitter()
+					local button = outfitterButtons[data.variant]
+					assert(button and button.Active, "Requested pet cosmetic is unavailable")
+					mouse(button, 0.08)
+					assert(
+						waitFor(function()
+							for _, item in ipairs(state.items) do
+								if item.id == data.id then
+									return item.variant == data.variant
+								end
+							end
+							return false
+						end, 4),
+						"Real Pet Outfitter selection did not reach authoritative item state"
+					)
+					assert(
+						waitFor(function()
+							local pet = effects.pets[data.id]
+							return pet and pet:GetAttribute("CosmeticVariant") == data.variant
+						end, 4),
+						"Real rendered pet did not apply the selected cosmetic"
+					)
+					out.variant = data.variant
 				elseif data.kind == "DuelArmory" then
 					assert(type(data.weapon) == "string" and C.DuelWeapons[data.weapon], "Unknown Armory probe weapon")
 					assert(

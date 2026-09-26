@@ -458,6 +458,7 @@ function E:update(dt, state, records)
 		local species = record:GetAttribute("Species")
 		local rarity = record:GetAttribute("Rarity")
 		local element = record:GetAttribute("Element") or "Earth"
+		local variant = record:GetAttribute("Variant") or "Standard"
 		local mode = record:GetAttribute("DisplayMode") or "Pen"
 		local owner = ownerId and Players:GetPlayerByUserId(ownerId)
 		local root = owner and owner.Character and owner.Character:FindFirstChild("HumanoidRootPart")
@@ -485,6 +486,7 @@ function E:update(dt, state, records)
 			local pet = self.pets[record.Name]
 			if not pet then
 				pet = Art.pet(creature, rarity, element, self.folder)
+				Art.petCosmetic(pet, variant, element)
 				self.petRigs[record.Name] = RanchAnimation.bind(pet)
 				self.edges:track(pet)
 				pet:PivotTo(target)
@@ -505,6 +507,17 @@ function E:update(dt, state, records)
 				hitbox.CanQuery = true
 				hitbox:SetAttribute("PetId", record.Name)
 				hitbox:SetAttribute("OwnerUserId", ownerId)
+			end
+			if pet:GetAttribute("CosmeticVariant") ~= variant then
+				Art.petCosmetic(pet, variant, element)
+			end
+			local nameplate = pet.PrimaryPart and pet.PrimaryPart:FindFirstChild("Label")
+			local nameText = nameplate and nameplate:FindFirstChild("Text")
+			if nameText then
+				nameText.Text = (species or element .. " " .. creature)
+					.. " • "
+					.. rarity
+					.. (variant ~= "Standard" and (" • " .. variant) or "")
 			end
 			local interaction = pet:FindFirstChild("PetInteraction")
 			if interaction then

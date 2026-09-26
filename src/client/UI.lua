@@ -78,6 +78,7 @@ function U.preview(parent, item, x, y, w, h)
 		tool:Destroy()
 	elseif item.kind == "Pet" then
 		m = Art.pet(item.creature, item.rarity, item.element, world)
+		Art.petCosmetic(m, item.variant or "Standard", item.element)
 	else
 		m = Art.egg(item.rarity, world, item.creature)
 	end
