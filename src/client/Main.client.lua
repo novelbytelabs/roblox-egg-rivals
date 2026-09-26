@@ -891,7 +891,7 @@ local function paintOutfitter()
 	end
 	local variant = selected and (selected.variant or "Standard") or nil
 	outfitterInfo.Text = selected
-		and (selected.species .. " • " .. selected.rarity .. " • CURRENT STYLE: " .. variant:upper())
+			and (selected.species .. " • " .. selected.rarity .. " • CURRENT STYLE: " .. variant:upper())
 		or "Choose one of your pets, then fit a cosmetic style. Styles are free and never change stats."
 	for _, name in ipairs(C.PetVariantOrder) do
 		local button = outfitterButtons[name]
