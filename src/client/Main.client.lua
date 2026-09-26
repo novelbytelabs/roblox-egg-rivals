@@ -88,7 +88,7 @@ workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(bindCamera)
 bindCamera()
 local brand = U.frame(root, "Brand", 16, 12, 258, 62, C.Colors.Ink)
 U.text(brand, "Title", "EGG RIVALS", 14, 7, 230, 27, 24, C.Colors.Gold)
-U.text(brand, "Subtitle", "PET OUTFITTER • 0.4.10", 14, 36, 232, 17, 11, C.Colors.Muted)
+U.text(brand, "Subtitle", "ELEMENTAL BAZAAR • 0.4.11", 14, 36, 232, 17, 11, C.Colors.Muted)
 local phasePanel = U.frame(root, "Phase", 395, 12, 290, 62, C.Colors.Ink)
 local phaseTitle = U.text(phasePanel, "Title", "DAYTIME", 12, 6, 266, 25, 19)
 phaseTitle.TextXAlignment = Enum.TextXAlignment.Center
@@ -467,6 +467,62 @@ U.text(
 	820,
 	24,
 	12,
+	C.Colors.Muted
+)
+
+local bazaarPanel = U.frame(root, "ElementalBazaarPanel", 280, 120, 520, 480, C.Colors.Panel)
+bazaarPanel.Visible = false
+U.text(bazaarPanel, "Title", "ELEMENTAL BAZAAR", 20, 15, 430, 35, 23, C.Colors.Gold)
+U.button(bazaarPanel, "Close", "X", 470, 17, 30, 30, function()
+	menu = nil
+end, C.Colors.Muted)
+local bazaarInfo = U.text(
+	bazaarPanel,
+	"Info",
+	"Free ranch presentation themes. Incubator elements, pets, income and Speed stay unchanged.",
+	20,
+	58,
+	480,
+	58,
+	14,
+	C.Colors.Text
+)
+local bazaarButtons = {}
+local bazaarPositions = {
+	Standard = { 20, 130, 480 },
+	Fire = { 20, 190, 230 },
+	Water = { 270, 190, 230 },
+	Wind = { 20, 250, 230 },
+	Earth = { 270, 250, 230 },
+}
+for _, theme in ipairs(C.BazaarThemeOrder) do
+	local themeName = theme
+	local spec = C.BazaarThemes[themeName]
+	local pos = bazaarPositions[themeName]
+	local color = spec.element and C.Elements[spec.element].color or C.Colors.Text
+	bazaarButtons[themeName] = U.button(
+		bazaarPanel,
+		"Theme" .. themeName,
+		spec.name:upper(),
+		pos[1],
+		pos[2],
+		pos[3],
+		42,
+		function()
+			send("bazaarTheme", { theme = themeName })
+		end,
+		color
+	)
+end
+U.text(
+	bazaarPanel,
+	"Safety",
+	"Cosmetic-only • no Coins or Robux • themes replace instead of stacking.",
+	20,
+	330,
+	480,
+	50,
+	13,
 	C.Colors.Muted
 )
 
@@ -1108,6 +1164,20 @@ render = function()
 	if outfitterPanel.Visible then
 		paintOutfitter()
 	end
+	bazaarPanel.Visible = menu == "bazaar"
+	if bazaarPanel.Visible then
+		local currentTheme = state.baseTheme or "Standard"
+		local currentSpec = C.BazaarThemes[currentTheme] or C.BazaarThemes.Standard
+		bazaarInfo.Text = "CURRENT • " .. currentSpec.name:upper() .. "\n" .. currentSpec.description
+		for _, name in ipairs(C.BazaarThemeOrder) do
+			local button = bazaarButtons[name]
+			local selected = currentTheme == name
+			button.Text = selected and ("CURRENT • " .. C.BazaarThemes[name].name:upper())
+				or C.BazaarThemes[name].name:upper()
+			button.Active = not selected
+			button.AutoButtonColor = not selected
+		end
+	end
 	ranchPanel.Visible = menu == "ranch"
 	visitorPanel.Visible = menu == "visitor" and visitorPet ~= nil
 	tradePanel.Visible = menu == "trade"
@@ -1434,6 +1504,9 @@ feed.OnClientEvent:Connect(function(kind, data)
 		outfitterSelectedId = nil
 		outfitterFingerprint = ""
 		menu = "outfitter"
+		render()
+	elseif kind == "openElementalBazaar" then
+		menu = "bazaar"
 		render()
 	elseif kind == "ranchUpgrade" then
 		pendingRanchUpgrade = data
@@ -1971,6 +2044,31 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 						"Rendered contract claim did not reach authoritative state"
 					)
 					assert(out.moneyDelta >= data.rewardCoins, "Claim did not credit the advertised reward")
+				elseif data.kind == "ElementalBazaar" then
+					assert(C.BazaarThemes[data.theme], "Invalid Elemental Bazaar probe")
+					assert(
+						waitFor(function()
+							return bazaarPanel.Visible and state ~= nil
+						end, 3),
+						"Elemental Bazaar panel did not open"
+					)
+					local button = bazaarButtons[data.theme]
+					assert(button and button.Active, "Requested Bazaar theme is unavailable")
+					mouse(button, 0.08)
+					assert(
+						waitFor(function()
+							if not state or state.baseTheme ~= data.theme then
+								return false
+							end
+							local world = workspace:FindFirstChild("Moonwood")
+							local base = world and world:FindFirstChild("Base" .. tostring(state.base), true)
+							return base
+								and base:GetAttribute("BaseTheme") == data.theme
+								and (data.theme == "Standard" or base:FindFirstChild("BazaarTheme") ~= nil)
+						end, 4),
+						"Real Elemental Bazaar selection did not reach authoritative camp presentation"
+					)
+					out.theme = data.theme
 				elseif data.kind == "PetOutfitter" then
 					assert(type(data.id) == "string" and C.PetVariants[data.variant], "Invalid Outfitter probe")
 					assert(
