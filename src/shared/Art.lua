@@ -241,9 +241,10 @@ function Art.petCosmetic(pet, variant, element)
 	local petScale = pet:GetScale()
 	local petPivot = pet:GetPivot()
 	local function cosmeticPart(name, size, localCF, color, material)
-		local scaledCF = CFrame.new(localCF.Position * petScale) * localCF.Rotation
+		local scaledCF = CFrame.new(localCF.Position * petScale) * (localCF - localCF.Position)
 		local cosmetic = part(pet, name, size * petScale, petPivot * scaledCF, color, nil, material)
 		cosmetic:SetAttribute("PetCosmetic", true)
+		cosmetic:SetAttribute("NightEdgeExcluded", true)
 		return cosmetic
 	end
 	if variant == "Ranger" then
