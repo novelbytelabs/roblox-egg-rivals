@@ -384,8 +384,12 @@ function W.build()
 	local petOutfitter =
 		servicePoint("PetOutfitter", Vector3.new(71, 1.5, -12), Config.Colors.Mint, "PET OUTFITTER\nCosmetic identity")
 	petOutfitter:SetAttribute("NightEdgeColor", Config.Colors.Mint)
-	local elementalBazaar =
-		servicePoint("ElementalBazaar", Vector3.new(-71, 1.5, -12), Config.Colors.Gold, "ELEMENTAL BAZAAR\nRanch themes")
+	local elementalBazaar = servicePoint(
+		"ElementalBazaar",
+		Vector3.new(-71, 1.5, -12),
+		Config.Colors.Gold,
+		"ELEMENTAL BAZAAR\nRanch themes"
+	)
 	elementalBazaar:SetAttribute("NightEdgeColor", Config.Colors.Gold)
 
 	local trialStart = p(

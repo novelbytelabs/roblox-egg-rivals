@@ -425,12 +425,7 @@ function Camp.applyTheme(b, theme)
 			vane:SetAttribute("SpinRest", vane.CFrame)
 			vane:SetAttribute("SpinRate", 0.45 + index * 0.05)
 		else
-			local stone = decoration(
-				"RootStone",
-				Vector3.new(1.25, 1.8, 1.15),
-				center + offset,
-				Enum.Material.Slate
-			)
+			local stone = decoration("RootStone", Vector3.new(1.25, 1.8, 1.15), center + offset, Enum.Material.Slate)
 			stone.CFrame *= CFrame.Angles(0.12, index * 0.55, 0.08)
 		end
 	end
