@@ -680,6 +680,7 @@ function Tests.run(g)
 	require(script.Parent.VisitorChecks).run(g, check, a, b, results)
 	require(script.Parent.MasteryChecks).run(g, check, a)
 	require(script.Parent.LivingRanchChecks).run(g, check, a, b, results)
+	require(script.Parent.PersistenceChecks).run(g, check, a, b, results)
 	local departingRanch = { player = b, userId = b.UserId, base = g.profiles[b].base }
 	check("Actual client disconnect cancels selection without escrow loss", function()
 		prep()
