@@ -17,7 +17,7 @@ local A = {
 	ChaseRadius = 1.15,
 	ChasePeriod = 5.5,
 	SnapshotGrace = 2,
-	MaxHabitatParts = 20,
+	MaxHabitatParts = 52,
 	MaxAnimatedParts = 32,
 }
 A.Kinds = {
