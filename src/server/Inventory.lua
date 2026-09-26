@@ -339,6 +339,66 @@ function Inventory:income(owner)
 	end
 	return value -- Coins per minute; income follows ownership, including reservations.
 end
+function Inventory:replaceOwner(owner, records)
+	if not R.integer(owner, -100000000000, 100000000000) or type(records) ~= "table" or #records > C.MaxItems then
+		return false, "Invalid persistence inventory."
+	end
+	local seen, prepared, ids = {}, {}, {}
+	local maxOrder = self.sequence
+	for index, source in ipairs(records) do
+		if
+			type(source) ~= "table"
+			or not R.id(source.id)
+			or seen[source.id]
+			or source.ownerId ~= owner
+			or not R.integer(source.order, 1, 1000000000)
+			or not R.integer(source.createdAt, 0, 1000000000000)
+			or not R.integer(source.revision, 0, 1000000000)
+			or (source.state ~= "Inventory" and source.state ~= "Incubating")
+			or source.reservation ~= nil
+			or source.duelId ~= nil
+		then
+			return false, "Invalid persistence item at index " .. tostring(index) .. "."
+		end
+		local collision = self.items[source.id]
+		if collision and collision.ownerId ~= owner then
+			return false, "Persistence item id collides with another owner."
+		end
+		seen[source.id] = true
+		local item = table.clone(source)
+		if source.welcomedOwners then
+			item.welcomedOwners = table.clone(source.welcomedOwners)
+		end
+		if item.kind == "Item" then
+			local spec = C.ItemTypes[item.itemType]
+			if not spec then
+				return false, "Unknown persistent consumable."
+			end
+			item.species = spec.name
+		elseif item.kind == "Pet" then
+			item.species = item.element .. " " .. item.creature
+		elseif item.kind == "Egg" then
+			item.species = item.creature
+		else
+			return false, "Unknown persistent item kind."
+		end
+		prepared[source.id] = item
+		table.insert(ids, source.id)
+		maxOrder = math.max(maxOrder, source.order)
+	end
+	for id, item in pairs(self.items) do
+		if item.ownerId == owner then
+			self.items[id] = nil
+		end
+	end
+	for id, item in pairs(prepared) do
+		self.items[id] = item
+	end
+	self.sequence = maxOrder
+	self:record("persistenceRestore", ids)
+	return true
+end
+
 function Inventory:snapshotItem(item)
 	return {
 		id = item.id,
