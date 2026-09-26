@@ -208,7 +208,7 @@ C.Expansions = {
 	{ name = "Starter Ranch", capacity = 8, cost = 0, width = 28, depth = 14, columns = 4, rows = 2 },
 	{ name = "Side Paddocks", capacity = 12, cost = 800, width = 30, depth = 20, columns = 4, rows = 3 },
 	{ name = "Garden Paddock", capacity = 16, cost = 3000, width = 34, depth = 24, columns = 4, rows = 4 },
-	{ name = "Grand Ranch", capacity = 24, cost = 12000, width = 38, depth = 28, columns = 6, rows = 4 },
+	{ name = "Grand Ranch", capacity = 24, cost = 12000, width = 38, depth = 34, columns = 6, rows = 4 },
 }
 C.ItemTypes = { SnarePod = { name = "Snare Pod", cost = 15, exchange = 5, rarity = "Common" } }
 C.SpeedMilestones = { 100, 250, 600, 1200, 2200, 3800, 6000, 10000 }
