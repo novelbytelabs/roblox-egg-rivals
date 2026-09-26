@@ -1273,6 +1273,44 @@ function Game:action(p, name, data)
 		self:reconcilePets()
 		self:push(p)
 		return true
+	elseif name == "debugCoins" and RunService:IsStudio() then
+		if not self:rate(p, "debugCoins", 0.5) then
+			return false, "Cooldown"
+		end
+		local pro = self.profiles[p]
+		pro.money.Value = math.min(C.MaxCoins, pro.money.Value + 250000)
+		self:notify(p, "Studio funds added: +250,000 Coins.", "win")
+		self:push(p)
+		return true
+	elseif name == "debugRanch" and RunService:IsStudio() then
+		if self:busy(p) then
+			return false, "Finish your current activity first."
+		end
+		if not self:rate(p, "debugRanch", 1) then
+			return false, "Cooldown"
+		end
+		local specs = {
+			{ "Common", "Skunk", "Fire" },
+			{ "Uncommon", "Lizard", "Water" },
+			{ "Rare", "Gorilla", "Earth" },
+			{ "Epic", "Dragon", "Wind" },
+			{ "Legendary", "Lizard", "Fire" },
+			{ "Mythic", "Dragon", "Water" },
+			{ "Godly", "Gorilla", "Earth" },
+			{ "Rare", "Skunk", "Wind" },
+		}
+		local added = 0
+		for _, spec in ipairs(specs) do
+			local pet = self.inventory:create(p.UserId, "Pet", spec[1], spec[2], spec[3])
+			if pet then
+				self.ranch:acquired(p, pet)
+				added += 1
+			end
+		end
+		self:reconcilePets()
+		self:notify(p, "Studio ranch pack added: " .. tostring(added) .. " pets.", "win")
+		self:push(p)
+		return added > 0
 	end
 	return false, "Unknown action."
 end
