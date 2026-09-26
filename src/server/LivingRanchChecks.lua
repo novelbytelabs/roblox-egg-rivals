@@ -176,14 +176,22 @@ function Checks.run(g, check, a, b, results)
 			assert(area:GetAttribute("PresentationVersion") == 2)
 			assert(area:FindFirstChild("RanchPath") and area:FindFirstChild("RanchPlaza"))
 			local arch = assert(area:FindFirstChild("RanchEntryArch"))
-			local openLeaves = 0
+			local openLeaves, ledgerEdges = 0, 0
+			assert(arch:FindFirstChild("RanchLedger"))
 			for _, part in ipairs(arch:GetDescendants()) do
 				if part:IsA("BasePart") and part.Name == "OpenGateLeaf" then
 					openLeaves += 1
 					assert(not part.CanCollide and not part.CanTouch and not part.CanQuery)
+				elseif part:IsA("BasePart") and part.Name:find("RanchLedgerTrim", 1, true) == 1 then
+					ledgerEdges += 1
+					assert(part.Size.X <= 0.2 or part.Size.Y <= 0.2)
 				end
 			end
-			assert(openLeaves == 2)
+			assert(openLeaves == 2 and ledgerEdges == 4)
+			assert(#pro.base.penSlots == C.Expansions[level + 1].capacity)
+			for _, slot in ipairs(pro.base.penSlots) do
+				assert(math.abs(slot.X - pro.base.penCenter.X) >= 5)
+			end
 			local model = area:FindFirstChild("RanchHabitats")
 			assert(model and model:GetAttribute("PartCount") <= A.MaxHabitatParts)
 			for _, element in ipairs(C.ElementOrder) do
@@ -199,28 +207,49 @@ function Checks.run(g, check, a, b, results)
 		assert(signature(g, a) == before and g.inventory:income(a.UserId) == income)
 	end)
 
-	scenario("Studio ranch tools grant test funds and a bounded multi-element ranch pack", function()
+	scenario("Studio ranch tools fund, fill, and expose the Grand Ranch without touching live rules", function()
 		local pro = g.profiles[a]
 		local beforeMoney = pro.money.Value
-		local beforeIds = {}
+		local beforeIds, beforePets = {}, 0
 		for _, item in ipairs(g.inventory:list(a.UserId)) do
 			beforeIds[item.id] = true
+			if item.kind == "Pet" then
+				beforePets += 1
+			end
 		end
 		assert(g:action(a, "debugCoins", {}))
 		assert(pro.money.Value == math.min(C.MaxCoins, beforeMoney + 250000))
+		local currentCapacity = C.Expansions[pro.ranchLevel + 1].capacity
 		assert(g:action(a, "debugRanch", {}))
-		local added, elements = 0, {}
+		local afterFill = 0
 		for _, item in ipairs(g.inventory:list(a.UserId)) do
-			if not beforeIds[item.id] then
-				added += 1
-				elements[item.element] = true
-				assert(item.kind == "Pet" and item.ownerId == a.UserId and item.petMode == "Pen")
-				g.inventory.items[item.id] = nil
+			if item.kind == "Pet" then
+				afterFill += 1
 			end
 		end
-		assert(added == 8)
+		assert(afterFill == math.max(beforePets, currentCapacity))
+
+		assert(g:action(a, "debugMaxRanch", {}))
+		assert(pro.ranchLevel == #C.Expansions - 1 and pro.penPage == 1)
+		assert(pro.money.Value >= math.min(C.MaxCoins, 250000))
+		local maxCapacity = C.Expansions[#C.Expansions].capacity
+		assert(#pro.base.penSlots == maxCapacity)
+		local afterMax, elements = 0, {}
+		for _, item in ipairs(g.inventory:list(a.UserId)) do
+			if item.kind == "Pet" then
+				afterMax += 1
+				elements[item.element] = true
+				assert(item.ownerId == a.UserId)
+			end
+		end
+		assert(afterMax == math.max(afterFill, maxCapacity))
 		for _, element in ipairs(C.ElementOrder) do
 			assert(elements[element] == true)
+		end
+		for id, item in pairs(g.inventory.items) do
+			if item.ownerId == a.UserId and not beforeIds[id] then
+				g.inventory.items[id] = nil
+			end
 		end
 		g:reconcilePets()
 	end)
