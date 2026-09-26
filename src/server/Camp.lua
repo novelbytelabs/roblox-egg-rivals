@@ -239,7 +239,7 @@ function Camp.create(parent, index, color)
 	-- The gate stays fixed across expansions so attached interactions remain valid.
 	b.penGate = part(m, "PenGate", Vector3.new(0.2, 0.2, 0.2), Vector3.new(x, 1, -62), color, nil, false)
 	b.penGate.Transparency = 1
-	b.earningsLabel = Art.billboard(b.penGate, "YOUR RANCH\n0 pets", color, 245, 52, Vector3.new(0, 4, 0))
+	b.earningsLabel = nil
 	part(m, "PenWalk", Vector3.new(6, 0.2, 5), Vector3.new(x, 0.2, -60.5), wood, Enum.Material.WoodPlanks, true)
 	b.applyGrade = function(tier)
 		Camp.applyGrade(b, tier)
@@ -450,6 +450,9 @@ function Camp.applyExpansion(b, level)
 		fencePost("SidePost", center + Vector3.new(-halfW, 1.35, z))
 		fencePost("SidePost", center + Vector3.new(halfW, 1.35, z))
 	end
+	for _, x in ipairs({ -halfW, -(halfW + 3) / 2, (halfW + 3) / 2, halfW }) do
+		fencePost("FrontPost", center + Vector3.new(x, 1.35, halfD))
+	end
 
 	for _, height in ipairs({ 0.9, 2 }) do
 		part(
@@ -544,6 +547,48 @@ function Camp.applyExpansion(b, level)
 		230,
 		52,
 		Vector3.zero
+	)
+
+	-- The ranch ledger turns collection value into a physical part of the home.
+	local ledgerX = b.x + math.min(halfW - 4, 8.2)
+	local ledgerZ = -61.45
+	for _, dx in ipairs({ -3.15, 3.15 }) do
+		part(
+			arch,
+			"LedgerPost",
+			Vector3.new(0.35, 3.4, 0.35),
+			Vector3.new(ledgerX + dx, 1.7, ledgerZ),
+			wood,
+			Enum.Material.Wood,
+			false
+		)
+	end
+	local ledgerTrim = part(
+		arch,
+		"RanchLedgerTrim",
+		Vector3.new(7.35, 3.55, 0.18),
+		Vector3.new(ledgerX, 2.85, ledgerZ),
+		b.color,
+		Enum.Material.Neon,
+		false
+	)
+	ledgerTrim:SetAttribute("NightTint", b.color)
+	local ledger = part(
+		arch,
+		"RanchLedger",
+		Vector3.new(7, 3.2, 0.28),
+		Vector3.new(ledgerX, 2.85, ledgerZ - 0.12),
+		Color3.fromRGB(63, 47, 37),
+		Enum.Material.WoodPlanks,
+		false
+	)
+	b.earningsLabel = Art.billboard(
+		ledger,
+		"YOUR RANCH\n0 PETS • +0 COINS/MIN",
+		C.Colors.Text,
+		300,
+		64,
+		Vector3.new(0, 0, 0.55)
 	)
 
 	-- A simple shade structure gives residents a recognizable rest area.
