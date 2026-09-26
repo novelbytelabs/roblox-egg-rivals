@@ -259,6 +259,10 @@ function Checks.run(g, check, a, b, results)
 
 	scenario("Living Ranch paired play and group naps remain bounded to eligible same-owner residents", function()
 		local pro = g.profiles[a]
+		-- This assertion targets pair selection itself. Seed that scheduler boundary here
+		-- instead of depending on whichever ordinary episode the shared fixture happened to enter first.
+		pro.ranch.activities, pro.ranch.nextGroupAt, pro.ranch.groupSerial = {}, 0, 0
+		g.ranch:updateRecords(a, g:now())
 		local pairsSeen = {}
 		for _, entry in ipairs(g.ranch:visiblePets(a)) do
 			local partnerId = entry.record:GetAttribute("ActivityPartnerId")
@@ -291,6 +295,10 @@ function Checks.run(g, check, a, b, results)
 
 	scenario("Living Ranch removes interrupted partner links when a resident becomes active", function()
 		local pro = g.profiles[a]
+		-- Form the pair under test explicitly so this scenario does not inherit activity timing
+		-- from fixture setup or a previous scheduler decision.
+		pro.ranch.activities, pro.ranch.nextGroupAt, pro.ranch.groupSerial = {}, 0, 0
+		g.ranch:updateRecords(a, g:now())
 		local selected
 		for _, entry in ipairs(g.ranch:visiblePets(a)) do
 			if entry.record:GetAttribute("ActivityPartnerId") then
