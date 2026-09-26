@@ -1077,11 +1077,10 @@ function Game:push(p)
 		contracts = self.contracts:snapshot(p),
 		ranchLevel = pro.ranchLevel,
 		ranchCapacity = C.Expansions[pro.ranchLevel + 1].capacity,
-		ranchVisibleCapacity = pro.ranchDisplayCapacity
-			or math.min(
-				C.Expansions[pro.ranchLevel + 1].capacity,
-				C.RanchVisibleSlots[pro.ranchLevel + 1] or C.MaxVisiblePets
-			),
+		ranchVisibleCapacity = pro.ranchDisplayCapacity or math.min(
+			C.Expansions[pro.ranchLevel + 1].capacity,
+			C.RanchVisibleSlots[pro.ranchLevel + 1] or C.MaxVisiblePets
+		),
 		ranch = self.ranch:snapshot(p),
 		trade = self.trades:snapshot(p),
 		duel = self.duels:snapshot(p),
