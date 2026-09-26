@@ -672,15 +672,18 @@ function Camp.applyExpansion(b, level)
 
 	local slots = {}
 	local sideColumns = math.max(1, math.floor(spec.columns / 2))
-	local usableHalf = math.max(5.2, halfW - 3.2)
-	local innerLane = math.min(5.2, usableHalf)
+	local usableHalf = math.max(6.4, halfW - 3.2)
+	local innerLane = math.min(6.4, usableHalf)
 	local laneStep = sideColumns > 1 and (usableHalf - innerLane) / (sideColumns - 1) or 0
+	local rowHalfSpan = math.max((spec.rows - 1) * 5.5 / 2, halfD - 4)
+	local rowStep = spec.rows > 1 and rowHalfSpan * 2 / (spec.rows - 1) or 0
 	for row = 0, spec.rows - 1 do
 		for col = 0, spec.columns - 1 do
 			local side = col < sideColumns and -1 or 1
 			local sideIndex = col % sideColumns
 			local xOffset = side * (innerLane + sideIndex * laneStep)
-			table.insert(slots, center + Vector3.new(xOffset, 1.8, (row - (spec.rows - 1) / 2) * 5.5))
+			local zOffset = spec.rows > 1 and (-rowHalfSpan + row * rowStep) or 0
+			table.insert(slots, center + Vector3.new(xOffset, 1.8, zOffset))
 		end
 	end
 
