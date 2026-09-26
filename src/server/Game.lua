@@ -713,8 +713,11 @@ function Game:reconcilePets()
 				penCount += 1
 			end
 		end
-		local capacity = C.Expansions[(pro.ranchLevel or 0) + 1].capacity
-		pro.penPages = math.max(1, math.ceil(penCount / capacity))
+		local ranchIndex = (pro.ranchLevel or 0) + 1
+		local capacity = C.Expansions[ranchIndex].capacity
+		local visibleCapacity = math.min(capacity, C.RanchVisibleSlots[ranchIndex] or C.MaxVisiblePets)
+		pro.ranchDisplayCapacity = visibleCapacity
+		pro.penPages = math.max(1, math.ceil(penCount / visibleCapacity))
 		pro.penCount = penCount
 		pro.penPage = math.clamp(pro.penPage or 1, 1, pro.penPages)
 		local totalPets = 0
@@ -755,9 +758,8 @@ function Game:reconcilePets()
 				local position = nil
 				if unlocked and not activePet then
 					index += 1
-					local capacity = C.Expansions[(pro.ranchLevel or 0) + 1].capacity
-					local page = math.floor((index - 1) / capacity) + 1
-					local slot = (index - 1) % capacity + 1
+					local page = math.floor((index - 1) / visibleCapacity) + 1
+					local slot = (index - 1) % visibleCapacity + 1
 					displayed = page == pro.penPage
 					position = pro.base.penSlots[slot]
 				end
@@ -1075,6 +1077,11 @@ function Game:push(p)
 		contracts = self.contracts:snapshot(p),
 		ranchLevel = pro.ranchLevel,
 		ranchCapacity = C.Expansions[pro.ranchLevel + 1].capacity,
+		ranchVisibleCapacity = pro.ranchDisplayCapacity
+			or math.min(
+				C.Expansions[pro.ranchLevel + 1].capacity,
+				C.RanchVisibleSlots[pro.ranchLevel + 1] or C.MaxVisiblePets
+			),
 		ranch = self.ranch:snapshot(p),
 		trade = self.trades:snapshot(p),
 		duel = self.duels:snapshot(p),

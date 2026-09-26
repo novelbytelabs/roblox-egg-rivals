@@ -189,6 +189,22 @@ function Checks.run(g, check, a, b, results)
 			end
 			assert(openLeaves == 2 and ledgerEdges == 4)
 			assert(#pro.base.penSlots == C.Expansions[level + 1].capacity)
+			local visibleSlots = C.RanchVisibleSlots[level + 1]
+			assert(pro.base.model:GetAttribute("VisibleResidentSlots") == visibleSlots)
+			local firstPageLeft, firstPageRight = 0, 0
+			local minZ, maxZ = math.huge, -math.huge
+			for slotIndex = 1, visibleSlots do
+				local slot = pro.base.penSlots[slotIndex]
+				if slot.X < pro.base.penCenter.X then
+					firstPageLeft += 1
+				else
+					firstPageRight += 1
+				end
+				minZ = math.min(minZ, slot.Z)
+				maxZ = math.max(maxZ, slot.Z)
+			end
+			assert(math.abs(firstPageLeft - firstPageRight) <= 1)
+			assert(maxZ - minZ >= math.max(5, pro.base.penBounds.Y))
 			for _, slot in ipairs(pro.base.penSlots) do
 				assert(math.abs(slot.X - pro.base.penCenter.X) >= 6.2)
 				assert(math.abs(slot.Z - pro.base.penCenter.Z) <= pro.base.penBounds.Y)
@@ -244,6 +260,19 @@ function Checks.run(g, check, a, b, results)
 			end
 		end
 		assert(afterMax == math.max(afterFill, maxCapacity))
+		assert(pro.ranchDisplayCapacity == C.RanchVisibleSlots[#C.Expansions])
+		local displayedResidents = 0
+		for _, record in ipairs(g.petRecords:GetChildren()) do
+			if
+				record:GetAttribute("OwnerUserId") == a.UserId
+				and record:GetAttribute("DisplayMode") == "Pen"
+				and record:GetAttribute("Displayed") == true
+			then
+				displayedResidents += 1
+			end
+		end
+		assert(displayedResidents == math.min(afterMax, pro.ranchDisplayCapacity))
+		assert(pro.penPages == math.max(1, math.ceil(afterMax / pro.ranchDisplayCapacity)))
 		for _, element in ipairs(C.ElementOrder) do
 			assert(elements[element] == true)
 		end

@@ -366,6 +366,7 @@ end
 function Camp.applyExpansion(b, level)
 	local spec = C.Expansions[level + 1]
 	assert(spec, "Invalid ranch expansion")
+	local visibleSlots = math.min(spec.capacity, C.RanchVisibleSlots[level + 1] or C.MaxVisiblePets)
 	local area = Instance.new("Model")
 	area.Name = "PenArea"
 	area:SetAttribute("Level", level)
@@ -404,7 +405,7 @@ function Camp.applyExpansion(b, level)
 	part(
 		area,
 		"RanchPlaza",
-		Vector3.new(8.2, 0.09, 5.6),
+		Vector3.new(9.6, 0.09, 6.6),
 		center + Vector3.new(0, 0.18, -math.min(2.5, halfD * 0.18)),
 		Color3.fromRGB(151, 140, 117),
 		Enum.Material.Cobblestone,
@@ -542,7 +543,7 @@ function Camp.applyExpansion(b, level)
 	signAnchor.Transparency = 1
 	Art.billboard(
 		signAnchor,
-		"LIVING RANCH\n" .. tostring(spec.capacity) .. " DISPLAY SLOTS",
+		spec.name:upper() .. "\n" .. tostring(visibleSlots) .. " ACTIVE RESIDENTS",
 		b.color,
 		230,
 		52,
@@ -677,13 +678,14 @@ function Camp.applyExpansion(b, level)
 	local laneStep = sideColumns > 1 and (usableHalf - innerLane) / (sideColumns - 1) or 0
 	local rowHalfSpan = math.max((spec.rows - 1) * 5.5 / 2, halfD - 4)
 	local rowStep = spec.rows > 1 and rowHalfSpan * 2 / (spec.rows - 1) or 0
-	for row = 0, spec.rows - 1 do
-		for col = 0, spec.columns - 1 do
-			local side = col < sideColumns and -1 or 1
-			local sideIndex = col % sideColumns
-			local xOffset = side * (innerLane + sideIndex * laneStep)
+	-- Order slots by lane first, then depth. The first page therefore spans the
+	-- whole ranch on both sides of the clear aisle instead of crowding one row.
+	for sideIndex = 0, sideColumns - 1 do
+		local xDistance = innerLane + sideIndex * laneStep
+		for row = 0, spec.rows - 1 do
 			local zOffset = spec.rows > 1 and (-rowHalfSpan + row * rowStep) or 0
-			table.insert(slots, center + Vector3.new(xOffset, 1.8, zOffset))
+			table.insert(slots, center + Vector3.new(-xDistance, 1.8, zOffset))
+			table.insert(slots, center + Vector3.new(xDistance, 1.8, zOffset))
 		end
 	end
 
@@ -697,6 +699,7 @@ function Camp.applyExpansion(b, level)
 	b.penBounds = Vector2.new(halfW - 2.5, halfD - 2.5)
 	Habitats.build(b, area, center, b.penBounds)
 	b.model:SetAttribute("PenCapacity", spec.capacity)
+	b.model:SetAttribute("VisibleResidentSlots", visibleSlots)
 	b.model:SetAttribute("RanchLevel", level)
 end
 

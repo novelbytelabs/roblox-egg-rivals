@@ -30,7 +30,7 @@ function H.build(base, area, center, bounds)
 		local style = C.Elements[element]
 		local xSign = index % 2 == 1 and -1 or 1
 		local zSign = index <= 2 and -1 or 1
-		local position = center + Vector3.new(xSign * bounds.X * 0.62, 0.2, zSign * bounds.Y * 0.52)
+		local position = center + Vector3.new(xSign * bounds.X * 0.72, 0.2, zSign * bounds.Y * 0.64)
 		local model = Instance.new("Model")
 		model.Name = element .. "Habitat"
 		model:SetAttribute("Element", element)

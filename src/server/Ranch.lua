@@ -320,6 +320,8 @@ function Ranch:snapshot(p)
 		level = pro.ranchLevel,
 		name = spec.name,
 		capacity = spec.capacity,
+		displayCapacity = pro.ranchDisplayCapacity
+			or math.min(spec.capacity, C.RanchVisibleSlots[pro.ranchLevel + 1] or C.MaxVisiblePets),
 		nextCost = C.Expansions[pro.ranchLevel + 2] and C.Expansions[pro.ranchLevel + 2].cost or nil,
 	}
 end

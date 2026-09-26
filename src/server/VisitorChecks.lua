@@ -13,7 +13,7 @@ local function visiblePet(g, owner)
 	g:reconcilePets()
 	local record = assert(g.petRecords:FindFirstChild(pet.id))
 	local index = assert(record:GetAttribute("DisplayIndex"))
-	local capacity = C.Expansions[g.profiles[owner].ranchLevel + 1].capacity
+	local capacity = assert(g.profiles[owner].ranchDisplayCapacity)
 	g.profiles[owner].penPage = math.floor((index - 1) / capacity) + 1
 	g:reconcilePets()
 	assert(record:GetAttribute("Displayed") == true and record:GetAttribute("DisplayMode") == "Pen")
