@@ -369,7 +369,20 @@ function Camp.applyExpansion(b, level)
 	local area = Instance.new("Model")
 	area.Name = "PenArea"
 	area:SetAttribute("Level", level)
+	area:SetAttribute("PresentationVersion", 2)
 	local center = Vector3.new(b.x, 0.2, -62 - spec.depth / 2)
+	local halfW, halfD = spec.width / 2, spec.depth / 2
+
+	-- Layered ground gives the ranch a deliberate footprint instead of one flat green slab.
+	part(
+		area,
+		"RanchSoil",
+		Vector3.new(spec.width + 1.2, 0.18, spec.depth + 1.2),
+		center + Vector3.new(0, -0.14, 0),
+		Color3.fromRGB(91, 70, 48),
+		Enum.Material.Ground,
+		true
+	)
 	part(
 		area,
 		"PetPenFloor",
@@ -379,33 +392,65 @@ function Camp.applyExpansion(b, level)
 		Enum.Material.Grass,
 		true
 	)
-	local halfW, halfD = spec.width / 2, spec.depth / 2
-	-- Paddocks are added as real sections; the fixed entry stays open and accessible.
+	part(
+		area,
+		"RanchPath",
+		Vector3.new(5.4, 0.08, math.max(6, spec.depth - 1.4)),
+		center + Vector3.new(0, 0.17, 0),
+		Color3.fromRGB(135, 126, 107),
+		Enum.Material.Cobblestone,
+		false
+	)
+	part(
+		area,
+		"RanchPlaza",
+		Vector3.new(8.2, 0.09, 5.6),
+		center + Vector3.new(0, 0.18, -math.min(2.5, halfD * 0.18)),
+		Color3.fromRGB(151, 140, 117),
+		Enum.Material.Cobblestone,
+		false
+	)
+
+	-- Subtle paddock bands keep a large ranch readable without creating extra collision.
 	for row = 1, spec.rows do
 		local z = center.Z + (row - (spec.rows + 1) / 2) * 5.5
 		part(
 			area,
 			"Paddock" .. row,
-			Vector3.new(spec.width - 2, 0.07, 5.3),
-			Vector3.new(b.x, 0.37, z),
-			row % 2 == 0 and Color3.fromRGB(92, 134, 81) or Color3.fromRGB(78, 118, 70),
+			Vector3.new(spec.width - 2, 0.05, 5.15),
+			Vector3.new(b.x, 0.34, z),
+			row % 2 == 0 and Color3.fromRGB(92, 134, 81) or Color3.fromRGB(76, 115, 69),
 			Enum.Material.Grass,
-			true
+			false
 		)
-		if row > 2 then
-			for _, dx in ipairs({ -halfW + 1, halfW - 1 }) do
-				part(
-					area,
-					"PaddockCorner",
-					Vector3.new(0.5, 2, 0.5),
-					Vector3.new(b.x + dx, 1.2, z),
-					wood,
-					Enum.Material.Wood,
-					true
-				)
-			end
-		end
 	end
+
+	local function fencePost(name, position)
+		local post = part(area, name, Vector3.new(0.55, 2.7, 0.55), position, wood, Enum.Material.Wood, true)
+		local cap = part(
+			area,
+			"PostCap",
+			Vector3.new(0.7, 0.18, 0.7),
+			position + Vector3.new(0, 1.43, 0),
+			b.color,
+			Enum.Material.Metal,
+			false
+		)
+		cap:SetAttribute("NightTint", b.color)
+		return post
+	end
+
+	-- Back and side posts make the fence read as a real ranch from a distance.
+	for i = 0, spec.columns do
+		local x = -halfW + (spec.width * i / spec.columns)
+		fencePost("BackPost", center + Vector3.new(x, 1.35, -halfD))
+	end
+	for i = 1, spec.rows do
+		local z = -halfD + (spec.depth * i / (spec.rows + 1))
+		fencePost("SidePost", center + Vector3.new(-halfW, 1.35, z))
+		fencePost("SidePost", center + Vector3.new(halfW, 1.35, z))
+	end
+
 	for _, height in ipairs({ 0.9, 2 }) do
 		part(
 			area,
@@ -437,34 +482,152 @@ function Camp.applyExpansion(b, level)
 			)
 		end
 	end
-	for _, dx in ipairs({ -halfW, -3, 3, halfW }) do
+
+	-- The gate is visibly open. Its leaves are presentation-only, so the walk-through stays reliable.
+	local arch = Instance.new("Model")
+	arch.Name = "RanchEntryArch"
+	arch.Parent = area
+	for _, side in ipairs({ -1, 1 }) do
+		local x = b.x + side * 3
 		local post = part(
-			area,
+			arch,
 			"GatePost",
-			Vector3.new(0.55, 2.6, 0.55),
-			Vector3.new(b.x + dx, 1.4, -62),
+			Vector3.new(0.7, 4.4, 0.7),
+			Vector3.new(x, 2.2, -62),
 			wood,
 			Enum.Material.Wood,
 			true
 		)
-		if math.abs(dx) == 3 then
-			local lamp = part(
+		local lamp = part(
+			arch,
+			"CampLamp",
+			Vector3.new(0.65, 0.65, 0.65),
+			post.Position + Vector3.new(0, 2.25, 0),
+			b.color,
+			Enum.Material.Neon,
+			false
+		)
+		lamp:SetAttribute("CampPowered", true)
+		lamp:SetAttribute("NightTint", b.color)
+		local light = Instance.new("PointLight")
+		light.Range = 16
+		light.Brightness = 0.6
+		light.Color = b.color
+		light.Parent = lamp
+		local leaf = part(
+			arch,
+			"OpenGateLeaf",
+			Vector3.new(3.2, 1.7, 0.28),
+			Vector3.new(b.x + side * 4.45, 1.25, -61.85),
+			wood,
+			Enum.Material.WoodPlanks,
+			false
+		)
+		leaf.CFrame *= CFrame.Angles(0, math.rad(side * 28), 0)
+	end
+	local beam = part(
+		arch,
+		"GateBeam",
+		Vector3.new(7.2, 0.55, 0.7),
+		Vector3.new(b.x, 4.45, -62),
+		wood,
+		Enum.Material.Wood,
+		false
+	)
+	local signAnchor = part(
+		arch,
+		"RanchSignAnchor",
+		Vector3.new(0.1, 0.1, 0.1),
+		beam.Position + Vector3.new(0, 0.55, 0),
+		b.color,
+		nil,
+		false
+	)
+	signAnchor.Transparency = 1
+	Art.billboard(
+		signAnchor,
+		"LIVING RANCH\n" .. tostring(spec.capacity) .. " DISPLAY SLOTS",
+		b.color,
+		230,
+		52,
+		Vector3.zero
+	)
+
+	-- A simple shade structure gives residents a recognizable rest area.
+	local shelterX = b.x - math.max(5, halfW * 0.48)
+	local shelterZ = center.Z - math.max(2.5, halfD * 0.46)
+	for _, dx in ipairs({ -2.7, 2.7 }) do
+		part(
+			area,
+			"ShelterPost",
+			Vector3.new(0.35, 3.6, 0.35),
+			Vector3.new(shelterX + dx, 1.8, shelterZ),
+			wood,
+			Enum.Material.Wood,
+			false
+		)
+	end
+	local canopy = part(
+		area,
+		"ShadeCanopy",
+		Vector3.new(6.5, 0.22, 4),
+		Vector3.new(shelterX, 3.65, shelterZ),
+		b.color:Lerp(Color3.fromRGB(76, 62, 84), 0.45),
+		Enum.Material.Fabric,
+		false
+	)
+	canopy:SetAttribute("NightTint", b.color)
+
+	if level >= 1 then
+		for _, side in ipairs({ -1, 1 }) do
+			local planterPos = center + Vector3.new(side * math.min(halfW - 3.5, 8), 0.48, halfD - 2.5)
+			part(
 				area,
-				"CampLamp",
-				Vector3.new(0.55, 0.55, 0.55),
-				post.Position + Vector3.new(0, 1.5, 0),
-				b.color,
+				"RanchPlanter",
+				Vector3.new(3.6, 0.7, 1.6),
+				planterPos,
+				Color3.fromRGB(97, 67, 45),
+				Enum.Material.WoodPlanks,
+				false
+			)
+			part(
+				area,
+				"PlanterGreen",
+				Vector3.new(3.2, 0.18, 1.25),
+				planterPos + Vector3.new(0, 0.43, 0),
+				Color3.fromRGB(79, 143, 79),
+				Enum.Material.Grass,
+				false
+			)
+		end
+	end
+	if level >= 2 then
+		local marker = part(
+			area,
+			"GardenBeacon",
+			Vector3.new(0.7, 2.8, 0.7),
+			center + Vector3.new(0, 1.5, -halfD + 2.2),
+			b.color,
+			Enum.Material.Neon,
+			false
+		)
+		marker:SetAttribute("NightTint", b.color)
+	end
+	if level >= 3 then
+		for _, side in ipairs({ -1, 1 }) do
+			local trim = part(
+				area,
+				"GrandRanchTrim",
+				Vector3.new(0.18, 0.18, spec.depth - 2),
+				center + Vector3.new(side * (halfW - 0.65), 0.48, 0),
+				C.Colors.Gold,
 				Enum.Material.Neon,
 				false
 			)
-			lamp:SetAttribute("CampPowered", true)
-			local light = Instance.new("PointLight")
-			light.Range = 14
-			light.Brightness = 0.5
-			light.Color = b.color
-			light.Parent = lamp
+			trim:SetAttribute("NightTint", C.Colors.Gold)
 		end
 	end
+
 	local slots = {}
 	for row = 0, spec.rows - 1 do
 		for col = 0, spec.columns - 1 do
@@ -474,6 +637,7 @@ function Camp.applyExpansion(b, level)
 			)
 		end
 	end
+
 	local old = b.model:FindFirstChild("PenArea")
 	if old then
 		old:Destroy()
@@ -486,4 +650,5 @@ function Camp.applyExpansion(b, level)
 	b.model:SetAttribute("PenCapacity", spec.capacity)
 	b.model:SetAttribute("RanchLevel", level)
 end
+
 return Camp
