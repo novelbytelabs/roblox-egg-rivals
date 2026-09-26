@@ -24,9 +24,9 @@ function V.run(g, check, a, b)
 	check("Visitor inspection exposes exact read-only pet identity only at the ranch", function()
 		local pet, record = visiblePet(g, b)
 		local pos = assert(record:GetAttribute("PenPosition"))
-		local beforeMoney = g.profiles[b].money.Value
 		local beforeRevision = pet.revision
 		near(g, a, pos + Vector3.new(0, 2, 4))
+		local beforeMoney = g.profiles[b].money.Value
 		local ok, data = g.ranch:inspect(a, pet.id)
 		assert(ok and data.id == pet.id and data.ownerUserId == b.UserId and data.ownerName == b.DisplayName)
 		assert(data.species == pet.species and data.element == pet.element and data.rarity == pet.rarity)
