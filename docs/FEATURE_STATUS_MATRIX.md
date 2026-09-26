@@ -83,7 +83,7 @@ Status meanings:
 | Duel Armory | IMPLEMENTED / VERIFICATION PENDING | Free Blaster/Rail/Scatter server-owned sidegrades; no paid competitive power |
 | Pet Outfitter | IMPLEMENTED / VERIFICATION PENDING | Free Standard/Ranger/Starlight styles on exact owned pets; no stat, income, size or rarity-readability mutation |
 | Quest Board / Ranger Station | ENGINEERING VERIFIED / PRESENTATION PENDING | Physical Ranger Station, three server-owned session contracts and exact-once Coin claims passed 0.4.2 regression |
-| Elemental Bazaar | APPROVED / NOT YET IMPLEMENTED | Elemental cosmetics/habitats |
+| Elemental Bazaar | IMPLEMENTED / VERIFICATION PENDING | Free Standard/Fire/Water/Wind/Earth ranch presentation themes; nonphysical and no economy/progression authority |
 | Egg Appraiser | EXCLUDED | Explicitly rejected |
 | Public item-transfer staking | DEFERRED / POLICY GATE | Requires current Roblox review |
 | Persistence | DEFERRED TO MVP | Current build session-only |

@@ -61,11 +61,26 @@ The physical Pet Outfitter offers three free cosmetic styles for exact owned pet
 
 Styles reuse the existing pet `variant` field, persist through existing inventory transfers, and replicate to ranch/companion rendering plus read-only visitor inspection. They do not alter creature, element, rarity, income, size, movement, Godly halo behavior, Coins or Robux.
 
+### 0.4.11 — Elemental Bazaar v1
+
+**IMPLEMENTED / VERIFICATION PENDING**
+
+The physical Elemental Bazaar offers five free ranch presentation themes:
+
+- **Standard Camp** — no elemental overlay.
+- **Ember Court** — Fire.
+- **Tide Court** — Water.
+- **Gale Court** — Wind.
+- **Root Court** — Earth.
+
+A selected theme adds a bounded nonphysical presentation layer to the player’s camp and recolors only the camp nameplate. Existing Fire/Water/Wind/Earth incubators keep their own authoritative element identity and the starter ranch habitats remain unchanged.
+
+Themes cost no Coins or Robux, replace rather than stack, and do not mutate inventory, pets, pet income, Speed, lab grade, ranch expansion, visible capacity or activity layout.
+
 ## Next approved gameplay sequence
 
-After the verification queue, Night Market, Duel Armory and Pet Outfitter:
+After the verification queue and completed shop slices:
 
-1. **Elemental Bazaar** — elemental ranch/incubator/pet presentation without pay-to-win bonuses.
-2. **Persistence / MVP production** — save progression, then broaden creatures, zones and platform support.
+1. **Persistence / MVP production** — save progression, then broaden creatures, zones and platform support.
 
 The project should remain centered on the established loop rather than drifting into unrelated side systems.

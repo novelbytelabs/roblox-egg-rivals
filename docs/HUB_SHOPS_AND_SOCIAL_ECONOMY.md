@@ -153,17 +153,25 @@ Quests should direct players toward the game's systems rather than become discon
 
 ## Elemental Bazaar
 
-The Elemental Bazaar supports Fire, Water, Wind, and Earth identity.
+Implementation candidate: **0.4.11 v1 — verification pending**.
 
-Candidate offerings:
+The Elemental Bazaar deepens Fire, Water, Wind, and Earth expression without creating four separate economies or selling progression.
 
-- elemental ranch decorations;
-- incubator cosmetics;
-- pet visual effects;
-- habitat objects;
-- base presentation.
+The initial free session themes are:
 
-It should deepen elemental expression without creating four separate pay-to-win economies.
+- **Standard Camp:** original camp presentation;
+- **Ember Court:** Fire-colored nonphysical beacons and camp sigil;
+- **Tide Court:** Water-colored glass droplets and camp sigil;
+- **Gale Court:** Wind-colored nonphysical vanes and camp sigil;
+- **Root Court:** Earth-colored nonphysical stones and camp sigil.
+
+Theme selection is server-owned, requires physical Bazaar proximity, and replaces the previous theme rather than stacking presentation.
+
+The theme layer affects only camp presentation and the camp nameplate color. It deliberately does not recolor or replace the four elemental incubators, because their Fire/Water/Wind/Earth identity remains gameplay-readable and authoritative.
+
+Themes cost no Coins or Robux and do not change inventory, pet income, Speed, lab grade, ranch expansion, visible resident capacity, habitat activity geometry or pet power.
+
+Future Bazaar depth may add similarly bounded incubator skins, habitat objects or base decorations only when they preserve element readability and remain cosmetic-only.
 
 ## Explicitly rejected
 
