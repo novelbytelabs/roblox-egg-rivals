@@ -489,15 +489,8 @@ function Camp.applyExpansion(b, level)
 	arch.Parent = area
 	for _, side in ipairs({ -1, 1 }) do
 		local x = b.x + side * 3
-		local post = part(
-			arch,
-			"GatePost",
-			Vector3.new(0.7, 4.4, 0.7),
-			Vector3.new(x, 2.2, -62),
-			wood,
-			Enum.Material.Wood,
-			true
-		)
+		local post =
+			part(arch, "GatePost", Vector3.new(0.7, 4.4, 0.7), Vector3.new(x, 2.2, -62), wood, Enum.Material.Wood, true)
 		local lamp = part(
 			arch,
 			"CampLamp",
