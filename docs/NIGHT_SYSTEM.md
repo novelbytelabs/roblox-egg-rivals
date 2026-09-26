@@ -180,13 +180,22 @@ This enhances an existing pet behavior rather than introducing a separate Night 
 
 ## Night Market
 
-The Night Market is physically closed during the day.
+Implementation candidate: **0.4.8 v1 — verification pending**.
 
-At Night its lights turn on and the location becomes active.
+The Night Market is physically closed during the day: its shutter blocks the stall, its search-aid prompt is disabled, and its lamps are dim.
 
-It may offer lanterns, maps, clue tools, or limited-use aids that help narrow the hidden egg search without revealing the exact location.
+At Moonrise the shutter opens, the lamps illuminate, and the shop becomes available. The free personal flashlight remains free and is not converted into a purchased lantern.
 
-Its purpose is to reinforce Night as a world event, not to trivialize the search.
+The bounded v1 sells two ephemeral search aids for ordinary Coins:
+
+- **Moon Compass — 35 Coins:** one coarse relative direction toward the still-hidden Night egg;
+- **Glow Map — 60 Coins:** one broad Forest sector clue.
+
+Each aid may be used once per player per Moonrise. A new Night resets eligibility.
+
+The server owns Night state, proximity, pricing, usage and clue generation. A purchase is rejected without charging if the player is away from the market, the target egg is already in play, the aid was already used that Night, or the player cannot afford it.
+
+Neither aid sends hidden-egg coordinates or creates an exact waypoint. Their purpose is to narrow the search while preserving exploration tension.
 
 ## Owner refinement — 2026-09-24
 

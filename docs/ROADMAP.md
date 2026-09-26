@@ -1,36 +1,49 @@
 # Egg Rivals Roadmap
 
-## Current engineering candidate
+## Current engineering baseline
 
-**EGG-RIVALS-0.4.5-rc1 — VISITOR RANCH INTERACTIONS v1** is the current verified engineering candidate.
+**EGG-RIVALS-0.4.5-rc1 — VISITOR RANCH INTERACTIONS v1** remains the latest engineering-verified candidate.
 
-- Exact tested source bytes committed at: `03e660ab64b192dafffcd216a79c4f28c20ea952`
-- Source digest: `540ca1c77c675d178412a1beae38eb48dcfc515fd5be46a96f833fb6638db369`
 - Exact-source multiplayer regression: **110 passed / 0 failed**
 - Real Studio topology: one server + two clients
-- PLAY/TEST gameplay scripts: **39 byte-identical**
-- Human Visitor Ranch feel/presentation review: **PENDING**
+- Human presentation review remains a separate gate
 - Roblox publication: **NOT PERFORMED**
 - Merge to `main`: **NOT AUTHORIZED**
 
-The 0.4.4 107/107 Social Drafting, 0.4.3 104/104 Elemental Tuning, 0.4.2 99/99 Ranger, 0.4.1 90/90 Sprint, 0.4.0-rc2 86/86 Night/Forest and earlier baselines remain preserved historical references.
+The 0.4.4 107/107 Social Drafting, 0.4.3 104/104 Elemental Tuning, 0.4.2 99/99 Ranger Contracts, 0.4.1 90/90 Sprint Rivalry, 0.4.0-rc2 86/86 Night/Forest and earlier baselines remain preserved historical references.
 
-## 0.4.5 achieved mechanically
+## Verification queue
 
-Engineering verification covers server-validated foreign-pet inspection, owner/self/range/unavailable-pet rejection, harmless rate-limited Admire, exact pet-state preservation, passive-income-only Coin movement, retained visitor Godly reverence, and the Trading Post transfer boundary. All prior regression families remain green.
+### 0.4.6 — Speed Mastery v1
 
-Exact evidence: `docs/STAGE3_045_VERIFICATION.md`.
+**IMPLEMENTED / VERIFICATION PENDING**
 
-## Current product gate
+Precision Mode and Overdrive Cut are implemented on the dedicated repair branch. Historical 112/2 and 113/1 failure evidence remains preserved. A fresh zero-failure exact-source Studio regression is still required before promotion.
 
-Mechanics-first development may continue while owner feel review remains separate. Eventually evaluate foreign-pet discoverability, panel readability, Admire frequency, reverence coexistence and Trading Post boundary clarity.
+### 0.4.7 — Living Ranch + Pet Activity
 
-## Next mechanics-first design target
+**IMPLEMENTED / VERIFICATION PENDING**
 
-**Speed Mastery v1** is the strongest remaining mechanics gap, but its control-focused unlocks must be defined concretely before implementation. The next design pass must preserve bounded movement, normalized Sprint fairness, server authority and non-pay-to-win progression.
+The branch contains richer ranch activity, habitat, homecoming and presentation work plus later pen usability improvements. The owner is satisfied with current pen progress, so further pen-layout polish is not the active roadmap target. Fresh exact-source Studio verification remains required.
 
-## Later production gates
+### 0.4.8 — Night Market v1
 
-Persistence, broader zones, mobile/console support, deeper shop ecosystems, additional creatures, public policy-reviewed staking, monetization implementation, broader live operations and public Roblox release remain later work.
+**IMPLEMENTED / VERIFICATION PENDING**
 
-No feature branch merges to `main` until owner review explicitly authorizes it.
+The Night Market is physically closed by Day and opens at Moonrise. Two bounded, one-use-per-Moonrise Coin aids narrow the hidden-egg search without exposing coordinates or an exact waypoint:
+
+- **Moon Compass** — coarse relative direction.
+- **Glow Map** — broad Forest sector.
+
+Server authority owns eligibility, cost, per-Night usage and clue generation. A real-client purchase probe is included in the regression family.
+
+## Next approved gameplay sequence
+
+After the verification queue and Night Market:
+
+1. **Duel Armory** — balanced weapon sidegrades and competitive presentation.
+2. **Pet Outfitter** — cosmetic pet identity without obscuring creature/element/rarity readability.
+3. **Elemental Bazaar** — elemental ranch/incubator/pet presentation without pay-to-win bonuses.
+4. **Persistence / MVP production** — save progression, then broaden creatures, zones and platform support.
+
+The project should remain centered on the established loop rather than drifting into unrelated side systems.

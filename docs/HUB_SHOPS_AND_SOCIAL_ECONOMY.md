@@ -67,20 +67,20 @@ The Exchange provides a useful sink for unwanted inventory without requiring pla
 Locked / Favorite items cannot be exchanged accidentally.
 ## Night Market
 
-The Night Market is a world-state shop.
+Implementation candidate: **0.4.8 v1 — verification pending**.
 
-During Day it is visibly closed.
+The Night Market is a world-state shop. During Day its shutter is closed, lights are dim and interaction is disabled. At Moonrise the stall opens and its neon lamps activate.
 
-At Night:
+The initial inventory deliberately stays small:
 
-- lights turn on;
-- neon presentation activates;
-- vendors / interfaces become available;
-- its inventory can support Night exploration.
+- **Moon Compass — 35 Coins:** a one-use-per-Moonrise coarse directional clue;
+- **Glow Map — 60 Coins:** a one-use-per-Moonrise broad Forest-sector clue.
 
-Approved item directions include lanterns, clue tools, maps, and limited-use aids that help narrow the hidden Night egg search.
+These are ephemeral search services rather than persistent inventory items. They do not add a new currency, change egg rarity, modify player Speed, alter pet income or reveal an exact waypoint.
 
-The Night Market must not simply reveal the egg with an exact waypoint.
+The free personal flashlight remains a baseline Night accessibility tool and is not sold here.
+
+Server validation owns Night availability, proximity, cost, per-Moonrise use and clue generation.
 
 ## Trainer Workshop
 

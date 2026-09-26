@@ -2,13 +2,15 @@
 
 Private canonical repository for Egg Rivals, a Roblox speed-heist, elemental-pet collection, living-ranch, social-economy, and opt-in rivalry game.
 
-Current verified engineering candidate: `EGG-RIVALS-0.4.4-rc1`.
+Current verified engineering candidate: `EGG-RIVALS-0.4.5-rc1`.
 
-The exact-source 0.4.4 candidate passed **107/107** checks in a real two-client Roblox Studio regression. The exact tested source bytes are committed at `301448dd7cf9a8fda748d4c14b585615f170d30d`. Source digest: `be7aaa66d706a1fa86dfe0a2ad7a277ee69a80934688719bb7a1a430a7ce70d8`.
+The exact-source 0.4.5 Visitor Ranch candidate passed **110/110** checks in a real two-client Roblox Studio regression. The 0.4.4 107/107 Social Drafting, 0.4.3 104/104 Elemental Tuning, 0.4.2 99/99 Ranger Contracts, 0.4.1 90/90 Sprint Rivalry, 0.4.0-rc2 86/86 Night/Forest and earlier baselines remain preserved historical evidence.
 
-0.4.4 retains the Night/Forest refinement, Sprint Rivalry, Ranger Contracts and Elemental Tuning, then adds server-owned Social Drafting: a bounded non-stacking +10% permanent-Speed training bonus for nearby simultaneous trainers.
+Current implementation queue:
 
-Human Social Drafting feel/tuning remains a separate owner-review gate. The prior 0.4.3 104/104, 0.4.2 99/99, 0.4.1 90/90, 0.4.0-rc2 86/86, rc1 77/77 and `MOONWOOD-0.3.2-r2` 24/24 candidates remain preserved historical evidence.
+- **0.4.6 Speed Mastery v1** — implemented on its repair branch; fresh exact-source Studio verification pending.
+- **0.4.7 Living Ranch + Pet Activity** — implemented on its feature branch; fresh exact-source Studio verification pending. The owner is satisfied with current pen progress, so further pen-layout polish is not the active roadmap target.
+- **0.4.8 Night Market v1** — implemented on `feature/0.4.8-night-market`; verification pending. It adds a physically closed-by-day Moonrise shop with bounded coarse search aids and no exact hidden-egg waypoint.
 
 Core loop:
 
@@ -18,9 +20,9 @@ Canonical source is under `src/`. Rojo projects are `default.project.json` and `
 
 ## Current direction
 
-The owner wants continued emphasis on **main mechanics and play** rather than polish closure.
+The owner wants continued emphasis on **main mechanics and play** rather than additional pen-layout polish.
 
-Social Drafting v1 is engineering-verified. The next bounded implementation candidate is 0.4.5 Visitor Ranch Interactions v1: read-only foreign-pet inspection, a harmless server-validated Admire reaction, and direct access to the existing visitor reverence request without new ownership or economy authority.
+The active verification queue is 0.4.6 Speed Mastery followed by 0.4.7 Living Ranch. GitHub-first feature development has resumed with 0.4.8 Night Market. After Night Market, the approved shop roadmap continues with Duel Armory, Pet Outfitter and Elemental Bazaar before later persistence, broader-world and production work.
 
 No merge to `main` or Roblox publication is authorized by engineering verification alone.
 

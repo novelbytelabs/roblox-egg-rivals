@@ -48,7 +48,7 @@ Status meanings:
 | Momentum training | ENGINEERING VERIFIED / PRESENTATION PENDING | Integral, threshold and decay behavior passed |
 | Visible treadmill modules | ENGINEERING PRESENT / PRESENTATION PENDING | Grade-driven LabModules, motor and grade indicators exist; independent component tree remains deferred |
 | Overdrive | ENGINEERING VERIFIED / PRESENTATION PENDING | Bounds, repeat rejection, expiry and duel/trial restrictions passed |
-| Speed Mastery | APPROVED / NOT YET IMPLEMENTED | Control-focused unlocks |
+| Speed Mastery | IMPLEMENTED / VERIFICATION PENDING | Precision Mode and Overdrive Cut are implemented; fresh exact-source Studio closure remains required |
 | Training Trials | ENGINEERING VERIFIED / PRESENTATION PENDING | Ordered gates, anti-teleport checks and real-client completion passed |
 | Personal ghost racer | ENGINEERING VERIFIED / PRESENTATION PENDING | Replayable personal-best path passed |
 | Elemental treadmill tuning | ENGINEERING VERIFIED / PRESENTATION PENDING | Standard/Fire/Water/Wind/Earth free server-owned sidegrades; normalized Trial/Sprint movement ignores tuning |
@@ -71,7 +71,7 @@ Status meanings:
 | Particle motion trails | ENGINEERING VERIFIED / PRESENTATION PENDING | Client pool reuse/budget checks passed; visual quality remains pending |
 | Full-stop collision splatter | ENGINEERING VERIFIED / PRESENTATION PENDING | Contact/full-stop classifier passed; visual quality remains pending |
 | Moon Shrine Night clue role | SOURCE PATH PRESENT / REVIEW PENDING | Server Awake/ClueRegion and client clue presentation exist; tuning remains open |
-| Night Market | APPROVED / NOT YET IMPLEMENTED | Closed by day |
+| Night Market | IMPLEMENTED / VERIFICATION PENDING | Closed by Day; Moonrise-only Moon Compass and Glow Map provide coarse coordinate-free search clues |
 | Arena neon collision effects | DEFERRED | Revisit with arena polish |
 | System | Status | Notes |
 |---|---|---|
