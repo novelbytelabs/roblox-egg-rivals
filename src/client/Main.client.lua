@@ -150,7 +150,7 @@ local function notify(text, sound)
 		end
 	end)
 end
-local debugPanel = U.frame(root, "StudioTools", 14, 394, 218, 246, C.Colors.Panel)
+local debugPanel = U.frame(root, "StudioTools", 14, 359, 218, 281, C.Colors.Panel)
 debugPanel.Visible = RunService:IsStudio()
 U.text(debugPanel, "Title", "STUDIO TEST CONTROLS", 10, 4, 198, 19, 11, C.Colors.Muted)
 local bossButton = U.button(debugPanel, "BossToggle", "BOSS: ON", 10, 29, 198, 29, function()
@@ -171,6 +171,42 @@ end, C.Colors.Gold)
 U.button(debugPanel, "MaxRanch", "MAX RANCH TEST", 10, 204, 198, 29, function()
 	send("debugMaxRanch")
 end, C.Colors.Mint)
+local ranchView = false
+local ranchViewButton
+ranchViewButton = U.button(debugPanel, "RanchView", "RANCH VIEW", 10, 239, 198, 29, function()
+	local camera = workspace.CurrentCamera
+	if not camera then
+		return
+	end
+	if ranchView then
+		ranchView = false
+		camera.CameraType = Enum.CameraType.Custom
+		local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			camera.CameraSubject = humanoid
+		end
+		ranchViewButton.Text = "RANCH VIEW"
+		return
+	end
+	local world = workspace:FindFirstChild("Moonwood")
+	local baseIndex = state and state.base
+	local base = world and baseIndex and world:FindFirstChild("Base" .. tostring(baseIndex))
+	local area = base and base:FindFirstChild("PenArea")
+	local floor = area and area:FindFirstChild("PetPenFloor")
+	if not floor then
+		notify("Your ranch view is not ready yet.")
+		return
+	end
+	ranchView = true
+	camera.CameraType = Enum.CameraType.Scriptable
+	local center = floor.Position
+	local depth = floor.Size.Z
+	camera.CFrame = CFrame.lookAt(
+		center + Vector3.new(0, math.max(18, depth * 0.62), math.max(23, depth * 0.88)),
+		center + Vector3.new(0, 1.5, 0)
+	)
+	ranchViewButton.Text = "EXIT RANCH VIEW"
+end, C.Colors.Blue)
 local modal = U.frame(root, "CollectionPanel", 90, 87, 900, 490, C.Colors.Panel)
 modal.Visible = false
 U.text(modal, "Title", "YOUR COLLECTION", 18, 12, 500, 35, 24, C.Colors.Gold)
