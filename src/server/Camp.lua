@@ -563,16 +563,24 @@ function Camp.applyExpansion(b, level)
 			false
 		)
 	end
-	local ledgerTrim = part(
-		arch,
-		"RanchLedgerTrim",
-		Vector3.new(7.35, 3.55, 0.18),
-		Vector3.new(ledgerX, 2.85, ledgerZ),
-		b.color,
-		Enum.Material.Neon,
-		false
-	)
-	ledgerTrim:SetAttribute("NightTint", b.color)
+	local ledgerWidth, ledgerHeight = 7.35, 3.55
+	for _, edge in ipairs({
+		{ "Top", Vector3.new(ledgerWidth, 0.14, 0.18), Vector3.new(0, ledgerHeight / 2, 0) },
+		{ "Bottom", Vector3.new(ledgerWidth, 0.14, 0.18), Vector3.new(0, -ledgerHeight / 2, 0) },
+		{ "Left", Vector3.new(0.14, ledgerHeight, 0.18), Vector3.new(-ledgerWidth / 2, 0, 0) },
+		{ "Right", Vector3.new(0.14, ledgerHeight, 0.18), Vector3.new(ledgerWidth / 2, 0, 0) },
+	}) do
+		local trim = part(
+			arch,
+			"RanchLedgerTrim" .. edge[1],
+			edge[2],
+			Vector3.new(ledgerX, 2.85, ledgerZ) + edge[3],
+			b.color,
+			Enum.Material.Neon,
+			false
+		)
+		trim:SetAttribute("NightTint", b.color)
+	end
 	local ledger = part(
 		arch,
 		"RanchLedger",
@@ -583,7 +591,9 @@ function Camp.applyExpansion(b, level)
 		false
 	)
 	b.earningsLabel =
-		Art.billboard(ledger, "YOUR RANCH\n0 PETS • +0 COINS/MIN", C.Colors.Text, 300, 64, Vector3.new(0, 0, 0.55))
+		Art.billboard(ledger, "YOUR RANCH\n0 PETS • +0 COINS/MIN", C.Colors.Text, 330, 64, Vector3.new(0, 0, 0.55))
+	b.earningsLabel.TextSize = 18
+	b.earningsLabel.Parent.MaxDistance = 90
 
 	-- A simple shade structure gives residents a recognizable rest area.
 	local shelterX = b.x - math.max(5, halfW * 0.48)
@@ -661,11 +671,18 @@ function Camp.applyExpansion(b, level)
 	end
 
 	local slots = {}
+	local sideColumns = math.max(1, math.floor(spec.columns / 2))
+	local usableHalf = math.max(5.2, halfW - 3.2)
+	local innerLane = math.min(5.2, usableHalf)
+	local laneStep = sideColumns > 1 and (usableHalf - innerLane) / (sideColumns - 1) or 0
 	for row = 0, spec.rows - 1 do
 		for col = 0, spec.columns - 1 do
+			local side = col < sideColumns and -1 or 1
+			local sideIndex = col % sideColumns
+			local xOffset = side * (innerLane + sideIndex * laneStep)
 			table.insert(
 				slots,
-				center + Vector3.new((col - (spec.columns - 1) / 2) * 5.2, 1.8, (row - (spec.rows - 1) / 2) * 5.5)
+				center + Vector3.new(xOffset, 1.8, (row - (spec.rows - 1) / 2) * 5.5)
 			)
 		end
 	end
