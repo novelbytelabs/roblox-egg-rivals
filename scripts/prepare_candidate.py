@@ -14,6 +14,7 @@ BRANCHES = (
     "feature/0.4.0-living-world",
     "fix/0.4.6-speed-mastery-verification",
     "feature/0.4.7-living-ranch",
+    "feature/0.4.8-night-market",
 )
 TEMPLATES = ("default.project.json", "test.project.json")
 
@@ -87,7 +88,7 @@ def main():
     root = args.repo.resolve(strict=True)
     branch, head = git(root, "branch", "--show-current"), git(root, "rev-parse", "HEAD")
     if args.expected_branch != BRANCHES[0] and not args.expected_head:
-        parser.error("The repair and Living Ranch branches require --expected-head")
+        parser.error("Non-baseline branches require --expected-head")
     if args.expected_head and not re.fullmatch(r"[0-9a-f]{40}", args.expected_head):
         parser.error("--expected-head must be a full 40-character lowercase commit SHA")
     if branch != args.expected_branch or (args.expected_head and head != args.expected_head):
