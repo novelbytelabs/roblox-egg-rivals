@@ -86,7 +86,7 @@ Status meanings:
 | Elemental Bazaar | IMPLEMENTED / VERIFICATION PENDING | Free Standard/Fire/Water/Wind/Earth ranch presentation themes; nonphysical and no economy/progression authority |
 | Egg Appraiser | EXCLUDED | Explicitly rejected |
 | Public item-transfer staking | DEFERRED / POLICY GATE | Requires current Roblox review |
-| Persistence | DEFERRED TO MVP | Current build session-only |
+| Persistence | SCHEMA FOUNDATION IMPLEMENTED / DATASTORE TRANSPORT PENDING | 0.5.0 captures, validates and restores durable profile state with exact item IDs; no DataStore I/O yet |
 | Mobile/tablet controls | DEFERRED TO MVP/LATER | PC first |
 | Xbox / PlayStation controls | DEFERRED TO MVP/LATER | PC first |
 | VR | EXCLUDED | Out of scope |

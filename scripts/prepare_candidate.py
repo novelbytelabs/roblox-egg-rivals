@@ -18,6 +18,7 @@ BRANCHES = (
     "feature/0.4.9-duel-armory",
     "feature/0.4.10-pet-outfitter",
     "feature/0.4.11-elemental-bazaar",
+    "feature/0.5.0-persistence-schema",
 )
 TEMPLATES = ("default.project.json", "test.project.json")
 

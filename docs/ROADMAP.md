@@ -77,10 +77,32 @@ A selected theme adds a bounded nonphysical presentation layer to the player’s
 
 Themes cost no Coins or Robux, replace rather than stack, and do not mutate inventory, pets, pet income, Speed, lab grade, ranch expansion, visible capacity or activity layout.
 
+### 0.5.0 — Persistence Schema Foundation
+
+**IMPLEMENTED / VERIFICATION PENDING — NO DATASTORE I/O**
+
+This slice defines a versioned, server-owned durable profile record and exact restore path before any live persistence transport is enabled.
+
+The schema covers the MVP persistence requirements already present in the game:
+
+- Speed, Coins and fractional Coin remainder;
+- Speed Lab grade, tuning, milestones and cumulative records;
+- exact inventory item IDs and durable item metadata;
+- pet ownership, active/pen state, Favorite/Lock, cosmetic variant and welcome history;
+- egg creature/rarity plus incubating element and remaining duration;
+- ranch expansion;
+- selected Duel Armory loadout;
+- selected Elemental Bazaar ranch theme.
+
+Transient Trade/Exchange/Escrow states are rejected rather than serialized. Duel/Trade/Trial/Sprint/hold/preview state, active Overdrive, momentary momentum/energy and live Instances are not part of the durable record.
+
+The restore path reconstructs incubator models and ranch presentation from validated data. It resets transient lab/session state instead of pretending those values are durable.
+
+This slice performs **no DataStore reads or writes**.
+
 ## Next approved gameplay sequence
 
-After the verification queue and completed shop slices:
-
-1. **Persistence / MVP production** — save progression, then broaden creatures, zones and platform support.
+1. **0.5.1 DataStore transport / session ownership** — one-key-per-player DataStore integration using the verified schema, fail-closed loading, UpdateAsync-based writes, bounded retries and safe shutdown behavior.
+2. **MVP production hardening** — migration/rollback/observability, then broader creatures, zones and platform support.
 
 The project should remain centered on the established loop rather than drifting into unrelated side systems.

@@ -34,6 +34,14 @@ MVP persistence is expected for at least:
 - unlocked cosmetics / progression.
 
 Persistence implementation belongs to MVP, not the already-verified Stage 3 baseline.
+
+### Current persistence implementation status
+
+0.5.0 implements only the **schema/restore foundation**. It version-checks and validates durable player data, rejects unresolved ownership-transaction states, preserves exact inventory IDs, and reconstructs resumable incubations and ranch presentation.
+
+0.5.0 intentionally performs **no DataStore reads or writes**. DataStore transport, session ownership/locking, retry policy, shutdown saves, migrations, rollback and production observability remain 0.5.1+ work.
+
+Roblox's current production guidance should be followed for that transport layer: use server-only DataStore access, prefer a small fixed set of stores with one/few keys per player, buffer gameplay state in memory, prefer UpdateAsync for multi-server-safe dependent writes, handle transient failures with bounded ordered retries, and keep Studio away from production data.
 ## Server authority and anti-exploit
 
 The server owns:
