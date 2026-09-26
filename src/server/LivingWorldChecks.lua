@@ -337,8 +337,8 @@ function Checks.run(g, check, a, b, results)
 		pro.slowUntil = 0
 		pro.speed.Value = C.Grades[pro.tier].cap
 		pro.lab.charge = 100
-		local normal = R.speed(pro.speed.Value, false, C.Tunings.Standard.overdriveFactor)
-		local burst = R.speed(pro.speed.Value, true, C.Tunings.Standard.overdriveFactor)
+		local normal = Rules.speed(pro.speed.Value, false, C.Tunings.Standard.overdriveFactor)
+		local burst = Rules.speed(pro.speed.Value, true, C.Tunings.Standard.overdriveFactor)
 		assert(g:action(a, "overdrive", {}))
 		assert(g.carry[a] == carried and pro.lab.charge == 0 and math.abs(g:humanoid(a).WalkSpeed - burst) < 0.001)
 		assert(not g.speedLab:activate(a))
