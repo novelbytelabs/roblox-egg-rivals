@@ -1,3 +1,4 @@
+local Habitats = require(script.Parent.RanchHabitats)
 -- Original modular camp geometry. Upgrades replace only owned presentation sections.
 local Shared = game:GetService("ReplicatedStorage").Stage3Shared
 local C = require(Shared.Config)
@@ -481,6 +482,7 @@ function Camp.applyExpansion(b, level)
 	b.penCenter = center
 	b.penSlots = slots
 	b.penBounds = Vector2.new(halfW - 2.5, halfD - 2.5)
+	Habitats.build(b, area, center, b.penBounds)
 	b.model:SetAttribute("PenCapacity", spec.capacity)
 	b.model:SetAttribute("RanchLevel", level)
 end

@@ -36,9 +36,21 @@ end
 local function signature(g, p)
 	local rows = {}
 	for _, item in ipairs(g.inventory:list(p.UserId)) do
-		table.insert(rows, { item.id, item.ownerId, item.kind, item.rarity or "", item.creature or "", item.element or "",
-			item.state, item.revision or 0, item.petMode or "", item.favorite == true, item.order or 0,
-			item.locked == true, item.reservation or "" })
+		table.insert(rows, {
+			item.id,
+			item.ownerId,
+			item.kind,
+			item.rarity or "",
+			item.creature or "",
+			item.element or "",
+			item.state,
+			item.revision or 0,
+			item.petMode or "",
+			item.favorite == true,
+			item.order or 0,
+			item.locked == true,
+			item.reservation or "",
+		})
 	end
 	return HttpService:JSONEncode(rows)
 end
@@ -49,12 +61,18 @@ function Checks.run(g, check, a, b, results)
 		local token = "ranch-position-" .. p.UserId .. "-" .. tostring(g:now())
 		g:teleport(p, cf)
 		g:feed(p, "completionInputProbe", { token = token, kind = "Position", target = cf.Position })
-		assert(waitFor(function()
-			local root = g:root(p)
-			local diag = g.clientDiagnostics[p]
-			return root and (root.Position - cf.Position).Magnitude < 6
-				and diag and diag.token == token and diag.passed
-		end, 5), "Ranch fixture did not settle on both client and server")
+		assert(
+			waitFor(function()
+				local root = g:root(p)
+				local diag = g.clientDiagnostics[p]
+				return root
+					and (root.Position - cf.Position).Magnitude < 6
+					and diag
+					and diag.token == token
+					and diag.passed
+			end, 5),
+			"Ranch fixture did not settle on both client and server"
+		)
 	end
 	local function scenario(name, body)
 		check(name, function()
@@ -62,11 +80,20 @@ function Checks.run(g, check, a, b, results)
 			for _, p in ipairs({ a, b }) do
 				assert(g:alive(p) and not g:busy(p) and not g.carry[p], "Ranch fixture requires free real players")
 				local pro = g.profiles[p]
-				saved[p] = { ranch = copy(pro.ranch), level = pro.ranchLevel, page = pro.penPage,
-					active = pro.activePetId, position = g:root(p).CFrame,
-					money = pro.money.Value, remainder = pro.coinRemainder, speed = pro.speed.Value,
-					lab = copy(pro.lab), tutorial = pro.tutorial, rates = copy(pro.rates),
-					contracts = copy(g.contracts.sessions[p]) }
+				saved[p] = {
+					ranch = copy(pro.ranch),
+					level = pro.ranchLevel,
+					page = pro.penPage,
+					active = pro.activePetId,
+					position = g:root(p).CFrame,
+					money = pro.money.Value,
+					remainder = pro.coinRemainder,
+					speed = pro.speed.Value,
+					lab = copy(pro.lab),
+					tutorial = pro.tutorial,
+					rates = copy(pro.rates),
+					contracts = copy(g.contracts.sessions[p]),
+				}
 			end
 			local function pet(p, rarity, creature, element, order)
 				local item, err = g.inventory:create(p.UserId, "Pet", rarity, creature, element)
@@ -160,32 +187,37 @@ function Checks.run(g, check, a, b, results)
 		assert(signature(g, a) == before and g.inventory:income(a.UserId) == income)
 	end)
 
-	scenario("Living Ranch episodes remain stable between decision times and recover missing habitat targets", function(items)
-		local pro = g.profiles[a]
-		pro.ranch.activities, pro.ranch.nextGroupAt = {}, g:now() + 3600
-		local now = g:now()
-		g.ranch:updateRecords(a, now)
-		local record = assert(g.petRecords:FindFirstChild(items[2].id))
-		local serial = record:GetAttribute("ActivitySerial")
-		g.ranch:updateRecords(a, now + 0.1)
-		assert(record:GetAttribute("ActivitySerial") == serial)
-		local entry = { item = items[2], record = record }
-		local plan
-		for _ = 1, 5 do
-			plan = g.ranch.activities:solo(pro, entry, now, g.ranch.activities:godlies(a.UserId))
-			if plan.habitat then break end
+	scenario(
+		"Living Ranch episodes remain stable between decision times and recover missing habitat targets",
+		function(items)
+			local pro = g.profiles[a]
+			pro.ranch.activities, pro.ranch.nextGroupAt = {}, g:now() + 3600
+			local now = g:now()
+			g.ranch:updateRecords(a, now)
+			local record = assert(g.petRecords:FindFirstChild(items[2].id))
+			local serial = record:GetAttribute("ActivitySerial")
+			g.ranch:updateRecords(a, now + 0.1)
+			assert(record:GetAttribute("ActivitySerial") == serial)
+			local entry = { item = items[2], record = record }
+			local plan
+			for _ = 1, 5 do
+				plan = g.ranch.activities:solo(pro, entry, now, g.ranch.activities:godlies(a.UserId))
+				if plan.habitat then
+					break
+				end
+			end
+			assert(plan and plan.habitat == "Fire")
+			pro.ranch.activities[items[2].id] = plan
+			pro.base.activitySites.Fire.model:Destroy()
+			g.ranch:updateRecords(a, now + 0.2)
+			assert(record:GetAttribute("ActivityHabitat") == nil)
+			assert(record:GetAttribute("ActivityKind") == "Idle")
+			assert(R.vector(record:GetAttribute("ActivityTarget")))
+			local foreignSite = g.profiles[b].base.activitySites.Water
+			pro.base.activitySites.Water = foreignSite
+			assert(g.ranch.activities:site(pro, "Water") == nil)
 		end
-		assert(plan and plan.habitat == "Fire")
-		pro.ranch.activities[items[2].id] = plan
-		pro.base.activitySites.Fire.model:Destroy()
-		g.ranch:updateRecords(a, now + 0.2)
-		assert(record:GetAttribute("ActivityHabitat") == nil)
-		assert(record:GetAttribute("ActivityKind") == "Idle")
-		assert(R.vector(record:GetAttribute("ActivityTarget")))
-		local foreignSite = g.profiles[b].base.activitySites.Water
-		pro.base.activitySites.Water = foreignSite
-		assert(g.ranch.activities:site(pro, "Water") == nil)
-	end)
+	)
 
 	scenario("Living Ranch paired play and group naps remain bounded to eligible same-owner residents", function()
 		local pro = g.profiles[a]
@@ -202,14 +234,16 @@ function Checks.run(g, check, a, b, results)
 			end
 		end
 		local pairCount = 0
-		for _ in pairs(pairsSeen) do pairCount = pairCount + 1 end
+		for _ in pairs(pairsSeen) do
+			pairCount = pairCount + 1
+		end
 		assert(pairCount >= 1 and pairCount <= A.MaxPairs)
 		pro.ranch.activities, pro.ranch.nextGroupAt, pro.ranch.groupSerial = {}, 0, 2
 		g.ranch:updateRecords(a, g:now())
 		local napCount, element = 0, nil
 		for _, entry in ipairs(g.ranch:visiblePets(a)) do
 			if entry.record:GetAttribute("ActivityKind") == "GroupNap" then
-				napCount = napCount + (1)
+				napCount = napCount + 1
 				element = element or entry.item.element
 				assert(entry.item.element == element and entry.item.rarity ~= "Godly")
 			end
@@ -221,7 +255,10 @@ function Checks.run(g, check, a, b, results)
 		local pro = g.profiles[a]
 		local selected
 		for _, entry in ipairs(g.ranch:visiblePets(a)) do
-			if entry.record:GetAttribute("ActivityPartnerId") then selected = entry break end
+			if entry.record:GetAttribute("ActivityPartnerId") then
+				selected = entry
+				break
+			end
 		end
 		assert(selected, "Pair fixture did not form")
 		local partnerId = selected.record:GetAttribute("ActivityPartnerId")
@@ -237,18 +274,27 @@ function Checks.run(g, check, a, b, results)
 		end
 	end)
 
-	scenario("Living Ranch return greeting uses a real absence and does not repeat while the owner stays home", function()
-		local pro = g.profiles[a]
-		place(a, CFrame.new(0, 4, 30))
-		assert(waitFor(function() return pro.ranch.wasHome == false and pro.ranch.leftAt ~= nil end, 3))
-		local departed = pro.ranch.leftAt
-		assert(waitFor(function() return g:now() - departed >= C.HomeAwayTime + 0.1 end, C.HomeAwayTime + 3))
-		place(a, CFrame.new(pro.base.center + Vector3.new(0, 4, 0)))
-		assert(waitFor(function() return pro.ranch.wasHome and pro.ranch.greetUntil > g:now() end, 3))
-		local deadline = pro.ranch.greetUntil
-		task.wait(C.RanchTick + 0.1)
-		assert(pro.ranch.greetUntil == deadline)
-	end)
+	scenario(
+		"Living Ranch return greeting uses a real absence and does not repeat while the owner stays home",
+		function()
+			local pro = g.profiles[a]
+			place(a, CFrame.new(0, 4, 30))
+			assert(waitFor(function()
+				return pro.ranch.wasHome == false and pro.ranch.leftAt ~= nil
+			end, 3))
+			local departed = pro.ranch.leftAt
+			assert(waitFor(function()
+				return g:now() - departed >= C.HomeAwayTime + 0.1
+			end, C.HomeAwayTime + 3))
+			place(a, CFrame.new(pro.base.center + Vector3.new(0, 4, 0)))
+			assert(waitFor(function()
+				return pro.ranch.wasHome and pro.ranch.greetUntil > g:now()
+			end, 3))
+			local deadline = pro.ranch.greetUntil
+			task.wait(C.RanchTick + 0.1)
+			assert(pro.ranch.greetUntil == deadline)
+		end
+	)
 
 	scenario("Living Ranch rejects stale owner and expired activity snapshots without invalid geometry", function(items)
 		local record = assert(g.petRecords:FindFirstChild(items[2].id))
@@ -268,52 +314,70 @@ function Checks.run(g, check, a, b, results)
 		assert(record:GetAttribute("ActivityOwnerUserId") == a.UserId)
 	end)
 
-	scenario("Living Ranch homecoming and milestones are independently rate-limited without authority changes", function()
-		local pro = g.profiles[a]
-		local inventory = signature(g, a)
-		local coins, remainder, speed = pro.money.Value, pro.coinRemainder, pro.speed.Value
-		-- No waits occur between these production calls and assertions.
-		assert(g.ranch:homecoming(a, "return"))
-		local untilTime = pro.ranch.greetUntil
-		assert(not g.ranch:homecoming(a, "return"))
-		assert(not g.ranch:homecoming(a, "respawn"))
-		assert(pro.ranch.greetUntil == untilTime)
-		assert(g.ranch:homecoming(a, "record"))
-		assert(not g.ranch:homecoming(a, "record"))
-		assert(not g.ranch:homecoming(a, "unsupported"))
-		g.ranch:updateRecords(a, g:now())
-		assert(signature(g, a) == inventory)
-		assert(pro.money.Value == coins and pro.coinRemainder == remainder and pro.speed.Value == speed)
-	end)
-
-	scenario("Living Ranch training spectators follow authoritative training without changing progression", function(items)
-		local pro = g.profiles[a]
-		place(a, CFrame.new(pro.base.treadmill.Position + Vector3.new(0, 3, 0)))
-		assert(waitFor(function() return pro.training == true end, 3), "Real treadmill training did not begin")
-		local companion = assert(g.petRecords:FindFirstChild(items[10].id))
-		local watchers = 0
-		assert(waitFor(function()
-			watchers = 0
-			for _, entry in ipairs(g.ranch:visiblePets(a)) do
-				if entry.record:GetAttribute("ActivityKind") == "TrainingWatch" then watchers = watchers + 1 end
-			end
-			return watchers > 0 and companion:GetAttribute("CompanionActivity") == "Training"
-		end, A.MilestoneSeconds + A.HomecomingSeconds + 4), "Training reaction did not follow higher-priority celebrations")
-		local inventory, speed, coins, charge = signature(g, a), pro.speed.Value, pro.money.Value, pro.lab.charge
-		g.ranch:updateRecords(a, g:now())
-		assert(watchers <= A.MaxSpectators)
-		assert(companion:GetAttribute("CompanionActivity") == "Training")
-		assert(companion:GetAttribute("CompanionTarget") == pro.base.treadmill.Position)
-		assert(signature(g, a) == inventory and pro.speed.Value == speed and pro.money.Value == coins)
-		assert(pro.lab.charge == charge)
-		place(a, CFrame.new(pro.base.center + Vector3.new(0, 4, 0)))
-		assert(waitFor(function() return pro.training == false end, 3))
-		g.ranch:updateRecords(a, g:now())
-		assert(companion:GetAttribute("CompanionActivity") ~= "Training")
-		for _, entry in ipairs(g.ranch:visiblePets(a)) do
-			assert(entry.record:GetAttribute("ActivityKind") ~= "TrainingWatch")
+	scenario(
+		"Living Ranch homecoming and milestones are independently rate-limited without authority changes",
+		function()
+			local pro = g.profiles[a]
+			local inventory = signature(g, a)
+			local coins, remainder, speed = pro.money.Value, pro.coinRemainder, pro.speed.Value
+			-- No waits occur between these production calls and assertions.
+			assert(g.ranch:homecoming(a, "return"))
+			local untilTime = pro.ranch.greetUntil
+			assert(not g.ranch:homecoming(a, "return"))
+			assert(not g.ranch:homecoming(a, "respawn"))
+			assert(pro.ranch.greetUntil == untilTime)
+			assert(g.ranch:homecoming(a, "record"))
+			assert(not g.ranch:homecoming(a, "record"))
+			assert(not g.ranch:homecoming(a, "unsupported"))
+			g.ranch:updateRecords(a, g:now())
+			assert(signature(g, a) == inventory)
+			assert(pro.money.Value == coins and pro.coinRemainder == remainder and pro.speed.Value == speed)
 		end
-	end)
+	)
+
+	scenario(
+		"Living Ranch training spectators follow authoritative training without changing progression",
+		function(items)
+			local pro = g.profiles[a]
+			place(a, CFrame.new(pro.base.treadmill.Position + Vector3.new(0, 3, 0)))
+			assert(
+				waitFor(function()
+					return pro.training == true
+				end, 3),
+				"Real treadmill training did not begin"
+			)
+			local companion = assert(g.petRecords:FindFirstChild(items[10].id))
+			local watchers = 0
+			assert(
+				waitFor(function()
+					watchers = 0
+					for _, entry in ipairs(g.ranch:visiblePets(a)) do
+						if entry.record:GetAttribute("ActivityKind") == "TrainingWatch" then
+							watchers = watchers + 1
+						end
+					end
+					return watchers > 0 and companion:GetAttribute("CompanionActivity") == "Training"
+				end, A.MilestoneSeconds + A.HomecomingSeconds + 4),
+				"Training reaction did not follow higher-priority celebrations"
+			)
+			local inventory, speed, coins, charge = signature(g, a), pro.speed.Value, pro.money.Value, pro.lab.charge
+			g.ranch:updateRecords(a, g:now())
+			assert(watchers <= A.MaxSpectators)
+			assert(companion:GetAttribute("CompanionActivity") == "Training")
+			assert(companion:GetAttribute("CompanionTarget") == pro.base.treadmill.Position)
+			assert(signature(g, a) == inventory and pro.speed.Value == speed and pro.money.Value == coins)
+			assert(pro.lab.charge == charge)
+			place(a, CFrame.new(pro.base.center + Vector3.new(0, 4, 0)))
+			assert(waitFor(function()
+				return pro.training == false
+			end, 3))
+			g.ranch:updateRecords(a, g:now())
+			assert(companion:GetAttribute("CompanionActivity") ~= "Training")
+			for _, entry in ipairs(g.ranch:visiblePets(a)) do
+				assert(entry.record:GetAttribute("ActivityKind") ~= "TrainingWatch")
+			end
+		end
+	)
 
 	scenario("Living Ranch sampled activity stays inside pens and respects every Godly exclusion", function()
 		local godlies = g.ranch.activities:godlies(a.UserId)
@@ -335,25 +399,30 @@ function Checks.run(g, check, a, b, results)
 		end
 	end)
 
-	scenario("Living Ranch paging and active switches prune activities without losing ownership or income", function(items)
-		local pro = g.profiles[a]
-		local count, income = #g.inventory:list(a.UserId), g.inventory:income(a.UserId)
-		assert(pro.penPages > 1)
-		assert(g:setPenPage(a, 2))
-		g.ranch:updateRecords(a, g:now())
-		for id in pairs(pro.ranch.activities) do
-			local record = assert(g.petRecords:FindFirstChild(id))
-			assert(record:GetAttribute("Displayed") and record:GetAttribute("DisplayMode") == "Pen")
+	scenario(
+		"Living Ranch paging and active switches prune activities without losing ownership or income",
+		function(items)
+			local pro = g.profiles[a]
+			local count, income = #g.inventory:list(a.UserId), g.inventory:income(a.UserId)
+			assert(pro.penPages > 1)
+			assert(g:setPenPage(a, 2))
+			g.ranch:updateRecords(a, g:now())
+			for id in pairs(pro.ranch.activities) do
+				local record = assert(g.petRecords:FindFirstChild(id))
+				assert(record:GetAttribute("Displayed") and record:GetAttribute("DisplayMode") == "Pen")
+			end
+			assert(g:setPetMode(a, items[2].id, "Active"))
+			g.ranch:updateRecords(a, g:now())
+			assert(pro.ranch.activities[items[2].id] == nil)
+			local active = 0
+			for _, item in ipairs(g.inventory:list(a.UserId)) do
+				if item.kind == "Pet" and item.petMode == "Active" then
+					active = active + 1
+				end
+			end
+			assert(active == 1 and #g.inventory:list(a.UserId) == count and g.inventory:income(a.UserId) == income)
 		end
-		assert(g:setPetMode(a, items[2].id, "Active"))
-		g.ranch:updateRecords(a, g:now())
-		assert(pro.ranch.activities[items[2].id] == nil)
-		local active = 0
-		for _, item in ipairs(g.inventory:list(a.UserId)) do
-			if item.kind == "Pet" and item.petMode == "Active" then active = active + 1 end
-		end
-		assert(active == 1 and #g.inventory:list(a.UserId) == count and g.inventory:income(a.UserId) == income)
-	end)
+	)
 
 	scenario("Living Ranch activities yield to welcome parties and same-element Godly reverence", function(items)
 		local pro, now = g.profiles[a], g:now()
@@ -373,20 +442,25 @@ function Checks.run(g, check, a, b, results)
 		end
 	end)
 
-	scenario("Living Ranch earnings include hidden and active owned pets while visitor sampling stays read-only", function(items)
-		local total = 0
-		for _, item in ipairs(g.inventory:list(a.UserId)) do
-			if item.kind == "Pet" then total = total + 1 end
+	scenario(
+		"Living Ranch earnings include hidden and active owned pets while visitor sampling stays read-only",
+		function(items)
+			local total = 0
+			for _, item in ipairs(g.inventory:list(a.UserId)) do
+				if item.kind == "Pet" then
+					total = total + 1
+				end
+			end
+			local text = g.profiles[a].base.earningsLabel.Text
+			assert(text:find(tostring(total) .. " pets", 1, true))
+			assert(text:find("+" .. g.inventory:income(a.UserId) .. " Coins/min", 1, true))
+			local record = assert(g.petRecords:FindFirstChild(items[2].id))
+			local before = signature(g, a)
+			assert(R.vector(g.ranch.activities:position(record, a)))
+			assert(g.ranch.activities:position(record, b) == nil)
+			assert(signature(g, a) == before)
 		end
-		local text = g.profiles[a].base.earningsLabel.Text
-		assert(text:find(tostring(total) .. " pets", 1, true))
-		assert(text:find("+" .. g.inventory:income(a.UserId) .. " Coins/min", 1, true))
-		local record = assert(g.petRecords:FindFirstChild(items[2].id))
-		local before = signature(g, a)
-		assert(R.vector(g.ranch.activities:position(record, a)))
-		assert(g.ranch.activities:position(record, b) == nil)
-		assert(signature(g, a) == before)
-	end)
+	)
 
 	scenario("Living Ranch habitat preferences use each pet's own element and current layout only", function(items)
 		local pro = g.profiles[a]
@@ -433,34 +507,45 @@ function Checks.run(g, check, a, b, results)
 		assert(item.state == "Inventory" and record:GetAttribute("ActivityOwnerUserId") == a.UserId)
 	end)
 
-	scenario("Living Ranch actual inventory transfer discards the old owner's activity and keeps income accounting", function(items)
-		local item = items[2]
-		local key = "ranch-transfer-" .. tostring(g:now())
-		local total = #g.inventory:list(a.UserId) + #g.inventory:list(b.UserId)
-		local income = g.inventory:income(a.UserId) + g.inventory:income(b.UserId)
-		assert(g.inventory:reserveOffer(a.UserId, { item.id }, key, "Trade"))
-		assert(g.inventory:transfer(key, a.UserId, { item.id }, b.UserId, {}))
-		g:reconcilePets()
-		local beforeA, beforeB = signature(g, a), signature(g, b)
-		g.ranch:updateRecords(a, g:now())
-		g.ranch:updateRecords(b, g:now())
-		local record = assert(g.petRecords:FindFirstChild(item.id))
-		assert(item.ownerId == b.UserId and record:GetAttribute("OwnerUserId") == b.UserId)
-		assert(g.profiles[a].ranch.activities[item.id] == nil)
-		assert(record:GetAttribute("ActivityOwnerUserId") == b.UserId)
-		assert(signature(g, a) == beforeA and signature(g, b) == beforeB)
-		assert(#g.inventory:list(a.UserId) + #g.inventory:list(b.UserId) == total)
-		assert(g.inventory:income(a.UserId) + g.inventory:income(b.UserId) == income)
-	end)
+	scenario(
+		"Living Ranch actual inventory transfer discards the old owner's activity and keeps income accounting",
+		function(items)
+			local item = items[2]
+			local key = "ranch-transfer-" .. tostring(g:now())
+			local total = #g.inventory:list(a.UserId) + #g.inventory:list(b.UserId)
+			local income = g.inventory:income(a.UserId) + g.inventory:income(b.UserId)
+			assert(g.inventory:reserveOffer(a.UserId, { item.id }, key, "Trade"))
+			assert(g.inventory:transfer(key, a.UserId, { item.id }, b.UserId, {}))
+			g:reconcilePets()
+			local beforeA, beforeB = signature(g, a), signature(g, b)
+			g.ranch:updateRecords(a, g:now())
+			g.ranch:updateRecords(b, g:now())
+			local record = assert(g.petRecords:FindFirstChild(item.id))
+			assert(item.ownerId == b.UserId and record:GetAttribute("OwnerUserId") == b.UserId)
+			assert(g.profiles[a].ranch.activities[item.id] == nil)
+			assert(record:GetAttribute("ActivityOwnerUserId") == b.UserId)
+			assert(signature(g, a) == beforeA and signature(g, b) == beforeB)
+			assert(#g.inventory:list(a.UserId) + #g.inventory:list(b.UserId) == total)
+			assert(g.inventory:income(a.UserId) + g.inventory:income(b.UserId) == income)
+		end
+	)
 
 	scenario("Living Ranch rest poses and ordinary episode changes never manufacture a landing hint", function(items)
 		local pro, item = g.profiles[a], items[2]
 		local entry = { item = item, record = assert(g.petRecords:FindFirstChild(item.id)) }
 		local now, gods = g:now(), g.ranch.activities:godlies(a.UserId)
-		for _, kind in ipairs({ "Idle", "Explore", "HabitatRest", "GroupNap", "GateWatch", "TrainingWatch", "Homecoming" }) do
+		for _, kind in ipairs({
+			"Idle",
+			"Explore",
+			"HabitatRest",
+			"GroupNap",
+			"GateWatch",
+			"TrainingWatch",
+			"Homecoming",
+		}) do
 			local home = entry.record:GetAttribute("PenPosition")
-			local plan = g.ranch.activities:make(pro, entry, kind, home, pro.base.penGate.Position,
-				now, A.EpisodeSeconds, gods)
+			local plan =
+				g.ranch.activities:make(pro, entry, kind, home, pro.base.penGate.Position, now, A.EpisodeSeconds, gods)
 			g.ranch.activities:publish(entry, plan, kind == "GroupNap" and "Rest" or "Idle", now)
 			local data = assert(Motion.read(entry.record))
 			for sample = 0, 32 do
@@ -470,35 +555,43 @@ function Checks.run(g, check, a, b, results)
 		end
 	end)
 
-	scenario("Living Ranch active switches clear stale companion metadata and keep exactly one follower", function(items)
-		local pro = g.profiles[a]
-		for _, item in ipairs({ items[2], items[3], items[4], items[5] }) do
-			assert(g:setPetMode(a, item.id, "Active"))
-			g.ranch:updateRecords(a, g:now())
-			local active = 0
-			for _, record in ipairs(g.petRecords:GetChildren()) do
-				if record:GetAttribute("OwnerUserId") == a.UserId then
-					if record:GetAttribute("DisplayMode") == "Active" then
-						active = active + 1
-						assert(record.Name == item.id and record:GetAttribute("CompanionOwnerUserId") == a.UserId)
-					else
-						assert(record:GetAttribute("CompanionOwnerUserId") == nil)
+	scenario(
+		"Living Ranch active switches clear stale companion metadata and keep exactly one follower",
+		function(items)
+			local pro = g.profiles[a]
+			for _, item in ipairs({ items[2], items[3], items[4], items[5] }) do
+				assert(g:setPetMode(a, item.id, "Active"))
+				g.ranch:updateRecords(a, g:now())
+				local active = 0
+				for _, record in ipairs(g.petRecords:GetChildren()) do
+					if record:GetAttribute("OwnerUserId") == a.UserId then
+						if record:GetAttribute("DisplayMode") == "Active" then
+							active = active + 1
+							assert(record.Name == item.id and record:GetAttribute("CompanionOwnerUserId") == a.UserId)
+						else
+							assert(record:GetAttribute("CompanionOwnerUserId") == nil)
+						end
 					end
 				end
+				assert(active == 1 and pro.activePetId == item.id)
 			end
-			assert(active == 1 and pro.activePetId == item.id)
 		end
-	end)
+	)
 
 	scenario("Real client renders Living Ranch activity within bounds using exact owner identity", function()
 		local ids = {}
-		for _, entry in ipairs(g.ranch:visiblePets(a)) do table.insert(ids, entry.item.id) end
+		for _, entry in ipairs(g.ranch:visiblePets(a)) do
+			table.insert(ids, entry.item.id)
+		end
 		local token = "living-ranch-render-" .. tostring(g:now())
 		g:feed(a, "ranchActivityProbe", { token = token, ids = ids })
-		assert(waitFor(function()
-			local diag = g.clientDiagnostics[a]
-			return diag and diag.token == token
-		end, 9), "No real-client Living Ranch observation was received")
+		assert(
+			waitFor(function()
+				local diag = g.clientDiagnostics[a]
+				return diag and diag.token == token
+			end, 9),
+			"No real-client Living Ranch observation was received"
+		)
 		local diag = g.clientDiagnostics[a]
 		results.livingRanchClient = diag
 		assert(diag.passed, diag.error)
@@ -510,11 +603,15 @@ end
 function Checks.afterDisconnect(g, check, context)
 	check("Actual owner disconnect clears ranch activities and the vacant earnings board", function()
 		local base = assert(context.base)
-		assert(waitFor(function()
-			return g.profiles[context.player] == nil and base.owner == nil
-				and base.model:GetAttribute("ActivityResidentCount") == 0
-				and base.earningsLabel.Text == "YOUR RANCH\n0 pets • +0 Coins/min"
-		end, 3), "Actual departing-owner ranch cleanup did not settle")
+		assert(
+			waitFor(function()
+				return g.profiles[context.player] == nil
+					and base.owner == nil
+					and base.model:GetAttribute("ActivityResidentCount") == 0
+					and base.earningsLabel.Text == "YOUR RANCH\n0 pets • +0 Coins/min"
+			end, 3),
+			"Actual departing-owner ranch cleanup did not settle"
+		)
 		for _, record in ipairs(g.petRecords:GetChildren()) do
 			assert(record:GetAttribute("ActivityOwnerUserId") ~= context.userId)
 			assert(record:GetAttribute("CompanionOwnerUserId") ~= context.userId)

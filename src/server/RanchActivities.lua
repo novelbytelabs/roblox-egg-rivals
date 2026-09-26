@@ -9,12 +9,26 @@ local Activities = {}
 Activities.__index = Activities
 
 local FIELDS = {
-	"ActivityKind", "ActivityOrigin", "ActivityTarget", "ActivityFocus", "ActivityStarted",
-	"ActivityEnds", "ActivityTravel", "ActivityPhase", "ActivityPartnerId", "ActivityOwnerUserId",
-	"ActivityHome", "ActivitySerial", "ActivityHabitat", "ActivityGroupId",
+	"ActivityKind",
+	"ActivityOrigin",
+	"ActivityTarget",
+	"ActivityFocus",
+	"ActivityStarted",
+	"ActivityEnds",
+	"ActivityTravel",
+	"ActivityPhase",
+	"ActivityPartnerId",
+	"ActivityOwnerUserId",
+	"ActivityHome",
+	"ActivitySerial",
+	"ActivityHabitat",
+	"ActivityGroupId",
 }
 local COMPANION_FIELDS = {
-	"CompanionActivity", "CompanionUntil", "CompanionTarget", "CompanionOwnerUserId",
+	"CompanionActivity",
+	"CompanionUntil",
+	"CompanionTarget",
+	"CompanionOwnerUserId",
 }
 local function set(record, name, value)
 	if record:GetAttribute(name) ~= value then
@@ -38,7 +52,10 @@ end
 function Activities.new(gameService)
 	assert(R.integer(A.MaxPairs, 1, 4) and R.integer(A.NapMembers, 2, 4), "Invalid group budget")
 	assert(R.integer(A.MaxGreeters, 1, 8) and R.integer(A.MaxSpectators, 1, 8), "Invalid reaction budget")
-	assert(A.EpisodeSeconds >= 2 and A.GroupSeconds >= 2 and A.GroupInterval >= A.GroupSeconds, "Invalid activity duration")
+	assert(
+		A.EpisodeSeconds >= 2 and A.GroupSeconds >= 2 and A.GroupInterval >= A.GroupSeconds,
+		"Invalid activity duration"
+	)
 	assert(A.WalkSpeed > 0 and A.HomecomingCooldown >= A.HomecomingSeconds, "Invalid activity pacing")
 	return setmetatable({ game = gameService }, Activities)
 end
@@ -51,12 +68,13 @@ function Activities:reset(p)
 	pro.ranch.activities = {}
 	pro.ranch.nextGroupAt = 0
 	for _, record in ipairs(g.petRecords:GetChildren()) do
-		if record:GetAttribute("OwnerUserId") == p.UserId
-			or record:GetAttribute("ActivityOwnerUserId") == p.UserId then
+		if record:GetAttribute("OwnerUserId") == p.UserId or record:GetAttribute("ActivityOwnerUserId") == p.UserId then
 			self:clear(record)
 		end
-		if record:GetAttribute("OwnerUserId") == p.UserId
-			or record:GetAttribute("CompanionOwnerUserId") == p.UserId then
+		if
+			record:GetAttribute("OwnerUserId") == p.UserId
+			or record:GetAttribute("CompanionOwnerUserId") == p.UserId
+		then
 			for _, name in ipairs(COMPANION_FIELDS) do
 				set(record, name, nil)
 			end
@@ -80,7 +98,10 @@ end
 
 function Activities:training(p, pro)
 	local root = self.game:root(p)
-	return pro.training == true and self.game:alive(p) and not self.game:busy(p) and root ~= nil
+	return pro.training == true
+		and self.game:alive(p)
+		and not self.game:busy(p)
+		and root ~= nil
 		and R.within(root.Position, pro.base.treadmill.Position, 5, 2.9, 5)
 end
 
@@ -120,11 +141,13 @@ end
 function Activities:godlies(ownerId)
 	local out = {}
 	for _, record in ipairs(self.game.petRecords:GetChildren()) do
-		if record:GetAttribute("OwnerUserId") == ownerId
+		if
+			record:GetAttribute("OwnerUserId") == ownerId
 			and record:GetAttribute("Rarity") == "Godly"
 			and record:GetAttribute("DisplayMode") == "Pen"
 			and record:GetAttribute("Displayed") == true
-			and record:GetAttribute("Locked") ~= true then
+			and record:GetAttribute("Locked") ~= true
+		then
 			local position = record:GetAttribute("PenPosition")
 			if R.vector(position) then
 				table.insert(out, position)
@@ -149,14 +172,26 @@ end
 function Activities:site(pro, element)
 	local site = pro.base.activitySites and pro.base.activitySites[element]
 	local area = pro.base.model:FindFirstChild("PenArea")
-	if not site or site.element ~= element or not site.anchor or not site.model
-		or not area or site.area ~= area or site.layout ~= pro.base.ranchLayoutSerial then
+	if
+		not site
+		or site.element ~= element
+		or not site.anchor
+		or not site.model
+		or not area
+		or site.area ~= area
+		or site.layout ~= pro.base.ranchLayoutSerial
+	then
 		return nil
 	end
-	if not site.anchor:IsA("BasePart") or not site.model:IsA("Model")
-		or not site.anchor:IsDescendantOf(site.model) or not site.model:IsDescendantOf(area)
+	if
+		not site.anchor:IsA("BasePart")
+		or not site.model:IsA("Model")
+		or not site.anchor:IsDescendantOf(site.model)
+		or not site.model:IsDescendantOf(area)
 		or site.anchor:GetAttribute("BaseIndex") ~= pro.base.index
-		or site.anchor:GetAttribute("Element") ~= element or not R.vector(site.anchor.Position) then
+		or site.anchor:GetAttribute("Element") ~= element
+		or not R.vector(site.anchor.Position)
+	then
 		return nil
 	end
 	local offset = site.anchor.Position - pro.base.penCenter
@@ -195,9 +230,13 @@ function Activities:make(pro, entry, kind, target, focus, now, duration, godlies
 end
 
 function Activities:valid(pro, entry, plan, members, now)
-	if not plan or now >= plan.ends or plan.ownerId ~= entry.item.ownerId
+	if
+		not plan
+		or now >= plan.ends
+		or plan.ownerId ~= entry.item.ownerId
 		or plan.home ~= entry.record:GetAttribute("PenPosition")
-		or plan.layout ~= (pro.base.ranchLayoutSerial or 0) then
+		or plan.layout ~= (pro.base.ranchLayoutSerial or 0)
+	then
 		return false
 	end
 	if plan.habitat then
@@ -353,8 +392,13 @@ end
 
 function Activities:updateCompanion(p, pro, now)
 	local item = pro.activePetId and self.game.inventory.items[pro.activePetId]
-	if not item or item.kind ~= "Pet" or item.ownerId ~= p.UserId
-		or item.state ~= "Inventory" or item.petMode ~= "Active" then
+	if
+		not item
+		or item.kind ~= "Pet"
+		or item.ownerId ~= p.UserId
+		or item.state ~= "Inventory"
+		or item.petMode ~= "Active"
+	then
 		return
 	end
 	local record = self.game.petRecords:FindFirstChild(item.id)
@@ -390,10 +434,15 @@ function Activities:updateRecords(ranch, p, now)
 	local eligible = {}
 	for _, entry in ipairs(visible) do
 		local item, record = entry.item, entry.record
-		if g.inventory.items[item.id] == item and item.ownerId == p.UserId and item.state == "Inventory"
+		if
+			g.inventory.items[item.id] == item
+			and item.ownerId == p.UserId
+			and item.state == "Inventory"
 			and record:GetAttribute("OwnerUserId") == p.UserId
-			and record:GetAttribute("DisplayMode") == "Pen" and record:GetAttribute("Locked") ~= true
-			and R.vector(record:GetAttribute("PenPosition")) then
+			and record:GetAttribute("DisplayMode") == "Pen"
+			and record:GetAttribute("Locked") ~= true
+			and R.vector(record:GetAttribute("PenPosition"))
+		then
 			members[item.id] = entry
 			table.insert(eligible, entry)
 		end
@@ -427,7 +476,8 @@ function Activities:updateRecords(ranch, p, now)
 		elseif r.greetUntil > now and index <= A.MaxGreeters then
 			behavior, kind, key, duration = "Homecoming", "Homecoming", "home:" .. r.greetUntil, r.greetUntil - now
 		elseif (r.milestoneUntil or 0) > now and index <= A.MaxGreeters then
-			behavior, kind, key, duration = "Play", "Milestone", "milestone:" .. r.milestoneUntil, r.milestoneUntil - now
+			behavior, kind, key, duration =
+				"Play", "Milestone", "milestone:" .. r.milestoneUntil, r.milestoneUntil - now
 		elseif training and index <= A.MaxSpectators then
 			behavior, kind, key, duration = "Idle", "TrainingWatch", "training", A.EpisodeSeconds
 		end
@@ -436,8 +486,12 @@ function Activities:updateRecords(ranch, p, now)
 		elseif kind then
 			local columns = math.max(4, math.floor(bounds.X * 2 / 5.1))
 			local slot = index - 1
-			target = center + Vector3.new((slot % columns - (columns - 1) / 2) * 3.6, 0,
-				bounds.Y - 0.7 - math.floor(slot / columns) * 3.6)
+			target = center
+				+ Vector3.new(
+					(slot % columns - (columns - 1) / 2) * 3.6,
+					0,
+					bounds.Y - 0.7 - math.floor(slot / columns) * 3.6
+				)
 			focus = kind == "TrainingWatch" and pro.base.treadmill.Position
 				or (kind == "Homecoming" and root and root.Position or pro.base.penGate.Position)
 			local current = plans[item.id]
@@ -449,12 +503,13 @@ function Activities:updateRecords(ranch, p, now)
 		else
 			local current = plans[item.id]
 			local site = current and current.habitat and self:site(pro, current.habitat) or nil
-			local lostHabitat = current and current.habitat and (not site
-				or site.anchor ~= current.siteAnchor or site.anchor.Position ~= current.sitePosition)
+			local lostHabitat = current
+				and current.habitat
+				and (not site or site.anchor ~= current.siteAnchor or site.anchor.Position ~= current.sitePosition)
 			if lostHabitat then
 				-- A removed/replaced landmark falls back to this pet's own home, not a foreign target.
-				plans[item.id] = self:make(pro, entry, "Idle", home, home + Vector3.new(0, 0, 1),
-					now, A.EpisodeSeconds, godlies)
+				plans[item.id] =
+					self:make(pro, entry, "Idle", home, home + Vector3.new(0, 0, 1), now, A.EpisodeSeconds, godlies)
 			elseif not self:valid(pro, entry, current, members, now) or current.key ~= nil then
 				plans[item.id] = nil
 				table.insert(available, entry)
@@ -471,14 +526,20 @@ function Activities:updateRecords(ranch, p, now)
 	end
 	-- A partner interrupted by a higher-priority event cannot leave an orphaned chase.
 	local queued, napCounts = {}, {}
-	for _, entry in ipairs(available) do queued[entry.item.id] = true end
+	for _, entry in ipairs(available) do
+		queued[entry.item.id] = true
+	end
 	for _, entry in ipairs(visible) do
 		local id = entry.item.id
 		local plan = plans[id]
 		if plan and plan.partnerId then
 			local partnerPlan = plans[plan.partnerId]
-			if not partnerPlan or partnerPlan.partnerId ~= id or partnerPlan.groupId ~= plan.groupId
-				or behaviorFor[plan.partnerId] ~= nil then
+			if
+				not partnerPlan
+				or partnerPlan.partnerId ~= id
+				or partnerPlan.groupId ~= plan.groupId
+				or behaviorFor[plan.partnerId] ~= nil
+			then
 				plans[id] = nil
 				if not behaviorFor[id] and not queued[id] then
 					table.insert(available, entry)
@@ -512,7 +573,10 @@ function Activities:updateRecords(ranch, p, now)
 		if not behavior then
 			local kind = plan and plan.kind or "Idle"
 			behavior = (kind == "PairPlay" or kind == "SoloPlay") and "Play"
-				or ((kind == "GroupNap" or kind == "HabitatRest") and "Rest" or (kind == "Explore" and "Wander" or "Idle"))
+				or (
+					(kind == "GroupNap" or kind == "HabitatRest") and "Rest"
+					or (kind == "Explore" and "Wander" or "Idle")
+				)
 		end
 		self:publish(entry, plan, behavior, now)
 	end
@@ -520,10 +584,15 @@ function Activities:updateRecords(ranch, p, now)
 		if record:GetAttribute("ActivityOwnerUserId") == p.UserId and not members[record.Name] then
 			self:clear(record)
 		end
-		if record:GetAttribute("CompanionOwnerUserId") == p.UserId and (
-			record:GetAttribute("OwnerUserId") ~= p.UserId or record.Name ~= pro.activePetId
-			or record:GetAttribute("DisplayMode") ~= "Active" or record:GetAttribute("Locked") == true
-		) then
+		if
+			record:GetAttribute("CompanionOwnerUserId") == p.UserId
+			and (
+				record:GetAttribute("OwnerUserId") ~= p.UserId
+				or record.Name ~= pro.activePetId
+				or record:GetAttribute("DisplayMode") ~= "Active"
+				or record:GetAttribute("Locked") == true
+			)
+		then
 			for _, name in ipairs(COMPANION_FIELDS) do
 				set(record, name, nil)
 			end

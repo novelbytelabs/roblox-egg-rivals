@@ -76,16 +76,22 @@ function ClientChecks.bind(effects)
 						local pose = Motion.read(record)
 						local anchors = {}
 						for _, other in ipairs(records:GetChildren()) do
-							if other:GetAttribute("OwnerUserId") == record:GetAttribute("OwnerUserId")
-								and other:GetAttribute("Rarity") == "Godly" and other:GetAttribute("Displayed")
-								and other:GetAttribute("DisplayMode") == "Pen" then
+							if
+								other:GetAttribute("OwnerUserId") == record:GetAttribute("OwnerUserId")
+								and other:GetAttribute("Rarity") == "Godly"
+								and other:GetAttribute("Displayed")
+								and other:GetAttribute("DisplayMode") == "Pen"
+							then
 								table.insert(anchors, other:GetAttribute("PenPosition"))
 							end
 						end
 						local sampleTime = workspace:GetServerTimeNow()
 						if pose and Motion.valid(pose, sampleTime) then
 							local expected = Motion.pose(pose, sampleTime, anchors).Position
-							assert((position - expected).Magnitude <= 1, "Rendered root disagrees with shared activity sampler")
+							assert(
+								(position - expected).Magnitude <= 1,
+								"Rendered root disagrees with shared activity sampler"
+							)
 						end
 						local interaction = assert(model:FindFirstChild("PetInteraction"))
 						assert(interaction:GetAttribute("OwnerUserId") == record:GetAttribute("OwnerUserId"))
@@ -95,12 +101,22 @@ function ClientChecks.bind(effects)
 						for _, part in ipairs(model:GetDescendants()) do
 							if part:IsA("BasePart") then
 								assert(part.Anchored and not part.CanCollide and not part.CanTouch)
-								if part.Name == "Tail" or part.Name == "Foot" or part.Name == "Arm" or part.Name == "Wing" then
+								if
+									part.Name == "Tail"
+									or part.Name == "Foot"
+									or part.Name == "Arm"
+									or part.Name == "Wing"
+								then
 									local relative = model:GetPivot():ToObjectSpace(part.CFrame)
 									local previous = firstLimb[part]
-									if previous and ((relative.Position - previous.Position).Magnitude > 0.002
-										or relative.LookVector:Dot(previous.LookVector) < 0.99999
-										or relative.UpVector:Dot(previous.UpVector) < 0.99999) then
+									if
+										previous
+										and (
+											(relative.Position - previous.Position).Magnitude > 0.002
+											or relative.LookVector:Dot(previous.LookVector) < 0.99999
+											or relative.UpVector:Dot(previous.UpVector) < 0.99999
+										)
+									then
 										out.limbMoved = true
 									end
 									firstLimb[part] = previous or relative
@@ -109,9 +125,12 @@ function ClientChecks.bind(effects)
 						end
 						if record:GetAttribute("Rarity") ~= "Godly" then
 							for _, other in ipairs(records:GetChildren()) do
-								if other:GetAttribute("OwnerUserId") == record:GetAttribute("OwnerUserId")
-									and other:GetAttribute("Rarity") == "Godly" and other:GetAttribute("Displayed")
-									and other:GetAttribute("DisplayMode") == "Pen" then
+								if
+									other:GetAttribute("OwnerUserId") == record:GetAttribute("OwnerUserId")
+									and other:GetAttribute("Rarity") == "Godly"
+									and other:GetAttribute("Displayed")
+									and other:GetAttribute("DisplayMode") == "Pen"
+								then
 									local anchor = other:GetAttribute("PenPosition")
 									local d = Vector2.new(position.X - anchor.X, position.Z - anchor.Z).Magnitude
 									assert(d >= C.GodlyDistance - 0.05, "Rendered activity entered Godly exclusion")

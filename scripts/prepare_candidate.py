@@ -81,6 +81,8 @@ def main():
                         help="Explicit isolated source worktree; tooling identity is recorded separately")
     parser.add_argument("--expected-branch", choices=BRANCHES, default=BRANCHES[0])
     parser.add_argument("--expected-head")
+    parser.add_argument("--output-root", type=Path,
+                        help="Generated builds directory, separate from canonical source")
     args = parser.parse_args()
     root = args.repo.resolve(strict=True)
     branch, head = git(root, "branch", "--show-current"), git(root, "rev-parse", "HEAD")
@@ -101,7 +103,8 @@ def main():
     subprocess.run(["stylua", "--check", "src"], cwd=root, check=True)
     digest = hashlib.sha256(json.dumps(before, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-    out = root / "build" / ("candidate-" + stamp)
+    output_root = args.output_root.resolve() if args.output_root else root / "build"
+    out = output_root / ("candidate-" + stamp)
     out.mkdir(parents=True, exist_ok=False)
     artifacts = {}
     try:

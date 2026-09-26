@@ -1,11 +1,12 @@
 local Players = game:GetService("Players")
 local C = require(game:GetService("ReplicatedStorage").Stage3Shared.Config)
 local R = require(game:GetService("ReplicatedStorage").Stage3Shared.Rules)
+local Activities = require(script.Parent.RanchActivities)
 local Ranch = {}
 Ranch.__index = Ranch
 
 function Ranch.new(gameService)
-	return setmetatable({ game = gameService, nextTick = 0 }, Ranch)
+	return setmetatable({ game = gameService, nextTick = 0, activities = Activities.new(gameService) }, Ranch)
 end
 
 local function ownerKey(userId)
@@ -27,6 +28,7 @@ function Ranch:setup(p)
 		leftAt = nil,
 		welcomeIds = {},
 	}
+	self.activities:reset(p)
 end
 
 function Ranch:acquired(p, item)
@@ -52,16 +54,11 @@ function Ranch:acquired(p, item)
 end
 
 function Ranch:homecoming(p, reason)
-	local pro = self.game.profiles[p]
-	if not pro or not pro.ranch then
-		return
-	end
-	pro.ranch.greetUntil = math.max(pro.ranch.greetUntil, self.game:now() + 4)
-	self.game:effect("homecoming", {
-		userId = p.UserId,
-		position = pro.base.respawnPad.Position,
-		reason = reason,
-	})
+	return self.activities:homecoming(p, reason)
+end
+
+function Ranch:leaving(p)
+	self.activities:leaving(p)
 end
 
 function Ranch:visiblePets(p)
@@ -173,7 +170,7 @@ function Ranch:visitorPet(visitor, petId)
 	if not owner or owner == visitor or not g.profiles[owner] then
 		return nil, "Visit another player's ranch pet."
 	end
-	local position = record:GetAttribute("PenPosition")
+	local position = self.activities:position(record, owner) or record:GetAttribute("PenPosition")
 	local root = g:root(visitor)
 	if not R.vector(position) or not root or (root.Position - position).Magnitude > C.VisitorInspectRange then
 		return nil, "Move closer to that ranch pet."
@@ -251,61 +248,7 @@ function Ranch:buyExpansion(p, level)
 	return true
 end
 function Ranch:updateRecords(p, now)
-	local g = self.game
-	local pro = g.profiles[p]
-	if not pro or not pro.ranch then
-		return
-	end
-	local r = pro.ranch
-	local visible = self:visiblePets(p)
-	local chosen = r.reverenceUntil > now and r.reverencePet or nil
-	local chosenRecord = chosen and g.petRecords:FindFirstChild(chosen)
-	local chosenItem = chosen and g.inventory.items[chosen]
-	if
-		chosen
-		and (
-			not chosenRecord
-			or not chosenRecord:GetAttribute("Displayed")
-			or not chosenItem
-			or chosenItem.ownerId ~= p.UserId
-		)
-	then
-		r.reverenceUntil = 0
-		r.reverencePet = nil
-		chosen = nil
-	end
-	for index, entry in ipairs(visible) do
-		local item, record = entry.item, entry.record
-		local behavior = "Idle"
-		if chosen then
-			if item.id == chosen then
-				behavior = "Ascend"
-			elseif item.rarity ~= "Godly" and item.element == chosenItem.element then
-				behavior = "Revere"
-			else
-				behavior = "Idle"
-			end
-		elseif item.rarity == "Godly" then
-			behavior = "Idle"
-		elseif r.welcomeUntil > now then
-			behavior = "Greet"
-		elseif r.greetUntil > now and index <= 4 then
-			behavior = "Homecoming"
-		else
-			behavior = ({ "Idle", "Wander", "Rest", "Play" })[(math.floor(now / 7) + item.order) % 4 + 1]
-		end
-		if record:GetAttribute("BehaviorState") ~= behavior then
-			record:SetAttribute("BehaviorStarted", now)
-		end
-		record:SetAttribute("BehaviorState", behavior)
-		record:SetAttribute("BehaviorSeed", item.order)
-		record:SetAttribute("Godly", item.rarity == "Godly")
-		record:SetAttribute("RanchGatePosition", pro.base.penGate.Position)
-		record:SetAttribute("PenCenter", pro.base.penCenter)
-		record:SetAttribute("PenBounds", pro.base.penBounds)
-		record:SetAttribute("ReverenceTarget", behavior == "Revere" and chosenRecord:GetAttribute("PenPosition") or nil)
-		record:SetAttribute("WelcomeMember", r.welcomeUntil > now and table.find(r.welcomeIds, item.id) ~= nil)
-	end
+	self.activities:updateRecords(self, p, now)
 end
 
 function Ranch:step(now)

@@ -7,6 +7,8 @@ local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Stage3Shared")
 local Art = require(Shared.Art)
 local C = require(Shared.Config)
 local PetMotion = require(Shared.PetMotion)
+local RanchMotion = require(Shared.RanchMotion)
+local RanchAnimation = require(script.Parent.RanchAnimation)
 local MotionParticles = require(script.Parent.MotionParticles)
 local NightEdges = require(script.Parent.NightEdges)
 local Flashlight = require(script.Parent.Flashlight)
@@ -35,6 +37,7 @@ function E.new()
 		sample = sample,
 		muted = false,
 		pets = {},
+		petRigs = {},
 		fireflies = {},
 		beltLines = {},
 		runTrack = nil,
@@ -469,32 +472,11 @@ function E:update(dt, state, records)
 			and C.Elements[element]
 		then
 			if mode == "Active" and root and not owner:GetAttribute("InDuel") then
-				local base = workspace.Moonwood:FindFirstChild("Base" .. tostring(owner:GetAttribute("BaseIndex")))
-				local treadmill = base and base:FindFirstChild("Treadmill")
-				if treadmill and treadmill:GetAttribute("Training") then
-					target =
-						CFrame.new(treadmill.Position + Vector3.new(1.5, 2.0 + math.abs(math.sin(t * 7)) * 0.2, 4.4))
-				else
-					target = root.CFrame * CFrame.new(3.2, 0.35 + math.sin(t * 3) * 0.18, 5.2)
-				end
+				target = RanchMotion.companion(record, root, t)
 			elseif mode == "Pen" then
-				local home = record:GetAttribute("PenPosition")
-				local center = record:GetAttribute("PenCenter")
-				local bounds = record:GetAttribute("PenBounds")
-				if typeof(home) == "Vector3" and typeof(center) == "Vector3" and typeof(bounds) == "Vector2" then
-					poseData = {
-						home = home,
-						center = center,
-						bounds = bounds,
-						seed = record:GetAttribute("BehaviorSeed") or 1,
-						index = record:GetAttribute("DisplayIndex") or record:GetAttribute("BehaviorSeed") or 1,
-						creature = creature,
-						behavior = record:GetAttribute("BehaviorState"),
-						godly = rarity == "Godly",
-						gate = record:GetAttribute("RanchGatePosition") or center + Vector3.new(0, 0, bounds.Y),
-						target = record:GetAttribute("ReverenceTarget"),
-					}
-					target, grounded, landing = PetMotion.pose(poseData, t, godlies[ownerId])
+				poseData = RanchMotion.read(record)
+				if poseData then
+					target, grounded, landing = RanchMotion.pose(poseData, t, godlies[ownerId])
 				end
 			end
 		end
@@ -503,6 +485,7 @@ function E:update(dt, state, records)
 			local pet = self.pets[record.Name]
 			if not pet then
 				pet = Art.pet(creature, rarity, element, self.folder)
+				self.petRigs[record.Name] = RanchAnimation.bind(pet)
 				self.edges:track(pet)
 				pet:PivotTo(target)
 				self.pets[record.Name] = pet
@@ -527,6 +510,10 @@ function E:update(dt, state, records)
 				hitbox:SetAttribute("PetId", record.Name)
 				hitbox:SetAttribute("OwnerUserId", ownerId)
 			end
+			local interaction = pet:FindFirstChild("PetInteraction")
+			if interaction then
+				interaction:SetAttribute("OwnerUserId", ownerId)
+			end
 			local from = pet:GetPivot()
 			local alpha = 1 - math.exp(-(mode == "Active" and 10 or 8) * dt)
 			local nextCF = (from.Position - target.Position).Magnitude > 35 and target or from:Lerp(target, alpha)
@@ -548,6 +535,16 @@ function E:update(dt, state, records)
 			end
 			pet:PivotTo(nextCF)
 			local velocity = dt > 0 and (nextCF.Position - from.Position) / dt or Vector3.zero
+			RanchAnimation.update(
+				self.petRigs[record.Name],
+				nextCF,
+				t,
+				record:GetAttribute("BehaviorState"),
+				mode == "Active" and record:GetAttribute("CompanionActivity") or record:GetAttribute("ActivityKind"),
+				velocity.Magnitude,
+				record:GetAttribute("BehaviorSeed") or 1,
+				rarity == "Godly"
+			)
 			self.particles:observe(
 				"pet:" .. record.Name,
 				pet.PrimaryPart,
@@ -573,6 +570,7 @@ function E:update(dt, state, records)
 		if not visible[id] then
 			pet:Destroy()
 			self.pets[id] = nil
+			self.petRigs[id] = nil
 		end
 	end
 	for _, fly in ipairs(self.fireflies) do

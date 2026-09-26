@@ -111,7 +111,7 @@ function M.pose(data, now, godlies)
 			landing = true
 		end
 	elseif (data.kind == "GroupNap" or data.kind == "HabitatRest") and afterArrival then
-		height = height - (0.18)
+		height = height - 0.18
 		height = height + (math.sin(phase * 1.1) * 0.025)
 		pitch = data.creature == "Gorilla" and 0.10 or 0.03
 		roll = data.creature == "Skunk" and 0.12 or 0
@@ -152,8 +152,7 @@ function M.companion(record, root, now)
 	local kind = record:GetAttribute("CompanionActivity")
 	local trainer = record:GetAttribute("CompanionTarget")
 	if kind == "Training" and vector(trainer) then
-		local y = creature == "Dragon" and (2.3 + math.sin(now * 2.2) * 0.25)
-			or (creature == "Gorilla" and 1.0 or 0.8)
+		local y = creature == "Dragon" and (2.3 + math.sin(now * 2.2) * 0.25) or (creature == "Gorilla" and 1.0 or 0.8)
 		if creature == "Lizard" or creature == "Skunk" then
 			y = y + (math.abs(math.sin(now * 7)) * 0.14)
 		end

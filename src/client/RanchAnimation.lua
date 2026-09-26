@@ -79,8 +79,10 @@ function Animation.update(rig, base, now, behavior, kind, speed, seed, godly)
 				delta = joint(Vector3.new(entry.side * 1.2, 0.65, 0), CFrame.Angles(swing, 0, entry.side * cheer))
 			elseif entry.role == "Wing" then
 				local amplitude = resting and 0.025 or (godly and 0.075 or 0.24)
-				delta = joint(Vector3.new(entry.side * 0.85, 0.45, 0.25),
-					CFrame.Angles(0, 0, entry.side * math.sin(now * 3.5 + seed) * amplitude))
+				delta = joint(
+					Vector3.new(entry.side * 0.85, 0.45, 0.25),
+					CFrame.Angles(0, 0, entry.side * math.sin(now * 3.5 + seed) * amplitude)
+				)
 			end
 			-- Rebuild from the captured rest pose, never from the previous animated pose.
 			part.CFrame = base * delta * entry.rest

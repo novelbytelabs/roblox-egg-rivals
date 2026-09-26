@@ -672,6 +672,8 @@ function Tests.run(g)
 	require(script.Parent.DraftingChecks).run(g, check, a, b, results)
 	require(script.Parent.VisitorChecks).run(g, check, a, b, results)
 	require(script.Parent.MasteryChecks).run(g, check, a)
+	require(script.Parent.LivingRanchChecks).run(g, check, a, b, results)
+	local departingRanch = { player = b, userId = b.UserId, base = g.profiles[b].base }
 	check("Actual client disconnect cancels selection without escrow loss", function()
 		prep()
 		assert(g.duels:request(a, b))
@@ -682,6 +684,7 @@ function Tests.run(g)
 		end, 4))
 		assert(itemA.ownerId == a.UserId and itemA.state == "Inventory")
 	end)
+	require(script.Parent.LivingRanchChecks).afterDisconnect(g, check, departingRanch)
 	report()
 end
 return Tests

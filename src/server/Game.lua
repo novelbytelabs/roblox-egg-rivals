@@ -756,6 +756,9 @@ function Game:reconcilePets()
 			end
 		end
 	end
+	for owner in pairs(self.profiles) do
+		self.ranch:updateRecords(owner, self:now())
+	end
 end
 
 function Game:setPenPage(p, page)
@@ -1703,6 +1706,7 @@ function Game.new()
 			pro.base.nameLabel.Text = "AVAILABLE BASE"
 		end
 		self.inventory:removeOwner(p.UserId)
+		self.ranch:leaving(p)
 		self.profiles[p] = nil
 		self:reconcilePets()
 	end)
