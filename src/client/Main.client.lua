@@ -86,7 +86,7 @@ workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(bindCamera)
 bindCamera()
 local brand = U.frame(root, "Brand", 16, 12, 258, 62, C.Colors.Ink)
 U.text(brand, "Title", "EGG RIVALS", 14, 7, 230, 27, 24, C.Colors.Gold)
-U.text(brand, "Subtitle", "LIVING RANCH • 0.4.7", 14, 36, 232, 17, 11, C.Colors.Muted)
+U.text(brand, "Subtitle", "DUEL ARMORY • 0.4.9", 14, 36, 232, 17, 11, C.Colors.Muted)
 local phasePanel = U.frame(root, "Phase", 395, 12, 290, 62, C.Colors.Ink)
 local phaseTitle = U.text(phasePanel, "Title", "DAYTIME", 12, 6, 266, 25, 19)
 phaseTitle.TextXAlignment = Enum.TextXAlignment.Center
@@ -365,6 +365,54 @@ local nightMapButton = U.button(
 	end,
 	Color3.fromRGB(203, 142, 255)
 )
+
+local armoryPanel = U.frame(root, "DuelArmoryPanel", 280, 130, 520, 450, C.Colors.Panel)
+armoryPanel.Visible = false
+U.text(armoryPanel, "Title", "DUEL ARMORY", 20, 15, 430, 35, 23, C.Colors.Red)
+U.button(armoryPanel, "Close", "X", 470, 17, 30, 30, function()
+	menu = nil
+end, C.Colors.Muted)
+U.text(
+	armoryPanel,
+	"Description",
+	"Choose a free arena sidegrade. Different ranges and cadences; no loadout costs Coins or Robux.",
+	20,
+	56,
+	480,
+	50,
+	14,
+	C.Colors.Text
+)
+local armoryButtons = {}
+for index, name in ipairs(C.DuelWeaponOrder) do
+	local weaponName = name
+	local spec = C.DuelWeapons[weaponName]
+	local y = 116 + (index - 1) * 98
+	U.text(
+		armoryPanel,
+		weaponName .. "Info",
+		weaponName:upper() .. " • " .. spec.description,
+		20,
+		y,
+		480,
+		34,
+		13,
+		spec.color
+	)
+	armoryButtons[weaponName] = U.button(
+		armoryPanel,
+		weaponName,
+		"SELECT " .. weaponName:upper(),
+		20,
+		y + 40,
+		480,
+		40,
+		function()
+			send("duelWeapon", { name = weaponName })
+		end,
+		spec.color
+	)
+end
 
 local ranchPanel = U.frame(root, "RanchPanel", 300, 195, 480, 250, C.Colors.Panel)
 ranchPanel.Visible = false
@@ -943,6 +991,16 @@ render = function()
 	modal.Visible = menu == "inventory"
 	shop.Visible = menu == "shop"
 	nightMarketPanel.Visible = menu == "nightMarket" and workspace:GetAttribute("Night") == true
+	armoryPanel.Visible = menu == "armory"
+	if armoryPanel.Visible then
+		for _, name in ipairs(C.DuelWeaponOrder) do
+			local selected = state.duelWeapon == name
+			local button = armoryButtons[name]
+			button.Text = selected and ("SELECTED • " .. name:upper()) or ("SELECT " .. name:upper())
+			button.Active = not selected
+			button.AutoButtonColor = not selected
+		end
+	end
 	ranchPanel.Visible = menu == "ranch"
 	visitorPanel.Visible = menu == "visitor" and visitorPet ~= nil
 	tradePanel.Visible = menu == "trade"
@@ -1174,9 +1232,14 @@ render = function()
 		duelTitle.Text = "REVIEW YOUR DUEL WITH " .. d.opponent:upper()
 		offerMine.Text = offerText("YOUR OFFER", d.mine, d.ready)
 		offerTheirs.Text = offerText("THEIR OFFER", d.theirs, d.otherReady)
-		offerNote.Text = d.studioStakes
-				and "Winner receives these two selected items. Changing either offer clears BOTH confirmations. No other collection items are at risk."
-			or "Practice mode: confirm to play. No items will move."
+		local loadouts = "LOADOUTS • YOU " .. (d.weapon or "Blaster"):upper() .. " • THEM " .. (d.otherWeapon or "Blaster"):upper()
+		offerNote.Text = loadouts
+			.. "\n"
+			.. (
+				d.studioStakes
+					and "Winner receives the selected items. Changing either offer clears BOTH confirmations."
+				or "Practice mode: confirm to play. No items will move."
+			)
 		confirmButton.Text = d.ready and "CONFIRMED • WAITING FOR OPPONENT" or "CONFIRM BOTH OFFERS"
 		local fp = d.id .. ":" .. d.revision
 		for _, item in ipairs(state.items) do
@@ -1207,7 +1270,10 @@ render = function()
 		end
 		scoreText.Text = "YOU  " .. d.score .. "  :  " .. d.otherScore .. "  " .. d.opponent
 		roundText.Text = d.phase == "Countdown" and "GET READY"
-			or (d.phase == "Active" and "FIRST TO 5 • 3 HITS TO ELIMINATE" or d.phase:upper())
+			or (
+				d.phase == "Active" and ("FIRST TO 5 • " .. (d.weapon or "Blaster"):upper() .. " LOADOUT")
+				or d.phase:upper()
+			)
 	elseif sprint then
 		duelFingerprint = ""
 		forfeitArmed = false
@@ -1248,6 +1314,9 @@ feed.OnClientEvent:Connect(function(kind, data)
 		render()
 	elseif kind == "openNightMarket" then
 		menu = "nightMarket"
+		render()
+	elseif kind == "openDuelArmory" then
+		menu = "armory"
 		render()
 	elseif kind == "ranchUpgrade" then
 		pendingRanchUpgrade = data
@@ -1379,7 +1448,8 @@ local function bindTool(tool)
 	if not tool:IsA("Tool") or boundTools[tool] then
 		return
 	end
-	if tool.Name ~= "Bat" and tool.Name ~= "SnarePod" and tool.Name ~= "DuelBlaster" then
+	local duelWeapon = tool:GetAttribute("DuelWeapon")
+	if tool.Name ~= "Bat" and tool.Name ~= "SnarePod" and not duelWeapon then
 		return
 	end
 	boundTools[tool] = true
@@ -1411,7 +1481,7 @@ local function bindTool(tool)
 			end)
 		elseif tool.Name == "SnarePod" then
 			send("trap")
-		elseif tool.Name == "DuelBlaster" and workspace.CurrentCamera then
+		elseif duelWeapon and workspace.CurrentCamera then
 			send("shoot", { direction = workspace.CurrentCamera.CFrame.LookVector })
 			local original = tool.Grip
 			TweenService:Create(tool, TweenInfo.new(0.055), { Grip = original * CFrame.new(0, 0, 0.2) }):Play()
@@ -1784,6 +1854,27 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 						"Rendered contract claim did not reach authoritative state"
 					)
 					assert(out.moneyDelta >= data.rewardCoins, "Claim did not credit the advertised reward")
+				elseif data.kind == "DuelArmory" then
+					assert(type(data.weapon) == "string" and C.DuelWeapons[data.weapon], "Unknown Armory probe weapon")
+					assert(
+						waitFor(function()
+							return armoryPanel.Visible and state and state.duelWeapon ~= nil
+						end, 3),
+						"Duel Armory panel did not open"
+					)
+					local button = armoryButtons[data.weapon]
+					assert(button and button.Active, "Requested Armory sidegrade is unavailable")
+					local beforeMoney = state.money
+					mouse(button, 0.08)
+					assert(
+						waitFor(function()
+							return state and state.duelWeapon == data.weapon
+						end, 4),
+						"Real Duel Armory selection did not reach authoritative state"
+					)
+					assert(state.money == beforeMoney, "Duel Armory sidegrade changed Coins")
+					out.weapon = state.duelWeapon
+					out.money = state.money
 				elseif data.kind == "NightMarket" then
 					assert(
 						waitFor(function()

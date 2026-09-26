@@ -174,7 +174,14 @@ function Game:giveGear(p, duel)
 		return
 	end
 	self:clearGear(p)
-	local names = duel and { "DuelBlaster" } or { "Bat", "SnarePod" }
+	local names
+	if duel then
+		local pro = self.profiles[p]
+		local spec = C.DuelWeapons[(pro and pro.duelWeapon) or "Blaster"] or C.DuelWeapons.Blaster
+		names = { spec.tool }
+	else
+		names = { "Bat", "SnarePod" }
+	end
 	for _, name in ipairs(names) do
 		local tool = Art.tool(name)
 		tool:SetAttribute("Stage3Tool", true)
@@ -231,6 +238,7 @@ function Game:setup(p)
 		onboardingComplete = false,
 		slowUntil = 0,
 		duel = nil,
+		duelWeapon = "Blaster",
 		trade = nil,
 		exchange = nil,
 		rates = {},
@@ -1170,6 +1178,7 @@ function Game:push(p)
 		ranch = self.ranch:snapshot(p),
 		trade = self.trades:snapshot(p),
 		duel = self.duels:snapshot(p),
+		duelWeapon = pro.duelWeapon or "Blaster",
 		result = pro.result and pro.result.untilTime > self:now() and pro.result or nil,
 		serverTime = self:now(),
 		bossEnabled = workspace:GetAttribute("BossEnabled"),
@@ -1257,6 +1266,8 @@ function Game:action(p, name, data)
 		return self.speedLab:setPrecision(p, data.active)
 	elseif name == "tuning" then
 		return self.speedLab:setTuning(p, data.name)
+	elseif name == "duelWeapon" then
+		return self.duels:setWeapon(p, data.name)
 	elseif name == "trialStart" then
 		return self.trials:start(p)
 	elseif name == "trialCancel" then
@@ -1839,6 +1850,13 @@ function Game.new()
 			cost = spec.cost,
 			capacity = spec.capacity,
 		})
+	end)
+	self.duelArmoryPrompt = self:prompt(self.world.duelArmory, "Choose arena loadout", "Duel Armory", function(p)
+		if self:busy(p) or self.carry[p] then
+			self:notify(p, "Finish your current activity before changing duel loadout.")
+			return
+		end
+		self:feed(p, "openDuelArmory", {})
 	end)
 	self:prompt(self.world.tradingPost, "Find trader", "Trading Post", function(p)
 		self:feed(p, "openTrade", {

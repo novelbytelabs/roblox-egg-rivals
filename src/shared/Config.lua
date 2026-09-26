@@ -1,6 +1,6 @@
 -- Canonical session-only tuning. No persistence, Robux commerce, or public item staking.
 local C = {
-	Build = "EGG-RIVALS-0.4.8-rc1",
+	Build = "EGG-RIVALS-0.4.9-rc1",
 	SchemaVersion = 4,
 	MaxPlayers = 4,
 	MaxItems = 80,
@@ -234,6 +234,39 @@ C.Colors = {
 	Muted = Color3.fromRGB(164, 194, 186),
 	Red = Color3.fromRGB(247, 135, 122),
 	Blue = Color3.fromRGB(132, 208, 244),
+}
+C.DuelWeaponOrder = { "Blaster", "Rail", "Scatter" }
+C.DuelWeapons = {
+	Blaster = {
+		tool = "DuelBlaster",
+		damage = C.DuelDamage,
+		cooldown = C.ShotCooldown,
+		range = C.DuelRange,
+		pellets = 1,
+		spread = 0,
+		color = C.Colors.Blue,
+		description = "Balanced cadence and range.",
+	},
+	Rail = {
+		tool = "DuelRail",
+		damage = 55,
+		cooldown = 0.5,
+		range = 300,
+		pellets = 1,
+		spread = 0,
+		color = C.Colors.Gold,
+		description = "Slower precision shots with longer reach.",
+	},
+	Scatter = {
+		tool = "DuelScatter",
+		damage = 13,
+		cooldown = 0.55,
+		range = 85,
+		pellets = 5,
+		spread = 6,
+		color = C.Colors.Red,
+		description = "Five-pellet close-range spread with short reach.",
+	},
 }
 C.Visual = {
 	NightBloomIntensity = 1.02,

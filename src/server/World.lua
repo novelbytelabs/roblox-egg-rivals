@@ -378,6 +378,9 @@ function W.build()
 		servicePoint("TradingPost", Vector3.new(-45, 1.5, 4), Config.Colors.Text, "TRADING POST\nSafe player trades")
 	local rangerStation =
 		servicePoint("RangerStation", Vector3.new(-71, 1.5, 4), Config.Colors.Blue, "RANGER STATION\nSession contracts")
+	local duelArmory =
+		servicePoint("DuelArmory", Vector3.new(0, 1.5, -25), Config.Colors.Red, "DUEL ARMORY\nFair arena loadouts")
+	duelArmory:SetAttribute("NightEdgeColor", Config.Colors.Red)
 
 	local trialStart = p(
 		"TrialStart",
@@ -541,6 +544,7 @@ function W.build()
 		exchangeShop = exchangeShop,
 		tradingPost = tradingPost,
 		rangerStation = rangerStation,
+		duelArmory = duelArmory,
 		trialStart = trialStart,
 		trialGates = trialGates,
 		shrine = shrine,

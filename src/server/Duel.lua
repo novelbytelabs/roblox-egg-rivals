@@ -11,6 +11,57 @@ end
 function Duel:other(s, p)
 	return p == s.a and s.b or s.a
 end
+
+function Duel:weapon(p)
+	local pro = self.game.profiles[p]
+	local name = pro and pro.duelWeapon or "Blaster"
+	local spec = C.DuelWeapons[name] or C.DuelWeapons.Blaster
+	return name, spec
+end
+
+function Duel:setWeapon(p, name)
+	local g = self.game
+	local pro, root = g.profiles[p], g:root(p)
+	local spec = type(name) == "string" and C.DuelWeapons[name] or nil
+	if not pro or not spec then
+		return false, "Choose a valid Duel Armory loadout."
+	end
+	if pro.duel or p:GetAttribute("InDuel") == true or g:busy(p) or g.carry[p] then
+		return false, "Finish your current activity before changing duel loadout."
+	end
+	if not g:alive(p) or not root or (root.Position - g.world.duelArmory.Position).Magnitude > C.ShopRange then
+		return false, "Visit the Duel Armory to change loadout."
+	end
+	pro.duelWeapon = name
+	g:push(p)
+	g:notify(p, spec.description .. " " .. name .. " selected.", "tick")
+	return true
+end
+
+function Duel:shotDirections(direction, spec)
+	local unit = direction.Unit
+	if spec.pellets <= 1 then
+		return { unit }
+	end
+	local reference = math.abs(unit.Y) > 0.95 and Vector3.new(1, 0, 0) or Vector3.new(0, 1, 0)
+	local right = unit:Cross(reference).Unit
+	local up = right:Cross(unit).Unit
+	local amount = math.tan(math.rad(spec.spread or 0))
+	local offsets = {
+		Vector2.new(0, 0),
+		Vector2.new(-1, 0),
+		Vector2.new(1, 0),
+		Vector2.new(0, -1),
+		Vector2.new(0, 1),
+	}
+	local out = {}
+	for i = 1, spec.pellets do
+		local offset = offsets[i] or Vector2.zero
+		table.insert(out, (unit + right * offset.X * amount + up * offset.Y * amount).Unit)
+	end
+	return out
+end
+
 function Duel:request(a, b)
 	local g = self.game
 	if a == b or not g:alive(a) or not g:alive(b) then
@@ -211,11 +262,12 @@ function Duel:shoot(p, direction)
 	if not R.vector(direction) or direction.Magnitude < 0.5 or direction.Magnitude > 1.5 then
 		return false, "Invalid aim."
 	end
-	if not g:alive(p) or not g:equipped(p, "DuelBlaster") then
-		return false, "Equip the blaster."
+	local weaponName, spec = self:weapon(p)
+	if not g:alive(p) or not g:equipped(p, spec.tool) then
+		return false, "Equip your " .. weaponName .. "."
 	end
 	local now = g:now()
-	if s.shotAt[p] and now - s.shotAt[p] < C.ShotCooldown then
+	if s.shotAt[p] and now - s.shotAt[p] < spec.cooldown then
 		return false, "Cooldown"
 	end
 	s.shotAt[p] = now
@@ -227,11 +279,17 @@ function Duel:shoot(p, direction)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.FilterDescendantsInstances = { p.Character, g.world.dynamic, g.world.fx }
-	local result = workspace:Raycast(head.Position, direction.Unit * C.DuelRange, params)
-	local finish = result and result.Position or head.Position + direction.Unit * C.DuelRange
-	g:effect("shot", { from = head.Position, to = finish, userId = p.UserId })
-	if result and result.Instance:IsDescendantOf(opponent.Character) then
-		g:humanoid(opponent):TakeDamage(C.DuelDamage)
+	local damage = 0
+	for index, shotDirection in ipairs(self:shotDirections(direction, spec)) do
+		local result = workspace:Raycast(head.Position, shotDirection * spec.range, params)
+		local finish = result and result.Position or head.Position + shotDirection * spec.range
+		g:effect("shot", { from = head.Position, to = finish, userId = p.UserId, weapon = weaponName, pellet = index })
+		if result and result.Instance:IsDescendantOf(opponent.Character) then
+			damage += spec.damage
+		end
+	end
+	if damage > 0 then
+		g:humanoid(opponent):TakeDamage(damage)
 		g:notify(p, "Hit confirmed", "tick")
 		g:feed(opponent, "damage", {})
 	end
@@ -401,6 +459,8 @@ function Duel:snapshot(p)
 		otherScore = s.scores[other],
 		deadline = s.deadline,
 		studioStakes = RunService:IsStudio(),
+		weapon = (self.game.profiles[p] and self.game.profiles[p].duelWeapon) or "Blaster",
+		otherWeapon = (self.game.profiles[other] and self.game.profiles[other].duelWeapon) or "Blaster",
 	}
 end
 return Duel

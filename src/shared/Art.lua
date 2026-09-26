@@ -294,21 +294,28 @@ function Art.tool(name)
 		)
 		part(tool, "Band", Vector3.new(0.85, 0.18, 0.85), CFrame.new(0, 1.2, 0), Config.Colors.Gold)
 		tool.Grip = CFrame.new(0, -0.5, 0) * CFrame.Angles(math.rad(25), 0, 0)
-	elseif name == "DuelBlaster" then
+	elseif name == "DuelBlaster" or name == "DuelRail" or name == "DuelScatter" then
+		local weaponName = if name == "DuelRail" then "Rail" elseif name == "DuelScatter" then "Scatter" else "Blaster"
+		local spec = Config.DuelWeapons[weaponName]
+		tool:SetAttribute("DuelWeapon", weaponName)
+		local bodyLength = if weaponName == "Rail" then 3.2 elseif weaponName == "Scatter" then 2.1 else 2.5
+		local bodyWidth = if weaponName == "Scatter" then 1.15 else 0.85
+		local barrelLength = if weaponName == "Rail" then 2.5 elseif weaponName == "Scatter" then 1.35 else 1.8
+		local barrelWidth = if weaponName == "Scatter" then 1.05 else 0.65
 		part(
 			tool,
 			"Body",
-			Vector3.new(0.85, 0.85, 2.5),
+			Vector3.new(bodyWidth, bodyWidth, bodyLength),
 			CFrame.new(0, 0.6, -0.85),
-			Color3.fromRGB(55, 98, 110),
+			Color3.fromRGB(55, 70, 76),
 			nil,
 			Enum.Material.Metal
 		)
 		part(
 			tool,
 			"Barrel",
-			Vector3.new(0.65, 0.65, 1.8),
-			CFrame.new(0, 0.65, -2.5),
+			Vector3.new(barrelWidth, barrelWidth, barrelLength),
+			CFrame.new(0, 0.65, -(1.65 + barrelLength / 2)),
 			Color3.fromRGB(49, 60, 63),
 			nil,
 			Enum.Material.Metal
@@ -316,24 +323,37 @@ function Art.tool(name)
 		part(
 			tool,
 			"Coil",
-			Vector3.new(0.76, 0.76, 0.2),
-			CFrame.new(0, 0.65, -2.8),
-			Config.Colors.Blue,
+			Vector3.new(barrelWidth + 0.11, barrelWidth + 0.11, 0.2),
+			CFrame.new(0, 0.65, -(1.7 + barrelLength)),
+			spec.color,
 			nil,
 			Enum.Material.Neon
 		)
 		part(
 			tool,
 			"Sight",
-			Vector3.new(0.12, 0.2, 0.3),
+			Vector3.new(0.12, 0.2, weaponName == "Rail" and 0.7 or 0.3),
 			CFrame.new(0, 1.13, -1.4),
 			Config.Colors.Gold,
 			nil,
 			Enum.Material.Neon
 		)
+		if weaponName == "Scatter" then
+			for _, x in ipairs({ -0.35, 0.35 }) do
+				part(
+					tool,
+					"MuzzleGuide",
+					Vector3.new(0.18, 0.18, 0.75),
+					CFrame.new(x, 0.65, -2.7),
+					spec.color,
+					nil,
+					Enum.Material.Neon
+				)
+			end
+		end
 		local muzzle = Instance.new("Attachment")
 		muzzle.Name = "Muzzle"
-		muzzle.Position = Vector3.new(0, 0.65, -3.4)
+		muzzle.Position = Vector3.new(0, 0.65, weaponName == "Rail" and -4.2 or (weaponName == "Scatter" and -2.9 or -3.4))
 		muzzle.Parent = h
 		tool.Grip = CFrame.new(0, -0.35, 0.3)
 	else
