@@ -353,7 +353,8 @@ function Art.tool(name)
 		end
 		local muzzle = Instance.new("Attachment")
 		muzzle.Name = "Muzzle"
-		muzzle.Position = Vector3.new(0, 0.65, weaponName == "Rail" and -4.2 or (weaponName == "Scatter" and -2.9 or -3.4))
+		muzzle.Position =
+			Vector3.new(0, 0.65, weaponName == "Rail" and -4.2 or (weaponName == "Scatter" and -2.9 or -3.4))
 		muzzle.Parent = h
 		tool.Grip = CFrame.new(0, -0.35, 0.3)
 	else

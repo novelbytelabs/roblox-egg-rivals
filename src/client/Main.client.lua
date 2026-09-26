@@ -1232,7 +1232,10 @@ render = function()
 		duelTitle.Text = "REVIEW YOUR DUEL WITH " .. d.opponent:upper()
 		offerMine.Text = offerText("YOUR OFFER", d.mine, d.ready)
 		offerTheirs.Text = offerText("THEIR OFFER", d.theirs, d.otherReady)
-		local loadouts = "LOADOUTS • YOU " .. (d.weapon or "Blaster"):upper() .. " • THEM " .. (d.otherWeapon or "Blaster"):upper()
+		local loadouts = "LOADOUTS • YOU "
+			.. (d.weapon or "Blaster"):upper()
+			.. " • THEM "
+			.. (d.otherWeapon or "Blaster"):upper()
 		offerNote.Text = loadouts
 			.. "\n"
 			.. (
