@@ -381,6 +381,9 @@ function W.build()
 	local duelArmory =
 		servicePoint("DuelArmory", Vector3.new(0, 1.5, -25), Config.Colors.Red, "DUEL ARMORY\nFair arena loadouts")
 	duelArmory:SetAttribute("NightEdgeColor", Config.Colors.Red)
+	local petOutfitter =
+		servicePoint("PetOutfitter", Vector3.new(71, 1.5, -12), Config.Colors.Mint, "PET OUTFITTER\nCosmetic identity")
+	petOutfitter:SetAttribute("NightEdgeColor", Config.Colors.Mint)
 
 	local trialStart = p(
 		"TrialStart",
@@ -545,6 +548,7 @@ function W.build()
 		tradingPost = tradingPost,
 		rangerStation = rangerStation,
 		duelArmory = duelArmory,
+		petOutfitter = petOutfitter,
 		trialStart = trialStart,
 		trialGates = trialGates,
 		shrine = shrine,

@@ -697,6 +697,36 @@ function Game:setPetMode(p, id, mode)
 	return true
 end
 
+function Game:setPetVariant(p, id, variant)
+	local pro, root = self.profiles[p], self:root(p)
+	local item = self.inventory.items[id]
+	local spec = type(variant) == "string" and C.PetVariants[variant] or nil
+	if not pro or not spec or not self:alive(p) or self:busy(p) or self.carry[p] or not root then
+		return false, "Finish your current activity before fitting a pet."
+	end
+	if (root.Position - self.world.petOutfitter.Position).Magnitude > C.ShopRange then
+		return false, "Visit the Pet Outfitter to change a pet style."
+	end
+	if
+		not item
+		or item.ownerId ~= p.UserId
+		or item.kind ~= "Pet"
+		or item.state ~= "Inventory"
+		or item.reservation ~= nil
+	then
+		return false, "Choose an available pet you own."
+	end
+	if item.variant == variant then
+		return true
+	end
+	item.variant = variant
+	item.revision += 1
+	self:reconcilePets()
+	self:push(p)
+	self:notify(p, item.species .. " now wears the " .. spec.name .. " style.", "tick")
+	return true
+end
+
 function Game:reconcilePets()
 	local records = self.petRecords
 	for _, record in ipairs(records:GetChildren()) do
@@ -762,6 +792,7 @@ function Game:reconcilePets()
 				record:SetAttribute("Species", item.species)
 				record:SetAttribute("Rarity", item.rarity)
 				record:SetAttribute("Element", item.element)
+				record:SetAttribute("Variant", item.variant or "Standard")
 				record:SetAttribute("Locked", not unlocked)
 				record:SetAttribute("DisplayMode", activePet and "Active" or "Pen")
 				local displayed = activePet
@@ -1356,6 +1387,8 @@ function Game:action(p, name, data)
 		return self:setPenPage(p, data.page)
 	elseif name == "petMode" then
 		return self:setPetMode(p, data.id, data.mode)
+	elseif name == "petVariant" then
+		return self:setPetVariant(p, data.id, data.variant)
 	elseif name == "drop" then
 		return self:drop(p, "manual")
 	elseif name == "reply" then
@@ -1857,6 +1890,13 @@ function Game.new()
 			return
 		end
 		self:feed(p, "openDuelArmory", {})
+	end)
+	self:prompt(self.world.petOutfitter, "Style a pet", "Pet Outfitter", function(p)
+		if self:busy(p) or self.carry[p] then
+			self:notify(p, "Finish your current activity before styling a pet.")
+			return
+		end
+		self:feed(p, "openPetOutfitter", {})
 	end)
 	self:prompt(self.world.tradingPost, "Find trader", "Trading Post", function(p)
 		self:feed(p, "openTrade", {

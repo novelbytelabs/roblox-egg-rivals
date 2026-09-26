@@ -193,6 +193,7 @@ function Ranch:inspect(visitor, petId)
 			species = item.species,
 			element = item.element,
 			rarity = item.rarity,
+			variant = item.variant or "Standard",
 			income = C.Rarities[item.rarity].income,
 		}
 end

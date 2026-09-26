@@ -1,6 +1,6 @@
 -- Canonical session-only tuning. No persistence, Robux commerce, or public item staking.
 local C = {
-	Build = "EGG-RIVALS-0.4.9-rc1",
+	Build = "EGG-RIVALS-0.4.10-rc1",
 	SchemaVersion = 4,
 	MaxPlayers = 4,
 	MaxItems = 80,
@@ -266,6 +266,24 @@ C.DuelWeapons = {
 		spread = 6,
 		color = C.Colors.Red,
 		description = "Five-pellet close-range spread with short reach.",
+	},
+}
+C.PetVariantOrder = { "Standard", "Ranger", "Starlight" }
+C.PetVariants = {
+	Standard = {
+		name = "Standard",
+		description = "Original creature, element and rarity presentation.",
+		color = C.Colors.Text,
+	},
+	Ranger = {
+		name = "Ranger",
+		description = "Low-profile elemental field collar with a gold ranger tag.",
+		color = C.Colors.Gold,
+	},
+	Starlight = {
+		name = "Starlight",
+		description = "Four subtle elemental body sparks; no crown or rarity halo.",
+		color = C.Colors.Blue,
 	},
 }
 C.Visual = {

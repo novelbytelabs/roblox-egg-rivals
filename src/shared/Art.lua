@@ -225,6 +225,54 @@ function Art.pet(creature, rarity, element, parent)
 	return m
 end
 
+function Art.petCosmetic(pet, variant, element)
+	variant = Config.PetVariants[variant] and variant or "Standard"
+	element = Config.Elements[element] and element or "Earth"
+	for _, child in ipairs(pet:GetChildren()) do
+		if child:GetAttribute("PetCosmetic") == true then
+			child:Destroy()
+		end
+	end
+	pet:SetAttribute("CosmeticVariant", variant)
+	if variant == "Standard" then
+		return
+	end
+	local style = Config.Elements[element]
+	local function cosmeticPart(name, size, cf, color, material)
+		local cosmetic = part(pet, name, size, cf, color, nil, material)
+		cosmetic:SetAttribute("PetCosmetic", true)
+		return cosmetic
+	end
+	if variant == "Ranger" then
+		local y, halfX, halfZ = 0.35, 0.82, 0.72
+		cosmeticPart("RangerCollar", Vector3.new(1.75, 0.16, 0.13), CFrame.new(0, y, -halfZ), style.accent)
+		cosmeticPart("RangerCollar", Vector3.new(1.75, 0.16, 0.13), CFrame.new(0, y, halfZ), style.accent)
+		cosmeticPart("RangerCollar", Vector3.new(0.13, 0.16, 1.45), CFrame.new(-halfX, y, 0), style.accent)
+		cosmeticPart("RangerCollar", Vector3.new(0.13, 0.16, 1.45), CFrame.new(halfX, y, 0), style.accent)
+		local tag = cosmeticPart(
+			"RangerTag",
+			Vector3.new(0.24, 0.28, 0.12),
+			CFrame.new(0, y - 0.18, -0.82),
+			Config.Colors.Gold,
+			Enum.Material.Neon
+		)
+		tag.Shape = Enum.PartType.Ball
+	elseif variant == "Starlight" then
+		local sparkColor = style.accent:Lerp(Color3.new(1, 1, 1), 0.28)
+		for i = 1, 4 do
+			local angle = (i - 1) * math.pi / 2
+			local spark = cosmeticPart(
+				"StarlightSpark",
+				Vector3.new(0.2, 0.2, 0.2),
+				CFrame.new(math.cos(angle) * 1.08, 0.48, math.sin(angle) * 1.08),
+				sparkColor,
+				Enum.Material.Neon
+			)
+			spark.Shape = Enum.PartType.Ball
+		end
+	end
+end
+
 function Art.guardian(parent)
 	local m = Art.model("ForestGuardian", parent)
 	local bark = Color3.fromRGB(107, 78, 54)
