@@ -1,0 +1,36 @@
+-- Presentation tuning only. None of these values grant progression or economy power.
+local A = {
+	EpisodeSeconds = 12,
+	EpisodeStagger = 0.7,
+	WalkSpeed = 3.2,
+	GroupSeconds = 12,
+	GroupInterval = 18,
+	PairDistance = 9,
+	MaxPairs = 1,
+	NapMembers = 3,
+	MaxGreeters = 4,
+	MaxSpectators = 4,
+	HomecomingSeconds = 4,
+	HomecomingCooldown = 10,
+	MilestoneSeconds = 4,
+	MilestoneCooldown = 8,
+	ChaseRadius = 1.15,
+	ChasePeriod = 5.5,
+	SnapshotGrace = 2,
+	MaxHabitatParts = 20,
+	MaxAnimatedParts = 32,
+}
+A.Kinds = {
+	Idle = true,
+	Explore = true,
+	HabitatRest = true,
+	GroupNap = true,
+	PairPlay = true,
+	SoloPlay = true,
+	GateWatch = true,
+	TrainingWatch = true,
+	Homecoming = true,
+	Milestone = true,
+	Welcome = true,
+}
+return A
