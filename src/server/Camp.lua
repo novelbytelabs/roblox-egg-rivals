@@ -680,10 +680,7 @@ function Camp.applyExpansion(b, level)
 			local side = col < sideColumns and -1 or 1
 			local sideIndex = col % sideColumns
 			local xOffset = side * (innerLane + sideIndex * laneStep)
-			table.insert(
-				slots,
-				center + Vector3.new(xOffset, 1.8, (row - (spec.rows - 1) / 2) * 5.5)
-			)
+			table.insert(slots, center + Vector3.new(xOffset, 1.8, (row - (spec.rows - 1) / 2) * 5.5))
 		end
 	end
 
