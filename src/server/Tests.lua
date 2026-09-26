@@ -389,8 +389,11 @@ function Tests.run(g)
 					local mode = r:GetAttribute("DisplayMode")
 					if mode == "Pen" then
 						local pos = r:GetAttribute("PenPosition")
-						assert(typeof(pos) == "Vector3" and math.abs(pos.X - pro.base.penCenter.X) <= 10)
-						assert(math.abs(pos.Z - pro.base.penCenter.Z) <= 3)
+						assert(
+							typeof(pos) == "Vector3"
+								and math.abs(pos.X - pro.base.penCenter.X) <= pro.base.penBounds.X + 0.01
+						)
+						assert(math.abs(pos.Z - pro.base.penCenter.Z) <= pro.base.penBounds.Y + 0.01)
 						visible += 1
 						shownIds[r.Name] = true
 					elseif mode == "Active" then
