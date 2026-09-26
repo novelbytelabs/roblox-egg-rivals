@@ -1319,7 +1319,11 @@ function Game:action(p, name, data)
 			end
 		end
 		self:reconcilePets()
-		self:notify(p, "Studio ranch filled: " .. tostring(current + added) .. " / " .. tostring(target) .. " pets.", "win")
+		self:notify(
+			p,
+			"Studio ranch filled: " .. tostring(current + added) .. " / " .. tostring(target) .. " pets.",
+			"win"
+		)
 		self:push(p)
 		return true
 	elseif name == "debugMaxRanch" and RunService:IsStudio() then

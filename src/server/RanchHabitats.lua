@@ -41,14 +41,8 @@ function H.build(base, area, center, bounds)
 		anchor:SetAttribute("RanchActivityTarget", true)
 		anchor:SetAttribute("BaseIndex", base.index)
 		anchor:SetAttribute("Element", element)
-		local habitatLabel = Art.billboard(
-			anchor,
-			element:upper() .. " HABITAT",
-			style.color,
-			150,
-			30,
-			Vector3.new(0, 2.5, 0)
-		)
+		local habitatLabel =
+			Art.billboard(anchor, element:upper() .. " HABITAT", style.color, 150, 30, Vector3.new(0, 2.5, 0))
 		habitatLabel.Parent.MaxDistance = 55
 		for step = 1, 3 do
 			local approach = center:Lerp(position, step / 4) + Vector3.new(0, 0.22, 0)

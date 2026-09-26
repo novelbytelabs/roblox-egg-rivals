@@ -582,14 +582,8 @@ function Camp.applyExpansion(b, level)
 		Enum.Material.WoodPlanks,
 		false
 	)
-	b.earningsLabel = Art.billboard(
-		ledger,
-		"YOUR RANCH\n0 PETS • +0 COINS/MIN",
-		C.Colors.Text,
-		300,
-		64,
-		Vector3.new(0, 0, 0.55)
-	)
+	b.earningsLabel =
+		Art.billboard(ledger, "YOUR RANCH\n0 PETS • +0 COINS/MIN", C.Colors.Text, 300, 64, Vector3.new(0, 0, 0.55))
 
 	-- A simple shade structure gives residents a recognizable rest area.
 	local shelterX = b.x - math.max(5, halfW * 0.48)
