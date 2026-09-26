@@ -510,6 +510,11 @@ function E:update(dt, state, records)
 			if interaction then
 				interaction:SetAttribute("OwnerUserId", ownerId)
 			end
+			local renderScale = mode == "Pen" and (rarity == "Godly" and 0.92 or 0.82) or 1
+			if pet:GetAttribute("RanchRenderScale") ~= renderScale then
+				pet:ScaleTo(renderScale)
+				pet:SetAttribute("RanchRenderScale", renderScale)
+			end
 			local from = pet:GetPivot()
 			local alpha = 1 - math.exp(-(mode == "Active" and 10 or 8) * dt)
 			local nextCF = (from.Position - target.Position).Magnitude > 35 and target or from:Lerp(target, alpha)
