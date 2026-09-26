@@ -1,6 +1,6 @@
 -- Canonical session-only tuning. No persistence, Robux commerce, or public item staking.
 local C = {
-	Build = "EGG-RIVALS-0.4.7-rc1",
+	Build = "EGG-RIVALS-0.4.8-rc1",
 	SchemaVersion = 4,
 	MaxPlayers = 4,
 	MaxItems = 80,
@@ -212,6 +212,18 @@ C.Expansions = {
 	{ name = "Grand Ranch", capacity = 24, cost = 12000, width = 38, depth = 34, columns = 6, rows = 4 },
 }
 C.ItemTypes = { SnarePod = { name = "Snare Pod", cost = 15, exchange = 5, rarity = "Common" } }
+C.NightMarketAids = {
+	MoonCompass = {
+		name = "Moon Compass",
+		cost = 35,
+		description = "One broad directional pull toward the hidden Moonrise egg.",
+	},
+	GlowMap = {
+		name = "Glow Map",
+		cost = 60,
+		description = "One broad Forest sector clue; never an exact marker.",
+	},
+}
 C.SpeedMilestones = { 100, 250, 600, 1200, 2200, 3800, 6000, 10000 }
 C.Colors = {
 	Ink = Color3.fromRGB(14, 31, 35),

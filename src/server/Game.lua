@@ -238,6 +238,8 @@ function Game:setup(p)
 		drafting = false,
 		tutorial = 1,
 		coinRemainder = 0,
+		nightMarketEpoch = 0,
+		nightMarketUsed = {},
 		ranchLevel = 0,
 		hatched = 0,
 		teleportSerial = 0,
@@ -956,6 +958,90 @@ function Game:exchangeCancel(p, reason)
 	return true
 end
 
+local function nightSector(pos)
+	local side = if pos.X < -30 then "WEST GROVE" elseif pos.X > 30 then "EAST GROVE" else "CENTRAL GROVE"
+	local depth = if pos.Z < 85 then "FOREST EDGE" elseif pos.Z < 145 then "MID FOREST" else "DEEP FOREST"
+	return side, depth
+end
+
+function Game:updateNightMarket(enabled)
+	local market = self.world and self.world.nightMarket
+	if not market then
+		return
+	end
+	market.counter:SetAttribute("Open", enabled == true)
+	market.shutter.CanCollide = enabled ~= true
+	market.shutter.CanQuery = enabled ~= true
+	market.shutter.Transparency = enabled and 1 or 0.08
+	market.label.Text = enabled and "NIGHT MARKET\nMoonrise search aids" or "NIGHT MARKET\nClosed until moonrise"
+	for _, lamp in ipairs(market.lamps) do
+		lamp.part.Transparency = enabled and 0 or 0.55
+		lamp.light.Enabled = enabled == true
+	end
+	if self.nightMarketPrompt then
+		self.nightMarketPrompt.Enabled = enabled == true
+	end
+end
+
+function Game:nightMarketClue(p, aidId)
+	local root = self:root(p)
+	local egg = self.nightEgg
+	if not root or not egg or egg.state ~= "Home" or not egg.nest then
+		return nil
+	end
+	local target = egg.nest.position
+	if aidId == "MoonCompass" then
+		local delta = target - root.Position
+		local horizontal = if math.abs(delta.X) < 18 then "AHEAD" elseif delta.X < 0 then "LEFT" else "RIGHT"
+		local depth = if math.abs(delta.Z) < 45 then "NEAR" else "FAR"
+		return "Moon Compass: " .. horizontal .. " • " .. depth .. " pull. Follow the abnormal glow."
+	elseif aidId == "GlowMap" then
+		local side, depth = nightSector(target)
+		return "Glow Map: " .. side .. " • " .. depth .. ". Search the region; there is no exact marker."
+	end
+	return nil
+end
+
+function Game:buyNightAid(p, aidId)
+	local pro, root = self.profiles[p], self:root(p)
+	local aid = type(aidId) == "string" and C.NightMarketAids[aidId] or nil
+	if not aid then
+		return false, "Unknown Night Market aid."
+	end
+	if workspace:GetAttribute("Night") ~= true then
+		return false, "The Night Market opens only at Moonrise."
+	end
+	if not self:alive(p) or self:busy(p) or not root then
+		return false, "Finish your current activity first."
+	end
+	local market = self.world.nightMarket
+	if not market or (root.Position - market.counter.Position).Magnitude > C.ShopRange then
+		return false, "Visit the Night Market to use a search aid."
+	end
+	if not self.nightEgg or self.nightEgg.state ~= "Home" then
+		return false, "The hidden Moonrise egg is already in play."
+	end
+	if pro.nightMarketEpoch ~= self.nightEpoch then
+		pro.nightMarketEpoch = self.nightEpoch
+		pro.nightMarketUsed = {}
+	end
+	if pro.nightMarketUsed[aidId] then
+		return false, aid.name .. " already used this Moonrise."
+	end
+	if pro.money.Value < aid.cost then
+		return false, "Need " .. aid.cost .. " Coins for " .. aid.name .. "."
+	end
+	local clue = self:nightMarketClue(p, aidId)
+	if not clue then
+		return false, "No hidden Moonrise egg can be sensed right now."
+	end
+	pro.money.Value -= aid.cost
+	pro.nightMarketUsed[aidId] = true
+	self:push(p)
+	self:notify(p, clue, "night")
+	return true, clue
+end
+
 function Game:buyTrap(p)
 	local pro, root = self.profiles[p], self:root(p)
 	if not self:alive(p) or self:busy(p) or (root.Position - self.world.shop.Position).Magnitude > C.ShopRange then
@@ -1218,6 +1304,8 @@ function Game:action(p, name, data)
 		return self:exchangeCancel(p, "Exchange canceled. Item returned.")
 	elseif name == "buyTrap" then
 		return self:buyTrap(p)
+	elseif name == "nightMarketBuy" then
+		return self:buyNightAid(p, data.id)
 	elseif name == "incubate" then
 		return self.incubation:preview(p, data.element, data.id)
 	elseif name == "incubationHold" then
@@ -1425,6 +1513,7 @@ function Game:setNight(enabled)
 		self.world.shrine:SetAttribute("Awake", false)
 		self.world.shrine:SetAttribute("ClueRegion", nil)
 	end
+	self:updateNightMarket(enabled)
 	self:pushAll()
 	return true
 end
@@ -1766,6 +1855,18 @@ function Game.new()
 			self:notify(p, err)
 		end
 	end)
+	self.nightMarketPrompt = self:prompt(self.world.nightMarket.counter, "Browse search aids", "Night Market", function(p)
+		if workspace:GetAttribute("Night") ~= true then
+			self:notify(p, "The Night Market opens only at Moonrise.")
+			return
+		end
+		if self:busy(p) then
+			self:notify(p, "Finish your current activity first.")
+			return
+		end
+		self:feed(p, "openNightMarket", {})
+	end)
+	self:updateNightMarket(false)
 	self.net.Request.OnServerEvent:Connect(function(p, name, data)
 		local ok, err = self:action(p, name, data)
 		if not ok and err and err ~= "Cooldown" and self:rate(p, "errorToast", 0.8) then

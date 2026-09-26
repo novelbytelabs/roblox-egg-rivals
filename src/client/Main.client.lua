@@ -318,6 +318,54 @@ local buyButton = U.button(shop, "BuyUpgrade", "UPGRADE SPEED LAB", 20, 394, 470
 		send("upgrade", { tier = state.lab.grade + 1 })
 	end
 end)
+local nightMarketPanel = U.frame(root, "NightMarketPanel", 300, 175, 480, 310, C.Colors.Panel)
+nightMarketPanel.Visible = false
+U.text(nightMarketPanel, "Title", "NIGHT MARKET", 20, 15, 390, 35, 23, Color3.fromRGB(203, 142, 255))
+U.button(nightMarketPanel, "Close", "X", 430, 17, 30, 30, function()
+	menu = nil
+end, C.Colors.Muted)
+U.text(
+	nightMarketPanel,
+	"Description",
+	"Moonrise-only search aids narrow the hidden egg hunt without revealing an exact waypoint.",
+	20,
+	58,
+	440,
+	58,
+	14,
+	C.Colors.Text
+)
+local compassSpec = C.NightMarketAids.MoonCompass
+local mapSpec = C.NightMarketAids.GlowMap
+U.text(nightMarketPanel, "CompassInfo", compassSpec.description, 20, 126, 440, 34, 12, C.Colors.Muted)
+U.button(
+	nightMarketPanel,
+	"MoonCompass",
+	compassSpec.name:upper() .. " • " .. compassSpec.cost .. " COINS",
+	20,
+	164,
+	440,
+	38,
+	function()
+		send("nightMarketBuy", { id = "MoonCompass" })
+	end,
+	C.Colors.Blue
+)
+U.text(nightMarketPanel, "MapInfo", mapSpec.description, 20, 210, 440, 34, 12, C.Colors.Muted)
+U.button(
+	nightMarketPanel,
+	"GlowMap",
+	mapSpec.name:upper() .. " • " .. mapSpec.cost .. " COINS",
+	20,
+	248,
+	440,
+	38,
+	function()
+		send("nightMarketBuy", { id = "GlowMap" })
+	end,
+	Color3.fromRGB(203, 142, 255)
+)
+
 local ranchPanel = U.frame(root, "RanchPanel", 300, 195, 480, 250, C.Colors.Panel)
 ranchPanel.Visible = false
 U.text(ranchPanel, "Title", "RANCH & PEN WORKS", 20, 15, 400, 35, 23, C.Colors.Mint)
@@ -883,6 +931,8 @@ render = function()
 	local selecting = d and d.phase == "Selecting"
 	if d or sprint then
 		menu = nil
+	elseif menu == "nightMarket" and workspace:GetAttribute("Night") ~= true then
+		menu = nil
 	elseif state.trade then
 		menu = "trade"
 	end
@@ -892,6 +942,7 @@ render = function()
 	trialCancelButton.Text = sprint and "CANCEL SPRINT" or "CANCEL TRIAL"
 	modal.Visible = menu == "inventory"
 	shop.Visible = menu == "shop"
+	nightMarketPanel.Visible = menu == "nightMarket" and workspace:GetAttribute("Night") == true
 	ranchPanel.Visible = menu == "ranch"
 	visitorPanel.Visible = menu == "visitor" and visitorPet ~= nil
 	tradePanel.Visible = menu == "trade"
@@ -1194,6 +1245,9 @@ feed.OnClientEvent:Connect(function(kind, data)
 		render()
 	elseif kind == "openContracts" then
 		menu = "contracts"
+		render()
+	elseif kind == "openNightMarket" then
+		menu = "nightMarket"
 		render()
 	elseif kind == "ranchUpgrade" then
 		pendingRanchUpgrade = data

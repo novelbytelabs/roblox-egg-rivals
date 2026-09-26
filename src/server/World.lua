@@ -112,6 +112,66 @@ function W.build()
 		p("ShopPost", Vector3.new(0.5, 7, 0.5), Vector3.new(x, 3.5, 6), wood, Enum.Material.Wood, true)
 	end
 	Art.billboard(shop, "TRAIL SUPPLIES\nSnare pod • 15 coins", Config.Colors.Gold, 240, 64, Vector3.new(0, 6, 0))
+
+	-- Night Market: physically closed by day, illuminated and accessible only during Moonrise.
+	local nightMarketCounter =
+		p("NightMarketCounter", Vector3.new(10, 3, 5), Vector3.new(71, 1.5, 16), wood, Enum.Material.WoodPlanks, true)
+	nightMarketCounter:SetAttribute("NightEdgeColor", Color3.fromRGB(190, 118, 255))
+	p(
+		"NightMarketCanopy",
+		Vector3.new(12, 0.4, 8),
+		Vector3.new(71, 7, 16),
+		Color3.fromRGB(73, 48, 102),
+		Enum.Material.Fabric,
+		false
+	)
+	for _, x in ipairs({ 66, 76 }) do
+		p("NightMarketPost", Vector3.new(0.5, 7, 0.5), Vector3.new(x, 3.5, 18), wood, Enum.Material.Wood, true)
+	end
+	local nightMarketShutter = p(
+		"NightMarketShutter",
+		Vector3.new(10.6, 4.2, 0.35),
+		Vector3.new(71, 3.25, 13.35),
+		Color3.fromRGB(51, 43, 70),
+		Enum.Material.Metal,
+		true
+	)
+	nightMarketShutter.Transparency = 0.08
+	local nightMarketLabel = Art.billboard(
+		nightMarketCounter,
+		"NIGHT MARKET\nClosed until moonrise",
+		Color3.fromRGB(194, 137, 255),
+		240,
+		64,
+		Vector3.new(0, 6, 0)
+	)
+	local nightMarketLamps = {}
+	for _, dx in ipairs({ -3, 0, 3 }) do
+		local lamp = p(
+			"NightMarketLamp",
+			Vector3.new(0.8, 0.8, 0.8),
+			Vector3.new(71 + dx, 5.5, 13.1),
+			Color3.fromRGB(177, 92, 255),
+			Enum.Material.Neon,
+			false
+		)
+		lamp.Transparency = 0.55
+		lamp:SetAttribute("NightEdgeColor", Color3.fromRGB(218, 139, 255))
+		local light = Instance.new("PointLight")
+		light.Color = Color3.fromRGB(192, 109, 255)
+		light.Brightness = 1.5
+		light.Range = 18
+		light.Enabled = false
+		light.Parent = lamp
+		table.insert(nightMarketLamps, { part = lamp, light = light })
+	end
+	local nightMarket = {
+		counter = nightMarketCounter,
+		shutter = nightMarketShutter,
+		label = nightMarketLabel,
+		lamps = nightMarketLamps,
+	}
+
 	local nests = {}
 	local positions = Config.ForestNestPositions
 	for i, pos in ipairs(positions) do
@@ -475,6 +535,7 @@ function W.build()
 		nests = nests,
 		spawn = spawn,
 		shop = shop,
+		nightMarket = nightMarket,
 		trainerShop = trainerShop,
 		ranchShop = ranchShop,
 		exchangeShop = exchangeShop,
