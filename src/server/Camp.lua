@@ -247,8 +247,12 @@ function Camp.create(parent, index, color)
 	b.applyExpansion = function(level)
 		Camp.applyExpansion(b, level)
 	end
+	b.applyTheme = function(theme)
+		Camp.applyTheme(b, theme)
+	end
 	Camp.applyGrade(b, 1)
 	Camp.applyExpansion(b, 0)
+	Camp.applyTheme(b, "Standard")
 	return b
 end
 
@@ -363,6 +367,83 @@ function Camp.applyGrade(b, tier)
 	modules.Parent = b.model
 	b.treadmill:SetAttribute("Tier", tier)
 end
+function Camp.applyTheme(b, theme)
+	local spec = C.BazaarThemes[theme]
+	assert(spec, "Invalid Bazaar theme")
+	local old = b.model:FindFirstChild("BazaarTheme")
+	if old then
+		old:Destroy()
+	end
+	b.model:SetAttribute("BaseTheme", theme)
+	b.nameLabel.TextColor3 = spec.element and C.Elements[spec.element].color or b.color
+	if theme == "Standard" then
+		return
+	end
+	local style = C.Elements[spec.element]
+	local model = Instance.new("Model")
+	model.Name = "BazaarTheme"
+	model:SetAttribute("Element", spec.element)
+	model:SetAttribute("Theme", theme)
+	model.Parent = b.model
+	local center = b.center
+	local function decoration(name, size, position, material, shape)
+		local p = part(model, name, size, position, style.accent, material, false)
+		p.CanTouch, p.CanQuery, p.CastShadow = false, false, false
+		p:SetAttribute("NightTint", style.night)
+		p:SetAttribute("BazaarDecoration", true)
+		if shape then
+			p.Shape = shape
+		end
+		return p
+	end
+	local corners = {
+		Vector3.new(-14.5, 1.5, 14.5),
+		Vector3.new(14.5, 1.5, 14.5),
+		Vector3.new(-14.5, 1.5, -14.5),
+		Vector3.new(14.5, 1.5, -14.5),
+	}
+	for index, offset in ipairs(corners) do
+		if theme == "Fire" then
+			decoration("EmberBeacon", Vector3.new(0.75, 2.4, 0.75), center + offset, Enum.Material.Neon)
+		elseif theme == "Water" then
+			local drop = decoration(
+				"TideDrop",
+				Vector3.new(1.05, 1.05, 1.05),
+				center + offset + Vector3.new(0, 0.8, 0),
+				Enum.Material.Glass,
+				Enum.PartType.Ball
+			)
+			drop.Transparency = 0.18
+		elseif theme == "Wind" then
+			local vane = decoration(
+				"GaleVane",
+				Vector3.new(0.18, 2.6, 0.9),
+				center + offset + Vector3.new(0, 0.6, 0),
+				Enum.Material.Neon
+			)
+			vane.CFrame *= CFrame.Angles(0, index * math.pi / 2, 0.18)
+			vane:SetAttribute("SpinRest", vane.CFrame)
+			vane:SetAttribute("SpinRate", 0.45 + index * 0.05)
+		else
+			local stone = decoration(
+				"RootStone",
+				Vector3.new(1.25, 1.8, 1.15),
+				center + offset,
+				Enum.Material.Slate
+			)
+			stone.CFrame *= CFrame.Angles(0.12, index * 0.55, 0.08)
+		end
+	end
+	ring(model, "ThemeSigil", center + Vector3.new(0, 0.72, 16.2), 3.1, style.color, 12)
+	for _, p in ipairs(model:GetDescendants()) do
+		if p:IsA("BasePart") then
+			p.CanCollide, p.CanTouch, p.CanQuery, p.CastShadow = false, false, false, false
+			p:SetAttribute("BazaarDecoration", true)
+			p:SetAttribute("NightTint", style.night)
+		end
+	end
+end
+
 function Camp.applyExpansion(b, level)
 	local spec = C.Expansions[level + 1]
 	assert(spec, "Invalid ranch expansion")

@@ -239,6 +239,7 @@ function Game:setup(p)
 		slowUntil = 0,
 		duel = nil,
 		duelWeapon = "Blaster",
+		baseTheme = "Standard",
 		trade = nil,
 		exchange = nil,
 		rates = {},
@@ -263,6 +264,7 @@ function Game:setup(p)
 	self.ranch:setup(p)
 	base.applyGrade(pro.tier)
 	base.applyExpansion(pro.ranchLevel)
+	base.applyTheme(pro.baseTheme)
 	p:SetAttribute("InDuel", false)
 	p:SetAttribute("InTrial", false)
 	p:SetAttribute("InSprint", false)
@@ -694,6 +696,25 @@ function Game:setPetMode(p, id, mode)
 	item.revision += 1
 	self:reconcilePets()
 	self:push(p)
+	return true
+end
+
+function Game:setBaseTheme(p, theme)
+	local pro, root = self.profiles[p], self:root(p)
+	local spec = type(theme) == "string" and C.BazaarThemes[theme] or nil
+	if not pro or not spec or not self:alive(p) or self:busy(p) or self.carry[p] or not root then
+		return false, "Finish your current activity before changing ranch theme."
+	end
+	if (root.Position - self.world.elementalBazaar.Position).Magnitude > C.ShopRange then
+		return false, "Visit the Elemental Bazaar to change ranch theme."
+	end
+	if pro.baseTheme == theme then
+		return true
+	end
+	pro.baseTheme = theme
+	pro.base.applyTheme(theme)
+	self:push(p)
+	self:notify(p, spec.name .. " applied to your camp.", "tick")
 	return true
 end
 
@@ -1210,6 +1231,7 @@ function Game:push(p)
 		trade = self.trades:snapshot(p),
 		duel = self.duels:snapshot(p),
 		duelWeapon = pro.duelWeapon or "Blaster",
+		baseTheme = pro.baseTheme or "Standard",
 		result = pro.result and pro.result.untilTime > self:now() and pro.result or nil,
 		serverTime = self:now(),
 		bossEnabled = workspace:GetAttribute("BossEnabled"),
@@ -1299,6 +1321,8 @@ function Game:action(p, name, data)
 		return self.speedLab:setTuning(p, data.name)
 	elseif name == "duelWeapon" then
 		return self.duels:setWeapon(p, data.name)
+	elseif name == "bazaarTheme" then
+		return self:setBaseTheme(p, data.theme)
 	elseif name == "trialStart" then
 		return self.trials:start(p)
 	elseif name == "trialCancel" then
@@ -1898,6 +1922,13 @@ function Game.new()
 		end
 		self:feed(p, "openPetOutfitter", {})
 	end)
+	self:prompt(self.world.elementalBazaar, "Choose ranch theme", "Elemental Bazaar", function(p)
+		if self:busy(p) or self.carry[p] then
+			self:notify(p, "Finish your current activity before changing ranch theme.")
+			return
+		end
+		self:feed(p, "openElementalBazaar", {})
+	end)
 	self:prompt(self.world.tradingPost, "Find trader", "Trading Post", function(p)
 		self:feed(p, "openTrade", {
 			targets = self:tradeTargets(p),
@@ -1961,6 +1992,7 @@ function Game.new()
 				end
 				pro.base.incubators[element].timer.Text = element:upper() .. " INCUBATOR\nAvailable"
 			end
+			pro.base.applyTheme("Standard")
 			pro.base.owner = nil
 			pro.base.nameLabel.Text = "AVAILABLE BASE"
 		end

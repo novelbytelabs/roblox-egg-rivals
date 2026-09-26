@@ -1,6 +1,6 @@
 -- Canonical session-only tuning. No persistence, Robux commerce, or public item staking.
 local C = {
-	Build = "EGG-RIVALS-0.4.10-rc1",
+	Build = "EGG-RIVALS-0.4.11-rc1",
 	SchemaVersion = 4,
 	MaxPlayers = 4,
 	MaxItems = 80,
@@ -266,6 +266,33 @@ C.DuelWeapons = {
 		spread = 6,
 		color = C.Colors.Red,
 		description = "Five-pellet close-range spread with short reach.",
+	},
+}
+C.BazaarThemeOrder = { "Standard", "Fire", "Water", "Wind", "Earth" }
+C.BazaarThemes = {
+	Standard = {
+		name = "Standard Camp",
+		description = "Original camp presentation with no elemental overlay.",
+	},
+	Fire = {
+		name = "Ember Court",
+		element = "Fire",
+		description = "Nonphysical ember beacons and a Fire camp sigil.",
+	},
+	Water = {
+		name = "Tide Court",
+		element = "Water",
+		description = "Nonphysical glass droplets and a Water camp sigil.",
+	},
+	Wind = {
+		name = "Gale Court",
+		element = "Wind",
+		description = "Nonphysical wind vanes and a Wind camp sigil.",
+	},
+	Earth = {
+		name = "Root Court",
+		element = "Earth",
+		description = "Nonphysical root stones and an Earth camp sigil.",
 	},
 }
 C.PetVariantOrder = { "Standard", "Ranger", "Starlight" }
