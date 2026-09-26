@@ -36,6 +36,25 @@ local function enum(tableValue, value)
 	return type(value) == "string" and tableValue[value] ~= nil
 end
 
+local function denseLength(value, maximum)
+	if type(value) ~= "table" then
+		return nil
+	end
+	local count = 0
+	for key in pairs(value) do
+		if not R.integer(key, 1, maximum) then
+			return nil
+		end
+		count += 1
+	end
+	for index = 1, count do
+		if value[index] == nil then
+			return nil
+		end
+	end
+	return count
+end
+
 local function welcomedList(item)
 	local out = {}
 	for key, value in pairs(item.welcomedOwners or {}) do
@@ -159,7 +178,8 @@ function Schema.capture(gameService, player)
 end
 
 local function validateWelcomed(value)
-	if type(value) ~= "table" or #value > 128 then
+	local count = denseLength(value, 128)
+	if count == nil then
 		return nil
 	end
 	local out, seen = {}, {}
@@ -305,7 +325,8 @@ function Schema.validate(source, expectedUserId)
 	if not lab then
 		return nil, labErr
 	end
-	if type(source.items) ~= "table" or #source.items > C.MaxItems then
+	local itemCount = denseLength(source.items, C.MaxItems)
+	if itemCount == nil then
 		return fail("Invalid persistent inventory.")
 	end
 	local items, byId = {}, {}
@@ -324,7 +345,8 @@ function Schema.validate(source, expectedUserId)
 		table.insert(items, item)
 	end
 	local incubations, incubationByItem, incubationByElement = {}, {}, {}
-	if type(source.incubations) ~= "table" or #source.incubations > #C.ElementOrder then
+	local incubationCount = denseLength(source.incubations, #C.ElementOrder)
+	if incubationCount == nil then
 		return fail("Invalid persistent incubations.")
 	end
 	for index, raw in ipairs(source.incubations) do
