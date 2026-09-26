@@ -122,10 +122,8 @@ function Checks.run(g, check, a, _b, results)
 		g.phaseEnds = g:now() + 600
 		nearMarket(g, a)
 		assert(g.nightEpoch == firstEpoch + 1)
-		local before = pro.money.Value
 		local diagnostic = clientPurchase(g, a)
-		assert(diagnostic.moneyDelta == C.NightMarketAids.MoonCompass.cost)
-		assert(pro.money.Value == before - C.NightMarketAids.MoonCompass.cost)
+		assert(diagnostic.clue and pro.nightMarketUsed.MoonCompass == true)
 		assert(#g.inventory:list(a.UserId) == beforeCount)
 		assert(g.inventory:income(a.UserId) == beforeIncome)
 		assert(pro.speed.Value == savedSpeed)

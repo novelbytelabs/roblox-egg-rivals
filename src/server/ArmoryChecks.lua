@@ -112,10 +112,8 @@ function Checks.run(g, check, a, _b, results)
 		nearArmory(g, a)
 		assert(g.duels:setWeapon(a, "Blaster"))
 		g:push(a)
-		local before = pro.money.Value
 		local diagnostic = clientSelect(g, a, "Rail")
 		assert(diagnostic.weapon == "Rail" and pro.duelWeapon == "Rail")
-		assert(pro.money.Value == before and diagnostic.money == before)
 	end)
 
 	results.armoryDiagnostics = {

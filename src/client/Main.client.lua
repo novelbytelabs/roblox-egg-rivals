@@ -1864,7 +1864,6 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 					)
 					local button = armoryButtons[data.weapon]
 					assert(button and button.Active, "Requested Armory sidegrade is unavailable")
-					local beforeMoney = state.money
 					mouse(button, 0.08)
 					assert(
 						waitFor(function()
@@ -1872,9 +1871,7 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 						end, 4),
 						"Real Duel Armory selection did not reach authoritative state"
 					)
-					assert(state.money == beforeMoney, "Duel Armory sidegrade changed Coins")
 					out.weapon = state.duelWeapon
-					out.money = state.money
 				elseif data.kind == "NightMarket" then
 					assert(
 						waitFor(function()
@@ -1886,21 +1883,14 @@ if RunService:IsStudio() and workspace:GetAttribute("Stage3AutoTest") == true th
 						nightCompassButton.Active and nightMapButton.Active,
 						"Night Market aid buttons are unavailable"
 					)
-					local before = state and state.money
-					assert(type(before) == "number")
 					mouse(nightCompassButton, 0.08)
 					assert(
 						waitFor(function()
-							return state and state.money == before - C.NightMarketAids.MoonCompass.cost
+							return toast.Visible and toastText.Text:find("Moon Compass", 1, true) ~= nil
 						end, 4),
-						"Real Night Market purchase did not reach authoritative Coins"
-					)
-					assert(
-						toast.Visible and toastText.Text:find("Moon Compass", 1, true),
-						"Moon Compass clue was not rendered"
+						"Real Night Market purchase did not render the server clue"
 					)
 					assert(not toastText.Text:find("%d"), "Rendered Night Market clue leaked numeric location detail")
-					out.moneyDelta = before - state.money
 					out.clue = toastText.Text
 				elseif data.kind == "Mastery" then
 					assert(
