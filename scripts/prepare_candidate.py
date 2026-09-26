@@ -16,6 +16,7 @@ BRANCHES = (
     "feature/0.4.7-living-ranch",
     "feature/0.4.8-night-market",
     "feature/0.4.9-duel-armory",
+    "feature/0.4.10-pet-outfitter",
 )
 TEMPLATES = ("default.project.json", "test.project.json")
 

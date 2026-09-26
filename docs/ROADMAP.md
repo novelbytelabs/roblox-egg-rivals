@@ -49,12 +49,23 @@ The physical Duel Armory offers three free session loadouts:
 
 Theoretical maximum damage cadence is deliberately bounded within roughly ten percent across the three loadouts. Selection is server-owned, costs no Coins or Robux, cannot change during a duel, and determines the exact duel tool and server shot rules.
 
+### 0.4.10 — Pet Outfitter v1
+
+**IMPLEMENTED / VERIFICATION PENDING**
+
+The physical Pet Outfitter offers three free cosmetic styles for exact owned pets:
+
+- **Standard** — original pet presentation.
+- **Ranger** — a low-profile elemental collar and ranger tag.
+- **Starlight** — four subtle elemental body sparks.
+
+Styles reuse the existing pet `variant` field, persist through existing inventory transfers, and replicate to ranch/companion rendering plus read-only visitor inspection. They do not alter creature, element, rarity, income, size, movement, Godly halo behavior, Coins or Robux.
+
 ## Next approved gameplay sequence
 
-After the verification queue, Night Market and Duel Armory:
+After the verification queue, Night Market, Duel Armory and Pet Outfitter:
 
-1. **Pet Outfitter** — cosmetic pet identity without obscuring creature/element/rarity readability.
-2. **Elemental Bazaar** — elemental ranch/incubator/pet presentation without pay-to-win bonuses.
-3. **Persistence / MVP production** — save progression, then broaden creatures, zones and platform support.
+1. **Elemental Bazaar** — elemental ranch/incubator/pet presentation without pay-to-win bonuses.
+2. **Persistence / MVP production** — save progression, then broaden creatures, zones and platform support.
 
 The project should remain centered on the established loop rather than drifting into unrelated side systems.

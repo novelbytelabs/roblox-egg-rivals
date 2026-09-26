@@ -116,19 +116,26 @@ Do not sell direct competitive superiority for Robux.
 
 ## Pet Outfitter
 
-The Pet Outfitter supports cosmetic identity.
+Implementation candidate: **0.4.10 v1 — verification pending**.
 
-Approved examples:
+The Pet Outfitter supports cosmetic identity without changing pet authority or competitive/economic power.
 
-- collars;
-- hats;
-- trails;
-- auras;
-- nameplate styles;
-- pet-size cosmetics where technically safe;
-- idle-animation variations.
+The initial free session styles are:
 
-Cosmetics should not obscure creature / element / rarity readability.
+- **Standard:** the original creature, element and rarity presentation;
+- **Ranger:** a low-profile elemental collar with a gold ranger tag;
+- **Starlight:** four subtle elemental body sparks.
+
+Players must be alive, free of another activity, physically at the Outfitter and styling an exact available pet they own. Reserved/traded/escrowed pets and foreign pets cannot be mutated through the Outfitter.
+
+The style is stored in the existing pet `variant` field, appears in Collection previews, ranch/companion rendering and read-only visitor inspection, and naturally survives the existing trade/duel transfer paths.
+
+v1 intentionally does **not** use size cosmetics, large hats, trails, crown-like shapes or rarity-colored replacement effects. Creature silhouette, elemental flair, rarity gem and Godly halo remain readable and authoritative.
+
+These styles cost no Coins or Robux and do not alter income, movement, rarity, creature, element or duel power.
+
+Future cosmetic directions may include additional collars, hats, trails, auras, nameplate styles or idle-animation variations only when they preserve the same readability and no-power rules.
+
 ## Quest Board / Ranger Station
 
 This location provides rotating objectives that reinforce existing systems.
